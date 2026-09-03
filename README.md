@@ -1,4 +1,4 @@
-# ProjetoLojaDeFone
+# SoundX Quality
 
 # 🎧 Sistema de Controle de Qualidade de Fones de Ouvido
 
