@@ -1,17 +1,49 @@
-# SoundX Quality
-
-# 🎧 Sistema de Controle de Qualidade de Fones de Ouvido
+# 🎧 SoundGuard Quality - Sistema de Controle de Qualidade de Fones de Ouvido
 
 ## 📌 Visão Geral do Projeto
-O **Sistema de Controle de Qualidade de Fones de Ouvido** tem como objetivo gerenciar, avaliar e rastrear a qualidade de fones de ouvido em um ambiente de controle de qualidade e manutenção. 
+O **SoundGuard Quality** é um sistema desenvolvido para gerenciar, avaliar e rastrear o controle de qualidade e manutenção de fones de ouvido.
 
-Atualmente, o projeto encontra-se em sua etapa inicial de estruturação, contando com a modelagem do banco de dados relacional em MySQL. Este banco de dados servirá como alicerce para o futuro desenvolvimento do sistema web.
+Atualmente, o projeto encontra-se em sua etapa inicial de estruturação, contando com a modelagem do banco de dados relacional em MySQL (`controle_qualidade_fones`). Este banco de dados servirá como alicerce para o futuro desenvolvimento da aplicação web.
+
+---
+
+## 👤 Personas do Sistema
+
+### 1. Inspetor de Qualidade (Usuário Operacional)
+* **Perfil:** Colaborador encarregado de testar fisicamente e funcionalmente os fones de ouvido no dia a dia.
+* **Objetivo:** Executar roteiros de testes de forma ágil e registrar o estado real dos produtos.
+* **Principais ações:**
+  * Cadastrar novos fones de ouvido e lotes de inspeção no sistema.
+  * Executar checklists de testes padronizados (áudio, microfone, conexões e bateria).
+  * Registrar não conformidades encontradas e vincular defeitos específicos aos fones.
+  * Anexar fotos de evidência das falhas identificadas durante a inspeção.
+  * Pesquisar e visualizar o histórico de inspeções realizadas.
+* **Mapeamento:** RF01, RF04, RF07, RF08, RF09, RF10, RF11, RF12, RF15 | Tabelas: `funcionario`, `fone`, `inspecao`, `resultado_teste`, `defeito_encontrado`.
+
+### 2. Técnico de Manutenção (Usuário Especialista)
+* **Perfil:** Profissional especializado responsável pelo conserto e revisão dos aparelhos reprovados no controle de qualidade.
+* **Objetivo:** Consultar o diagnóstico das inspeções para realizar o reparo apropriado e atualizar o histórico do fone.
+* **Principais ações:**
+  * Consultar falhas e apontamentos registrados pelos inspetores.
+  * Registrar serviços de manutenção prestados em cada dispositivo.
+  * Atualizar o status do fone no sistema após o reparo.
+* **Mapeamento:** RF11, RF12, RF15 | Tabelas: `tecnico`, `manutencao`, `fone`.
+
+### 3. Gerente / Gestor de Qualidade (Usuário Administrativo)
+* **Perfil:** Responsável por supervisionar a operação, definir padrões de qualidade e gerenciar o acesso da equipe.
+* **Objetivo:** Acompanhar métricas globais de aprovação/reprovação e manter o sistema configurado corretamente.
+* **Principais ações:**
+  * Cadastrar inspetores e novos critérios ou testes de inspeção.
+  * Gerenciar usuários, perfis e permissões de acesso ao sistema.
+  * Acompanhar o dashboard com indicadores de desempenho e taxas de defeito.
+  * Emitir relatórios analíticos de qualidade.
+* **Mapeamento:** RF05, RF06, RF13, RF14, RF15, RF16 | Tabelas: `gerente`, `teste`, `defeito`, `funcionario`.
 
 ---
 
 ## 🗄️ Estrutura e Funcionalidades do Banco de Dados (`controle_qualidade_fones`)
 
-A base de dados é composta por tabelas interligadas que cobrem todo o fluxo de avaliação, teste, apontamento de defeitos e manutenção dos dispositivos:
+A base de dados do **SoundGuard Quality** é composta por tabelas interligadas que cobrem todo o fluxo de avaliação, teste, apontamento de defeitos e manutenção dos dispositivos:
 
 1. **`funcionario`**: Armazena o cadastro dos colaboradores responsáveis pela execução das inspeções e operações do sistema, contendo dados de identificação e credenciais de acesso.
 2. **`fone`**: Registra as especificações individuais de cada fone de ouvido (número de série, modelo, marca, tipo de conexão, data de fabricação e status atual no fluxo de inspeção).
@@ -61,9 +93,17 @@ A base de dados é composta por tabelas interligadas que cobrem todo o fluxo de 
 ---
 
 ## 📌 Status Atual do Projeto
-O projeto está em sua etapa inicial, composta por:
-- Modelagem do banco de dados relacional (DDL).
+O projeto **SoundGuard Quality** está em sua etapa inicial, composta por:
+- Definido nome oficial do projeto (**SoundGuard Quality**).
+- Mapeamento das Personas e Perfis de Acesso.
+- Modelagem do banco de dados relacional em MySQL (DDL).
 - Povoamento inicial de dados para testes (DML).
 - Mapeamento completo dos Requisitos Funcionais e Não Funcionais.
 
 *Futuramente serão desenvolvidos o backend (com regras de negócio e APIs) e a interface do usuário (frontend web).*
+"""
+
+with open('/mnt/data/README.md', 'w', encoding='utf-8') as f:
+    f.write(readme_content)
+
+print("README.md atualizado com sucesso!")
