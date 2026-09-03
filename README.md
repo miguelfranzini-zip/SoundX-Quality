@@ -100,10 +100,3 @@ O projeto **SoundGuard Quality** está em sua etapa inicial, composta por:
 - Povoamento inicial de dados para testes (DML).
 - Mapeamento completo dos Requisitos Funcionais e Não Funcionais.
 
-*Futuramente serão desenvolvidos o backend (com regras de negócio e APIs) e a interface do usuário (frontend web).*
-"""
-
-with open('/mnt/data/README.md', 'w', encoding='utf-8') as f:
-    f.write(readme_content)
-
-print("README.md atualizado com sucesso!")
