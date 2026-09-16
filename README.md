@@ -1,6 +1,6 @@
 # SoundX Quality — Sistema de Controle de Qualidade de Fones de Ouvido
 
-> Repositório: *[informe a URL do repositório no GitHub]*
+> Repositório: *[https://github.com/miguelfranzini-zip/SoundX-Quality]*
 
 ## 📌 Escopo do Projeto
 
