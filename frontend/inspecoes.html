@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspeções — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Inspeções de Qualidade</h1>
+              <p>Histórico de inspeções realizadas na produção.</p>
+            </div>
+            <button class="btn btn--primario" id="btn-nova-inspecao">Nova Inspeção</button>
+          </div>
+
+          <div class="tabela-wrapper">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Fone</th>
+                  <th>Inspetor</th>
+                  <th>Resultado</th>
+                  <th>Observação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="corpo-tabela"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/pages/inspecoes.js"></script>
+</body>
+</html>

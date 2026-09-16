@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novo fone Bluetooth — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Cadastrar Fone Bluetooth</h1>
+              <p>Registre um novo fone Bluetooth Bluetooth de ouvido no sistema.</p>
+            </div>
+            <button class="btn btn--ghost" id="btn-voltar">Voltar para Fones</button>
+          </div>
+
+          <div class="card">
+            <div class="card__title">
+              <h2>Dados do dispositivo</h2>
+            </div>
+
+            <form class="form" id="form-fone" novalidate>
+              <div class="form__grid">
+                <div class="form__grupo">
+                  <label class="form__label" for="numero_serie">Número de série *</label>
+                  <input class="form__controle" type="text" id="numero_serie" name="numero_serie" placeholder="Ex.: SX-2026-0001" required>
+                </div>
+
+                <div class="form__grupo">
+                  <label class="form__label" for="modelo">Modelo *</label>
+                  <input class="form__controle" type="text" id="modelo" name="modelo" placeholder="Ex.: SoundX Pro" required>
+                </div>
+
+                <div class="form__grupo">
+                  <label class="form__label" for="marca">Marca</label>
+                  <input class="form__controle" type="text" id="marca" name="marca" placeholder="SoundX">
+                </div>
+
+                <div class="form__grupo">
+                  <label class="form__label" for="tipo_conexao">Tipo de conexão</label>
+<select class="form__controle" id="tipo_conexao" name="tipo_conexao">
+                     <option value="Bluetooth">Bluetooth</option>
+                   </select>
+                </div>
+
+                <div class="form__grupo">
+                  <label class="form__label" for="data_fabricacao">Data de fabricação</label>
+                  <input class="form__controle" type="date" id="data_fabricacao" name="data_fabricacao">
+                </div>
+
+                <div class="form__grupo">
+                  <label class="form__label" for="status">Status inicial</label>
+                  <select class="form__controle" id="status" name="status">
+                    <option value="Aguardando inspeção">Aguardando inspeção</option>
+                    <option value="Em inspeção">Em inspeção</option>
+                    <option value="Aprovado">Aprovado</option>
+                    <option value="Reprovado / Manutenção">Reprovado / Manutenção</option>
+                    <option value="Em manutenção">Em manutenção</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="alerta-form" class="alerta alerta--erro hidden" role="alert"></div>
+
+              <div class="toolbar">
+                <button type="submit" class="btn btn--primario" id="btn-salvar">Salvar Fone</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/pages/fone-cadastro.js"></script>
+</body>
+</html>

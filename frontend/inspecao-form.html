@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Inspeção — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Registrar Inspeção</h1>
+              <p>Registre o resultado da inspeção de um fone.</p>
+            </div>
+            <button class="btn btn--ghost" id="btn-voltar">Voltar para Inspeções</button>
+          </div>
+
+          <div class="card">
+            <div class="card__title">
+              <h2>Resultado da inspeção</h2>
+            </div>
+
+            <form class="form" id="form-inspecao" novalidate>
+              <div class="form__grid">
+                <div class="form__grupo">
+                  <label class="form__label" for="id_fone">Fone *</label>
+                  <select class="form__controle" id="id_fone" name="id_fone" required>
+                    <option value="">Carregando fones...</option>
+                  </select>
+                </div>
+
+                <div class="form__grupo">
+                  <label class="form__label" for="resultado_final">Resultado final *</label>
+                  <select class="form__controle" id="resultado_final" name="resultado_final" required>
+                    <option value="Aprovado">Aprovado</option>
+                    <option value="Reprovado / Manutenção">Reprovado / Manutenção</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form__grupo">
+                <label class="form__label" for="observacao">Observação</label>
+                <textarea
+                  class="form__controle"
+                  id="observacao"
+                  name="observacao"
+                  placeholder="Descreva evidências, falhas ou pontos observados..."
+                ></textarea>
+              </div>
+
+              <div id="alerta-form" class="alerta alerta--erro hidden" role="alert"></div>
+
+              <div class="toolbar">
+                <button type="submit" class="btn btn--primario" id="btn-salvar">Registrar Inspeção</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/pages/inspecao-form.js"></script>
+</body>
+</html>

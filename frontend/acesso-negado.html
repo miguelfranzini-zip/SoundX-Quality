@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso Negado — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <main class="acesso">
+    <div class="acesso__codigo">403</div>
+    <h1>Acesso negado</h1>
+    <p>
+      Seu perfil não possui permissão para acessar este recurso.
+      Caso precise deste acesso, solicite ao administrador do sistema.
+    </p>
+    <div class="toolbar">
+      <button class="btn btn--primario" onclick="history.back()">Voltar</button>
+      <button class="btn btn--secundario" id="btn-login">Fazer login</button>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('btn-login').addEventListener('click', () => {
+      localStorage.removeItem('sxq_session');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

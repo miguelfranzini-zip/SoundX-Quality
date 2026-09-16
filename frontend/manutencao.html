@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manutenção — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Fila de Manutenção</h1>
+              <p>Fones aguardando reparo na linha de produção.</p>
+            </div>
+          </div>
+
+          <div class="tabela-wrapper">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th>Fone</th>
+                  <th>Modelo</th>
+                  <th>Defeito</th>
+                  <th>Entrada</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="corpo-tabela"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-atualizar">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <div class="modal__header">
+        <h3 id="modal-titulo">Atualizar manutenção</h3>
+        <button class="modal__fechar" id="btn-fechar-modal" aria-label="Fechar">×</button>
+      </div>
+
+      <form class="form" id="form-manutencao" novalidate>
+        <div class="form__grupo">
+          <label class="form__label" for="manutencao-status">Status *</label>
+          <select class="form__controle" id="manutencao-status" required>
+            <option value="Em Manutencao">Em manutenção</option>
+            <option value="Concluido">Concluído</option>
+          </select>
+        </div>
+
+        <div class="form__grupo">
+          <label class="form__label" for="acao_corretiva">Ação corretiva</label>
+          <textarea
+            class="form__controle"
+            id="acao_corretiva"
+            placeholder="Descreva o reparo realizado..."
+          ></textarea>
+        </div>
+
+        <div id="alerta-manutencao" class="alerta alerta--erro hidden" role="alert"></div>
+
+        <div class="toolbar">
+          <button type="submit" class="btn btn--primario" id="btn-salvar-manutencao">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/pages/manutencao.js"></script>
+</body>
+</html>
