@@ -1,5 +1,6 @@
 const db = require('../config/database');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 exports.login = async (req, res) => {
   const { email, senha } = req.body;
@@ -13,7 +14,15 @@ exports.login = async (req, res) => {
 
     const funcionario = rows[0];
 
-    if (senha !== funcionario.senha) {
+    // Suporta hash bcrypt com fallback para texto plano (dados de seed/legado)
+    let senhaCorreta = false;
+    if (funcionario.senha && (funcionario.senha.startsWith('$2a$') || funcionario.senha.startsWith('$2b$') || funcionario.senha.startsWith('$2y$'))) {
+      senhaCorreta = bcrypt.compareSync(senha, funcionario.senha);
+    } else {
+      senhaCorreta = senha === funcionario.senha;
+    }
+
+    if (!senhaCorreta) {
       return res.status(401).json({ mensagem: 'Senha incorreta.' });
     }
 

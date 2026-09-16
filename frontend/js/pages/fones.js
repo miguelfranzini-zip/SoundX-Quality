@@ -68,7 +68,13 @@ corpoTabela.addEventListener('click', (e) => {
   window.location.href = `fone-historico.html?id=${btn.dataset.verHistorico}`;
 });
 
-buscaInput.addEventListener('input', () => filtrar(buscaInput.value));
+let timeoutBusca = null;
+buscaInput.addEventListener('input', () => {
+  clearTimeout(timeoutBusca);
+  timeoutBusca = setTimeout(() => {
+    filtrar(buscaInput.value);
+  }, 250);
+});
 
 btnNovoFone.addEventListener('click', () => {
   window.location.href = 'fone-cadastro.html';

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
+  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
 </head>
 <body>
   <div class="app-shell">
@@ -24,8 +25,8 @@
         <div class="content__inner">
           <div class="page-header">
             <div>
-              <h1>Cadastrar Fone Bluetooth</h1>
-              <p>Registre um novo fone Bluetooth Bluetooth de ouvido no sistema.</p>
+              <h1>Cadastrar Fone de Ouvido</h1>
+              <p>Registre um novo fone de ouvido no sistema.</p>
             </div>
             <button class="btn btn--ghost" id="btn-voltar">Voltar para Fones</button>
           </div>
@@ -54,9 +55,12 @@
 
                 <div class="form__grupo">
                   <label class="form__label" for="tipo_conexao">Tipo de conexão</label>
-<select class="form__controle" id="tipo_conexao" name="tipo_conexao">
-                     <option value="Bluetooth">Bluetooth</option>
-                   </select>
+                  <select class="form__controle" id="tipo_conexao" name="tipo_conexao">
+                    <option value="Bluetooth">Bluetooth</option>
+                    <option value="USB-C">USB-C</option>
+                    <option value="Cabo">Cabo</option>
+                    <option value="Wireless 2.4GHz">Wireless 2.4GHz</option>
+                  </select>
                 </div>
 
                 <div class="form__grupo">

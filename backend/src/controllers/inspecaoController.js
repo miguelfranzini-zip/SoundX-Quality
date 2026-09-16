@@ -73,6 +73,7 @@ exports.listarInspecoes = async (req, res) => {
     const query = `
       SELECT 
         i.id_inspecao,
+        i.id_fone,
         i.data_inspecao,
         i.resultado_final,
         i.observacao,
@@ -81,7 +82,7 @@ exports.listarInspecoes = async (req, res) => {
         func.nome AS inspetor
       FROM inspecao i
       JOIN fone f ON i.id_fone = f.id_fone
-      JOIN funcionario func ON i.id_funcionario = func.id_funcionario
+      LEFT JOIN funcionario func ON i.id_funcionario = func.id_funcionario
       ORDER BY i.data_inspecao DESC
     `;
     const [inspecoes] = await db.query(query);

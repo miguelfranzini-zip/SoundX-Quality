@@ -83,5 +83,5 @@ VALUES
     ('FN001', 'SoundX Pro', 'SoundX', 'Bluetooth', '2026-08-20', 'Reprovado / Manutenção'),
     ('SX-2026-001', 'SoundX 10', 'SoundX', 'Bluetooth', '2026-09-01', 'Reprovado / Manutenção'),
     ('SX-2026-002', 'SoundX Studio Pro', 'SoundX', 'USB-C', '2026-09-05', 'Aguardando inspeção'),
-    ('SX-2026-003', 'SoundX Bass Max', 'SoundX', 'P2', '2026-09-10', 'Aprovado')
+    ('SX-2026-003', 'SoundX Bass Max', 'SoundX', 'USB-C', '2026-09-10', 'Aprovado')
 ON DUPLICATE KEY UPDATE modelo = VALUES(modelo);

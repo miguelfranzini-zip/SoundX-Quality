@@ -10,6 +10,7 @@
   --marrom:          #602100;
   --marrom-profundo: #290E00;
   --terracota:       #BB7A59;
+  --marrom-quente:   #8D4622;
 
   /* Cores funcionais */
   --bg-base:           var(--creme);
@@ -31,12 +32,12 @@
   --info:     #602100;
   --info-bg:  #FBEDDB;
 
-  /* Gradientes oficiais */
-  --grad-base:    linear-gradient(135deg, #FEEFCE, #FFCA7B);
-  --grad-energia: linear-gradient(135deg, #FC9C2E, #FCC045);
-  --grad-suave:   linear-gradient(135deg, #FFC481, #FFDA8D);
-  --grad-dark:    linear-gradient(135deg, #5F2407, #BA7C5D);
-  --grad-forte:   linear-gradient(135deg, #FF9800, #602100);
+  /* Gradientes oficiais SoundX (conforme guia de identidade visual) */
+  --grad-base:    linear-gradient(135deg, #FEEFCE 0%, #FFCA7B 100%);
+  --grad-energia: linear-gradient(135deg, #FC9C2E 0%, #FCC045 100%);
+  --grad-suave:   linear-gradient(135deg, #FFC481 0%, #FDF0D0 50%, #FFDA8D 100%);
+  --grad-dark:    linear-gradient(135deg, #5F2407 0%, #BA7C5D 100%);
+  --grad-forte:   linear-gradient(135deg, #FF9800 0%, #8D4622 100%);
 
   /* Tipografia */
   --font-display: 'Garet', 'Segoe UI', sans-serif;
@@ -50,12 +51,12 @@
   --shadow-glow-orange: 0 4px 20px rgba(255, 152, 0, 0.30);
   --shadow-glow-gold: 0 4px 18px rgba(255, 189, 43, 0.35);
 
-  /* Raios */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  /* Raios de cantos arredondados (ajustados para estética técnica equilibrada) */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 999px;
 
   /* Espaçamento */
