@@ -51,6 +51,38 @@
     </div>
   </div>
 
+  <!-- Modal Editar Inspeção -->
+  <div class="modal-overlay" id="modal-editar-inspecao">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-inspecao-titulo">
+      <div class="modal__header">
+        <h3 id="modal-inspecao-titulo">Editar Inspeção</h3>
+        <button class="modal__fechar" id="btn-fechar-modal-inspecao" aria-label="Fechar">×</button>
+      </div>
+      <form id="form-editar-inspecao" class="form">
+        <div class="form__grupo">
+          <label class="form__label">Fone</label>
+          <input class="form__controle" type="text" id="edit-inspecao-fone" disabled style="opacity: 0.75;">
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-inspecao-resultado">Resultado Final</label>
+          <select class="form__controle" id="edit-inspecao-resultado" required>
+            <option value="Aprovado">Aprovado</option>
+            <option value="Reprovado / Manutenção">Reprovado / Manutenção</option>
+          </select>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-inspecao-obs">Observações / Parecer</label>
+          <textarea class="form__controle" id="edit-inspecao-obs" rows="3" placeholder="Detalhes ou motivos da reprovação..."></textarea>
+        </div>
+        <div id="alerta-modal-inspecao" class="alerta alerta--erro hidden" role="alert"></div>
+        <div style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4);">
+          <button type="button" class="btn btn--secundario" id="btn-cancelar-modal-inspecao">Cancelar</button>
+          <button type="submit" class="btn btn--primario" id="btn-salvar-modal-inspecao">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="toast-container" class="toast-container"></div>
 
   <script type="module" src="js/pages/inspecoes.js"></script>

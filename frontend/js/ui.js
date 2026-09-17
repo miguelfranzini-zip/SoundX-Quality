@@ -235,3 +235,49 @@ export function emptyState(container, titulo, descricao) {
     </div>
   `;
 }
+
+/* ---------- Diálogo de Confirmação ---------- */
+
+export function confirmarAcao({
+  titulo = 'Confirmar exclusão',
+  mensagem = 'Tem certeza que deseja excluir este registro?',
+  textoBotao = 'Excluir',
+  perigoso = true
+} = {}) {
+  return new Promise((resolve) => {
+    let overlay = document.getElementById('modal-confirmacao-global');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'modal-confirmacao-global';
+      overlay.className = 'modal-overlay';
+      document.body.appendChild(overlay);
+    }
+
+    overlay.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal__header">
+          <h3>${escapeHtml(titulo)}</h3>
+          <button class="modal__fechar" id="btn-fechar-confirmacao" aria-label="Fechar">×</button>
+        </div>
+        <p style="margin-bottom: var(--space-5); color: var(--text-secundario); font-size: 0.95rem; line-height: 1.5;">
+          ${escapeHtml(mensagem)}
+        </p>
+        <div style="display: flex; justify-content: flex-end; gap: var(--space-3);">
+          <button type="button" class="btn btn--secundario" id="btn-cancelar-confirmacao">Cancelar</button>
+          <button type="button" class="btn ${perigoso ? 'btn--danger' : 'btn--primario'}" id="btn-executar-confirmacao">${escapeHtml(textoBotao)}</button>
+        </div>
+      </div>
+    `;
+
+    overlay.classList.add('modal-overlay--aberta');
+
+    const fechar = (resultado) => {
+      overlay.classList.remove('modal-overlay--aberta');
+      resolve(resultado);
+    };
+
+    overlay.querySelector('#btn-fechar-confirmacao').onclick = () => fechar(false);
+    overlay.querySelector('#btn-cancelar-confirmacao').onclick = () => fechar(false);
+    overlay.querySelector('#btn-executar-confirmacao').onclick = () => fechar(true);
+  });
+}

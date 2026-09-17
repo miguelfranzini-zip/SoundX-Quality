@@ -305,6 +305,150 @@ const localProvider = {
       return [rows, []];
     }
 
+    // 19. Checagem de fone por número de série duplicado
+    if (cleanLower.includes('from fone where numero_serie = ? and id_fone != ?') || cleanLower.includes('from fone where numero_serie = ? and id_fone <> ?')) {
+      const [numSerie, id] = params;
+      const rows = data.fone.filter(f => f.numero_serie === numSerie && f.id_fone !== Number(id));
+      return [rows, []];
+    }
+
+    // 20. UPDATE fone completo
+    if (cleanLower.startsWith('update fone set numero_serie = ?')) {
+      const [numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status, id_fone] = params;
+      const fone = data.fone.find(f => f.id_fone === Number(id_fone));
+      if (fone) {
+        fone.numero_serie = numero_serie;
+        fone.modelo = modelo;
+        fone.marca = marca;
+        fone.tipo_conexao = tipo_conexao;
+        fone.data_fabricacao = data_fabricacao;
+        fone.status = status;
+        saveLocalData(data);
+      }
+      return [{ affectedRows: fone ? 1 : 0 }, []];
+    }
+
+    // 21. DELETE FROM fone WHERE id_fone = ? (com CASCADE em memória)
+    if (cleanLower.startsWith('delete from fone where id_fone = ?')) {
+      const id = Number(params[0]);
+      const idx = data.fone.findIndex(f => f.id_fone === id);
+      if (idx !== -1) {
+        data.fone.splice(idx, 1);
+        const inspecoesRemovidas = data.inspecao.filter(i => i.id_fone === id).map(i => i.id_inspecao);
+        data.inspecao = data.inspecao.filter(i => i.id_fone !== id);
+        data.teste = data.teste.filter(t => !inspecoesRemovidas.includes(t.id_inspecao));
+        data.manutencao = data.manutencao.filter(m => m.id_fone !== id);
+        saveLocalData(data);
+        return [{ affectedRows: 1 }, []];
+      }
+      return [{ affectedRows: 0 }, []];
+    }
+
+    // 22. SELECT * FROM inspecao WHERE id_inspecao = ?
+    if (cleanLower.startsWith('select * from inspecao where id_inspecao = ?') || cleanLower.startsWith('select id_inspecao, id_fone from inspecao where id_inspecao = ?')) {
+      const id = Number(params[0]);
+      const rows = data.inspecao.filter(i => i.id_inspecao === id);
+      return [rows, []];
+    }
+
+    // 23. UPDATE inspecao SET resultado_final = ?, observacao = ? WHERE id_inspecao = ?
+    if (cleanLower.startsWith('update inspecao set resultado_final = ?')) {
+      const [resultado_final, observacao, id] = params;
+      const inspecao = data.inspecao.find(i => i.id_inspecao === Number(id));
+      if (inspecao) {
+        inspecao.resultado_final = resultado_final;
+        inspecao.observacao = observacao;
+        saveLocalData(data);
+      }
+      return [{ affectedRows: inspecao ? 1 : 0 }, []];
+    }
+
+    // 24. DELETE FROM inspecao WHERE id_inspecao = ?
+    if (cleanLower.startsWith('delete from inspecao where id_inspecao = ?')) {
+      const id = Number(params[0]);
+      const idx = data.inspecao.findIndex(i => i.id_inspecao === id);
+      if (idx !== -1) {
+        data.inspecao.splice(idx, 1);
+        data.teste = data.teste.filter(t => t.id_inspecao !== id);
+        saveLocalData(data);
+        return [{ affectedRows: 1 }, []];
+      }
+      return [{ affectedRows: 0 }, []];
+    }
+
+    // 25. SELECT * FROM teste WHERE id_teste = ?
+    if (cleanLower.startsWith('select * from teste where id_teste = ?') || cleanLower.startsWith('select id_teste from teste where id_teste = ?')) {
+      const id = Number(params[0]);
+      const rows = data.teste.filter(t => t.id_teste === id);
+      return [rows, []];
+    }
+
+    // 26. UPDATE teste
+    if (cleanLower.startsWith('update teste set tipo_teste = ?')) {
+      const [tipo_teste, parametro_medido, resultado, observacao, id] = params;
+      const t = data.teste.find(item => item.id_teste === Number(id));
+      if (t) {
+        t.tipo_teste = tipo_teste;
+        t.parametro_medido = parametro_medido;
+        t.resultado = resultado;
+        t.observacao = observacao;
+        saveLocalData(data);
+      }
+      return [{ affectedRows: t ? 1 : 0 }, []];
+    }
+
+    // 27. DELETE FROM teste WHERE id_teste = ?
+    if (cleanLower.startsWith('delete from teste where id_teste = ?')) {
+      const id = Number(params[0]);
+      const idx = data.teste.findIndex(t => t.id_teste === id);
+      if (idx !== -1) {
+        data.teste.splice(idx, 1);
+        saveLocalData(data);
+        return [{ affectedRows: 1 }, []];
+      }
+      return [{ affectedRows: 0 }, []];
+    }
+
+    // 28. SELECT * FROM manutencao WHERE id_manutencao = ?
+    if (cleanLower.startsWith('select * from manutencao where id_manutencao = ?') || cleanLower.startsWith('select id_manutencao from manutencao where id_manutencao = ?')) {
+      const id = Number(params[0]);
+      const rows = data.manutencao.filter(m => m.id_manutencao === id);
+      return [rows, []];
+    }
+
+    // 29. UPDATE manutencao com descricao_defeito
+    if (cleanLower.startsWith('update manutencao set descricao_defeito = ?')) {
+      const [descricao_defeito, acao_corretiva, status, data_conclusao, id] = params;
+      const item = data.manutencao.find(m => m.id_manutencao === Number(id));
+      if (item) {
+        item.descricao_defeito = descricao_defeito;
+        item.acao_corretiva = acao_corretiva;
+        item.status = status;
+        item.data_conclusao = data_conclusao ? new Date().toISOString().replace('T', ' ').slice(0, 19) : null;
+        saveLocalData(data);
+      }
+      return [{ affectedRows: item ? 1 : 0 }, []];
+    }
+
+    // 30. DELETE FROM manutencao WHERE id_manutencao = ?
+    if (cleanLower.startsWith('delete from manutencao where id_manutencao = ?')) {
+      const id = Number(params[0]);
+      const idx = data.manutencao.findIndex(m => m.id_manutencao === id);
+      if (idx !== -1) {
+        data.manutencao.splice(idx, 1);
+        saveLocalData(data);
+        return [{ affectedRows: 1 }, []];
+      }
+      return [{ affectedRows: 0 }, []];
+    }
+
+    // 31. SELECT ordens abertas de manutencao por fone
+    if (cleanLower.includes('from manutencao where id_fone = ? and status !=') || cleanLower.includes('from manutencao where id_fone = ? and status <>')) {
+      const id = Number(params[0]);
+      const rows = data.manutencao.filter(m => m.id_fone === id && m.status !== 'Concluido');
+      return [rows, []];
+    }
+
     console.warn('Query SQL não mapeada no provedor local:', sql, params);
     return [[], []];
   }

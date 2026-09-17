@@ -63,6 +63,57 @@
     </div>
   </div>
 
+  <!-- Modal Editar Fone -->
+  <div class="modal-overlay" id="modal-editar-fone">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-fone-titulo">
+      <div class="modal__header">
+        <h3 id="modal-fone-titulo">Editar Fone</h3>
+        <button class="modal__fechar" id="btn-fechar-modal-fone" aria-label="Fechar">×</button>
+      </div>
+      <form id="form-editar-fone" class="form">
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-serie">Número de Série</label>
+          <input class="form__controle" type="text" id="edit-fone-serie" required>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-modelo">Modelo</label>
+          <input class="form__controle" type="text" id="edit-fone-modelo" required>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-marca">Marca</label>
+          <input class="form__controle" type="text" id="edit-fone-marca" required>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-conexao">Tipo de Conexão</label>
+          <select class="form__controle" id="edit-fone-conexao" required>
+            <option value="Bluetooth">Bluetooth</option>
+            <option value="USB-C">USB-C</option>
+            <option value="P3/P2">P3/P2 (3.5mm)</option>
+            <option value="Wireless 2.4GHz">Wireless 2.4GHz</option>
+          </select>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-status">Status</label>
+          <select class="form__controle" id="edit-fone-status" required>
+            <option value="Aguardando inspeção">Aguardando inspeção</option>
+            <option value="Em Análise">Em Análise</option>
+            <option value="Aprovado">Aprovado</option>
+            <option value="Reprovado / Manutenção">Reprovado / Manutenção</option>
+          </select>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-data">Data de Fabricação</label>
+          <input class="form__controle" type="date" id="edit-fone-data">
+        </div>
+        <div id="alerta-modal-fone" class="alerta alerta--erro hidden" role="alert"></div>
+        <div style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4);">
+          <button type="button" class="btn btn--secundario" id="btn-cancelar-modal-fone">Cancelar</button>
+          <button type="submit" class="btn btn--primario" id="btn-salvar-modal-fone">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="toast-container" class="toast-container"></div>
 
   <script type="module" src="js/pages/fones.js"></script>

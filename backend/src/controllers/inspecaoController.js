@@ -92,3 +92,69 @@ exports.listarInspecoes = async (req, res) => {
     res.status(500).json({ mensagem: 'Erro ao buscar inspeções.' });
   }
 };
+
+// 4. Atualizar uma inspeção
+exports.atualizarInspecao = async (req, res) => {
+  const { id } = req.params;
+  const { resultado_final, observacao } = req.body;
+
+  if (!resultado_final) {
+    return res.status(400).json({ mensagem: 'O resultado final é obrigatório.' });
+  }
+
+  try {
+    const [existentes] = await db.query('SELECT * FROM inspecao WHERE id_inspecao = ?', [id]);
+    if (!existentes || existentes.length === 0) {
+      return res.status(404).json({ mensagem: 'Inspeção não encontrada.' });
+    }
+
+    const inspecao = existentes[0];
+    await db.query(
+      'UPDATE inspecao SET resultado_final = ?, observacao = ? WHERE id_inspecao = ?',
+      [resultado_final, observacao !== undefined ? observacao : inspecao.observacao, id]
+    );
+
+    // Se o resultado final foi alterado, atualizar status do fone
+    if (resultado_final !== inspecao.resultado_final) {
+      const novoStatusFone = resultado_final === 'Aprovado' ? 'Aprovado' : 'Reprovado / Manutenção';
+      await db.query('UPDATE fone SET status = ? WHERE id_fone = ?', [novoStatusFone, inspecao.id_fone]);
+
+      // Se virou reprovado, abre ordem na fila de manutenção se não existir
+      if (resultado_final !== 'Aprovado') {
+        const [ordensAbertas] = await db.query(
+          "SELECT id_manutencao FROM manutencao WHERE id_fone = ? AND status != 'Concluido'",
+          [inspecao.id_fone]
+        );
+        if (!ordensAbertas || ordensAbertas.length === 0) {
+          await db.query(
+            "INSERT INTO manutencao (id_fone, descricao_defeito, status, data_entrada) VALUES (?, ?, 'Pendente', NOW())",
+            [inspecao.id_fone, observacao || 'Reprovado na inspeção de qualidade']
+          );
+        }
+      }
+    }
+
+    res.json({ mensagem: 'Inspeção atualizada com sucesso!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensagem: 'Erro ao atualizar inspeção.' });
+  }
+};
+
+// 5. Excluir uma inspeção
+exports.excluirInspecao = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [existentes] = await db.query('SELECT id_inspecao, id_fone FROM inspecao WHERE id_inspecao = ?', [id]);
+    if (!existentes || existentes.length === 0) {
+      return res.status(404).json({ mensagem: 'Inspeção não encontrada.' });
+    }
+
+    await db.query('DELETE FROM inspecao WHERE id_inspecao = ?', [id]);
+    res.json({ mensagem: 'Inspeção e seus testes associados excluídos com sucesso!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensagem: 'Erro ao excluir inspeção.' });
+  }
+};

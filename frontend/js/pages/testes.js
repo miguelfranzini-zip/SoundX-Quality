@@ -1,6 +1,6 @@
 import { api } from '../api.js';
-import { guardPagina } from '../auth.js';
-import { initShell, escapeHtml, emptyState, toast } from '../ui.js';
+import { guardPagina, isAdminGerente } from '../auth.js';
+import { initShell, escapeHtml, emptyState, toast, confirmarAcao } from '../ui.js';
 
 const usuario = guardPagina(['Admin', 'Gerente', 'Inspetor']);
 if (usuario) {
@@ -12,6 +12,16 @@ const btnSalvar = document.getElementById('btn-salvar');
 const alerta = document.getElementById('alerta-form');
 const selectInspecao = document.getElementById('id_inspecao');
 const listaTestesEl = document.getElementById('lista-testes');
+
+// Elementos do Modal de Edição de Teste
+const modalEditarTeste = document.getElementById('modal-editar-teste');
+const formEditarTeste = document.getElementById('form-editar-teste');
+const btnFecharModalTeste = document.getElementById('btn-fechar-modal-teste');
+const btnCancelarModalTeste = document.getElementById('btn-cancelar-modal-teste');
+const alertaModalTeste = document.getElementById('alerta-modal-teste');
+
+let testesCache = [];
+let testeEmEdicao = null;
 
 const inspecaoPreselecionada = new URLSearchParams(window.location.search).get('inspecao');
 
@@ -65,6 +75,7 @@ async function carregarInspecoes() {
 async function listarTestes(idInspecao) {
   if (!idInspecao) {
     listaTestesEl.innerHTML = '';
+    testesCache = [];
     return;
   }
 
@@ -74,9 +85,9 @@ async function listarTestes(idInspecao) {
   `;
 
   try {
-    const testes = await api(`/testes/inspecao/${idInspecao}`);
+    testesCache = await api(`/testes/inspecao/${idInspecao}`);
 
-    if (!testes.length) {
+    if (!testesCache.length) {
       emptyState(listaTestesEl, 'Nenhum teste registrado', 'Use o formulário acima para associar testes a esta inspeção.');
       return;
     }
@@ -90,10 +101,11 @@ async function listarTestes(idInspecao) {
               <th>Parâmetro</th>
               <th>Resultado</th>
               <th>Observação</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
-            ${testes
+            ${testesCache
               .map(
                 (t) => `
                 <tr>
@@ -105,6 +117,20 @@ async function listarTestes(idInspecao) {
                     </span>
                   </td>
                   <td>${escapeHtml(t.observacao || '—')}</td>
+                  <td>
+                    <div style="display: flex; gap: var(--space-2);">
+                      <button
+                        class="btn btn--secundario btn--pequeno"
+                        data-editar-teste="${t.id_teste}"
+                        title="Editar teste"
+                      >Editar</button>
+                      <button
+                        class="btn btn--danger btn--pequeno"
+                        data-excluir-teste="${t.id_teste}"
+                        title="Excluir teste"
+                      >Excluir</button>
+                    </div>
+                  </td>
                 </tr>
               `
               )
@@ -118,6 +144,108 @@ async function listarTestes(idInspecao) {
     toast(erro.message, 'erro');
   }
 }
+
+// Modal Helpers para Edição de Teste
+function abrirModalEdicao(teste) {
+  testeEmEdicao = teste;
+  if (alertaModalTeste) {
+    alertaModalTeste.classList.add('hidden');
+    alertaModalTeste.textContent = '';
+  }
+
+  document.getElementById('edit-tipo_teste').value = teste.tipo_teste || 'Áudio L/R';
+  document.getElementById('edit-parametro_medido').value = teste.parametro_medido || '';
+  document.getElementById('edit-resultado').value = teste.resultado || 'Passou';
+  document.getElementById('edit-observacao').value = teste.observacao || '';
+
+  modalEditarTeste.classList.add('modal-overlay--aberta');
+}
+
+function fecharModalEdicao() {
+  modalEditarTeste.classList.remove('modal-overlay--aberta');
+  testeEmEdicao = null;
+}
+
+if (btnFecharModalTeste) btnFecharModalTeste.addEventListener('click', fecharModalEdicao);
+if (btnCancelarModalTeste) btnCancelarModalTeste.addEventListener('click', fecharModalEdicao);
+if (modalEditarTeste) {
+  modalEditarTeste.addEventListener('click', (e) => {
+    if (e.target === modalEditarTeste) fecharModalEdicao();
+  });
+}
+
+if (formEditarTeste) {
+  formEditarTeste.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (alertaModalTeste) alertaModalTeste.classList.add('hidden');
+
+    if (!testeEmEdicao) return;
+
+    const btnSalvarEdicao = document.getElementById('btn-salvar-modal-teste');
+    btnSalvarEdicao.disabled = true;
+    btnSalvarEdicao.textContent = 'Salvando...';
+
+    const dados = {
+      tipo_teste: document.getElementById('edit-tipo_teste').value,
+      parametro_medido: document.getElementById('edit-parametro_medido').value.trim(),
+      resultado: document.getElementById('edit-resultado').value,
+      observacao: document.getElementById('edit-observacao').value.trim(),
+    };
+
+    try {
+      await api(`/testes/${testeEmEdicao.id_teste}`, {
+        method: 'PUT',
+        body: dados,
+      });
+
+      toast('Teste atualizado com sucesso!', 'sucesso');
+      fecharModalEdicao();
+      await listarTestes(selectInspecao.value);
+    } catch (erro) {
+      if (alertaModalTeste) {
+        alertaModalTeste.textContent = erro.message;
+        alertaModalTeste.classList.remove('hidden');
+      } else {
+        toast(erro.message, 'erro');
+      }
+    } finally {
+      btnSalvarEdicao.disabled = false;
+      btnSalvarEdicao.textContent = 'Salvar alterações';
+    }
+  });
+}
+
+// Ações na tabela de testes (Editar e Excluir)
+listaTestesEl.addEventListener('click', async (e) => {
+  const btnEditar = e.target.closest('[data-editar-teste]');
+  if (btnEditar) {
+    const teste = testesCache.find((t) => String(t.id_teste) === btnEditar.dataset.editarTeste);
+    if (teste) abrirModalEdicao(teste);
+    return;
+  }
+
+  const btnExcluir = e.target.closest('[data-excluir-teste]');
+  if (btnExcluir) {
+    const id = btnExcluir.dataset.excluirTeste;
+
+    const confirmou = await confirmarAcao({
+      titulo: 'Excluir Teste',
+      mensagem: `Deseja realmente excluir este teste #${id}?`,
+      textoBotao: 'Excluir definitivamente',
+      perigoso: true,
+    });
+
+    if (confirmou) {
+      try {
+        await api(`/testes/${id}`, { method: 'DELETE' });
+        toast('Teste excluído com sucesso!', 'sucesso');
+        await listarTestes(selectInspecao.value);
+      } catch (erro) {
+        toast(erro.message, 'erro');
+      }
+    }
+  }
+});
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();

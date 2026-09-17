@@ -50,34 +50,99 @@ Símbolo moderno e minimalista em alto contraste, composto por contorno geométr
 
 As versões do logotipo estão disponíveis nos arquivos `2.png`, `3.png`, `4.png`, `5.png` e `6.png` na raiz do projeto, para uso em fundos claros, escuros e aplicações variadas.
 
-## 👤 Personas do Sistema
-- **Inspetor de Qualidade (Operacional):** Testa física e funcionalmente os fones, cadastra fones/lotes, executa checklists, registra não conformidades e anexa evidências. Foco: agilidade na execução e registro.
-- **Técnico de Manutenção (Especialista):** Consulta os diagnósticos das inspeções, executa o reparo apropriado e atualiza o status/histórico do dispositivo.
-- **Gerente / Gestor de Qualidade (Administrativo):** Cadastra inspetores e critérios/testes, gerencia usuários e permissões, acompanha dashboards e emite relatórios analíticos.
+## 👤 Personas do Sistema e Matriz de Permissões (RBAC)
 
-## 🗄️ Banco de Dados (`controle_qualidade_fones`)
-10 tabelas interligadas: `funcionario`, `fone`, `inspecao`, `teste`, `resultado_teste`, `defeito`, `defeito_encontrado`, `tecnico`, `manutencao`, `gerente`.
+O sistema possui controle de acesso refinado baseado nos perfis operacionais e administrativos da fábrica:
+
+### 1. Inspetor de Qualidade (Operacional)
+- **Perfil de Acesso:** `Inspetor`
+- **Usuário Demonstração:** `lucas@email.com` | Senha: `1234`
+- **Responsabilidades:**
+  - Cadastrar e editar dados dos fones de ouvido (número de série, modelo, marca, conexão, lote).
+  - Executar checklists de testes técnicos padronizados (áudio, microfone, conexões e bateria).
+  - Registrar e retificar laudos de inspeção, aprovando ou reprovando itens.
+  - Editar e excluir testes específicos lançados durante a verificação.
+  - Consultar o histórico e a rastreabilidade completa de cada fone.
+
+### 2. Técnico de Manutenção (Especialista)
+- **Perfil de Acesso:** `Técnico`
+- **Usuário Demonstração:** `tecnico@soundx.com` | Senha: `1234`
+- **Responsabilidades:**
+  - Monitorar a **Fila de Manutenção** em tempo real com os fones reprovados pela qualidade.
+  - Abrir ordens de serviço de manutenção manuais quando necessário.
+  - Atualizar o status da ordem (`Pendente`, `Em Manutencao`, `Concluido`), detalhar o diagnóstico da falha e descrever as ações corretivas efetuadas.
+  - Ao concluir a manutenção, o dispositivo é automaticamente liberado para status *"Em Análise"* para reteste pela equipe de qualidade.
+
+### 3. Administrador / Gestor de Qualidade (Gestão & Governança)
+- **Perfil de Acesso:** `Admin` / `Gerente`
+- **Usuário Demonstração:** `admin@soundx.com` | Senha: `1234`
+- **Responsabilidades:**
+  - Acesso total e irrestrito a todos os módulos, telas e registros.
+  - Acompanhamento do **Dashboard de Indicadores** com KPIs em tempo real (total de fones produzidos, volume de inspeções, fones aprovados vs. reprovados e taxa percentual de conformidade).
+  - **Exclusividade em ações destrutivas (DELETE):** Apenas administradores podem excluir fones, laudos de inspeção e ordens de manutenção, salvaguardando a integridade histórica e a rastreabilidade da produção (RNF08).
+  - Poder de edição sobre qualquer registro operacional.
+
+---
+
+## 🗄️ Matriz de Operações (CRUD & RBAC)
+
+| Módulo / Entidade | Criar (POST) | Listar / Visualizar (GET) | Editar (PUT) | Excluir (DELETE) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Fones de Ouvido** | Inspetor, Admin | Todos autenticados | Inspetor, Admin | **Admin** *(preserva histórico em cascata)* |
+| **Inspeções** | Inspetor, Admin | Todos autenticados | Inspetor, Admin | **Admin** *(recalcula taxas e dashboards)* |
+| **Testes Técnicos** | Inspetor, Admin | Todos autenticados | Inspetor, Admin | Inspetor, Admin *(remoção de testes duplicados)* |
+| **Manutenção** | Todos autenticados | Técnico, Admin | Técnico, Admin | **Admin** *(impede descarte indevido de O.S.)* |
+
+---
 
 ## 📋 Requisitos do Sistema
 **Funcionais (RF01–RF16):** cadastrar/editar/excluir produtos, lotes, inspetores e critérios; criar checklists; registrar inspeções, não conformidades e fotos; pesquisar registros; visualizar histórico; gerar relatórios; visualizar dashboard; autenticação; gerenciar permissões.
 
 **Não Funcionais (RNF01–RNF10):** resposta ≤ 3s; disponibilidade ≥ 99%; senhas criptografadas; suporte a Chrome/Edge/Firefox; acesso restrito a autenticados; responsividade (desktop/tablet/smartphone); MySQL; rastreabilidade inalterável; uploads em JPG/JPEG/PNG; versionamento via Git/GitHub.
 
+---
+
 ## 📌 Status Atual do Projeto
-- [x] Identidade Visual e Design System
-- [x] Personas e Perfis de Acesso
-- [x] Requisitos Funcionais e Não Funcionais
-- [x] Modelagem do Banco de Dados (DDL) e dados iniciais (DML)
-- [x] Back-end (API REST com Node.js/Express, autenticação JWT e RBAC)
-- [ ] Front-end (interface web com suporte ao Design System)
+- [x] **Identidade Visual e Design System** (Cores oficiais, tipografia Garet/Muli, gradientes e logos)
+- [x] **Personas e Perfis de Acesso** (Inspetor, Técnico e Administrador com RBAC integrado)
+- [x] **Modelagem do Banco de Dados** (DDL e DML inicial com integridade referencial e cascade)
+- [x] **Back-end Completo** (API REST em Node.js/Express, autenticação JWT, validação de IDs e fallback local)
+- [x] **Front-end Completo** (Interface Web moderna, barra lateral retrátil com persistência, cards de KPI, tabelas responsivas, busca em tempo real e modais)
+- [x] **CRUD Completo e Integrado** (Operações de Criação, Leitura, Edição e Exclusão com diálogos de confirmação em todas as 4 entidades)
+
+---
+
+## 🚀 Como Executar o Sistema Localmente
+
+### 1. Iniciar o Banco de Dados (MySQL via XAMPP)
+1. Abra o **XAMPP Control Panel** e dê **Start** em **Apache** e **MySQL**.
+2. Acesse o phpMyAdmin em [http://localhost/phpmyadmin](http://localhost/phpmyadmin).
+3. Na aba **SQL**, execute o script localizado em [`backend/database.sql`](file:///c:/Users/Aluno/Desktop/SoundX-Quality-main/backend/database.sql).
+
+### 2. Iniciar o Servidor (Back-end + Front-end integrado)
+1. Abra o terminal na pasta do backend:
+   ```bash
+   cd backend
+   npm install
+   npm start
+   ```
+2. O servidor iniciará na porta **3001**.
+
+### 3. Acessar a Aplicação
+Abra seu navegador e acesse:
+👉 **[http://localhost:3001](http://localhost:3001)**
+
+> *Dica de teste:* Na tela de login, utilize os botões de **Acesso Rápido** para alternar instantaneamente entre os perfis de **Inspetor**, **Técnico** e **Admin**.
+
+---
 
 ## 🛠️ Tecnologias
-- HTML5
-- CSS3
-- JavaScript
-- Node.js + Express (API REST)
-- MySQL (SGBD Relacional)
-- Git & GitHub (Controle de Versão)
+- **Front-end:** HTML5 semântico, CSS3 Moderno (Tokens, Variáveis, Flexbox, Grid), JavaScript Vanilla (ES Modules)
+- **Back-end:** Node.js, Express 5, JWT (`jsonwebtoken`), Criptografia (`bcryptjs`), MySQL2
+- **Banco de Dados:** MySQL 8.0+ / MariaDB (via XAMPP) com fallback local em JSON
+- **Controle de Versão:** Git & GitHub
+
+---
 
 ## 👥 Equipe
 - Miguel Porto Franzini

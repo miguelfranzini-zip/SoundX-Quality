@@ -106,6 +106,47 @@
     </div>
   </div>
 
+  <!-- Modal Editar Teste -->
+  <div class="modal-overlay" id="modal-editar-teste">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-teste-titulo">
+      <div class="modal__header">
+        <h3 id="modal-teste-titulo">Editar Teste</h3>
+        <button class="modal__fechar" id="btn-fechar-modal-teste" aria-label="Fechar">×</button>
+      </div>
+      <form id="form-editar-teste" class="form">
+        <div class="form__grupo">
+          <label class="form__label" for="edit-tipo_teste">Tipo de teste *</label>
+          <select class="form__controle" id="edit-tipo_teste" required>
+            <option value="Áudio L/R">Áudio L/R</option>
+            <option value="Bluetooth">Bluetooth</option>
+            <option value="Microfone">Microfone</option>
+            <option value="Bateria">Bateria</option>
+          </select>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-parametro_medido">Parâmetro medido</label>
+          <input class="form__controle" type="text" id="edit-parametro_medido">
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-resultado">Resultado *</label>
+          <select class="form__controle" id="edit-resultado" required>
+            <option value="Passou">Passou</option>
+            <option value="Não passou">Não passou</option>
+          </select>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-observacao">Observação</label>
+          <input class="form__controle" type="text" id="edit-observacao">
+        </div>
+        <div id="alerta-modal-teste" class="alerta alerta--erro hidden" role="alert"></div>
+        <div style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4);">
+          <button type="button" class="btn btn--secundario" id="btn-cancelar-modal-teste">Cancelar</button>
+          <button type="submit" class="btn btn--primario" id="btn-salvar-modal-teste">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="toast-container" class="toast-container"></div>
 
   <script type="module" src="js/pages/testes.js"></script>

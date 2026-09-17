@@ -28,6 +28,7 @@
               <h1>Fila de Manutenção</h1>
               <p>Fones aguardando reparo na linha de produção.</p>
             </div>
+            <button class="btn btn--primario" id="btn-nova-manutencao">Nova Ordem</button>
           </div>
 
           <div class="tabela-wrapper">
@@ -59,8 +60,20 @@
 
       <form class="form" id="form-manutencao" novalidate>
         <div class="form__grupo">
+          <label class="form__label" for="manutencao-defeito">Descrição do Defeito *</label>
+          <textarea
+            class="form__controle"
+            id="manutencao-defeito"
+            rows="2"
+            placeholder="Descrição do problema relatado..."
+            required
+          ></textarea>
+        </div>
+
+        <div class="form__grupo">
           <label class="form__label" for="manutencao-status">Status *</label>
           <select class="form__controle" id="manutencao-status" required>
+            <option value="Pendente">Pendente</option>
             <option value="Em Manutencao">Em manutenção</option>
             <option value="Concluido">Concluído</option>
           </select>
@@ -79,6 +92,43 @@
 
         <div class="toolbar">
           <button type="submit" class="btn btn--primario" id="btn-salvar-manutencao">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Nova Manutenção -->
+  <div class="modal-overlay" id="modal-nova-manutencao">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-nova-titulo">
+      <div class="modal__header">
+        <h3 id="modal-nova-titulo">Abrir Ordem de Manutenção</h3>
+        <button class="modal__fechar" id="btn-fechar-modal-nova" aria-label="Fechar">×</button>
+      </div>
+
+      <form class="form" id="form-nova-manutencao" novalidate>
+        <div class="form__grupo">
+          <label class="form__label" for="novo-id_fone">Fone de Ouvido *</label>
+          <select class="form__controle" id="novo-id_fone" required>
+            <option value="">Selecione um fone...</option>
+          </select>
+        </div>
+
+        <div class="form__grupo">
+          <label class="form__label" for="novo-descricao_defeito">Descrição do Defeito *</label>
+          <textarea
+            class="form__controle"
+            id="novo-descricao_defeito"
+            rows="3"
+            placeholder="Descreva a falha ou motivo da manutenção..."
+            required
+          ></textarea>
+        </div>
+
+        <div id="alerta-nova-manutencao" class="alerta alerta--erro hidden" role="alert"></div>
+
+        <div style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4);">
+          <button type="button" class="btn btn--secundario" id="btn-cancelar-modal-nova">Cancelar</button>
+          <button type="submit" class="btn btn--primario" id="btn-salvar-nova-manutencao">Abrir Ordem</button>
         </div>
       </form>
     </div>
