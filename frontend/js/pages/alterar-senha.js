@@ -1,10 +1,12 @@
 import { API_URL, SESSION_KEY } from '../config.js';
-import { showToast, loadSidebar, loadTopbar, protectPage, getUsuario } from '../ui.js';
+import { toast, initShell } from '../ui.js?v=2';
+import { guardPagina } from '../auth.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  protectPage();
-  await loadSidebar();
-  await loadTopbar();
+  const usuario = guardPagina();
+  if (!usuario) return;
+
+  initShell('alterar-senha', usuario);
 
   const form = document.getElementById('form-alterar-senha');
   const alertaForm = document.getElementById('alerta-form');
@@ -57,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         alertaSucesso.textContent = data.message || 'Senha alterada com sucesso!';
         alertaSucesso.classList.remove('hidden');
         form.reset();
-        showToast('Senha alterada com sucesso!', 'success');
+        toast('Senha alterada com sucesso!', 'sucesso');
       } else {
         alertaForm.textContent = data.message || 'Erro ao alterar senha.';
         alertaForm.classList.remove('hidden');

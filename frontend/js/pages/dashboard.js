@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { guardPagina } from '../auth.js';
-import { initShell, showSkeleton, toast } from '../ui.js';
+import { initShell, showSkeleton, toast } from '../ui.js?v=2';
 
 const usuario = guardPagina(['Admin', 'Gerente', 'Inspetor']);
 if (usuario) {
