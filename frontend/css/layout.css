@@ -377,26 +377,63 @@ html.sxq-collapsed .sidebar .btn--sair span {
   gap: var(--space-3);
 }
 
+.topbar__user-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 2px 6px 2px 2px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.topbar__user-btn:hover,
+.topbar__user-btn[aria-expanded="true"] {
+  background: rgba(255, 152, 0, 0.12);
+  border-color: rgba(255, 152, 0, 0.25);
+}
+
 .topbar__avatar {
   width: 38px;
   height: 38px;
   border-radius: var(--radius-full);
-  background: var(--grad-forte);
-  color: #fff;
+  background: var(--grad-energia);
+  color: var(--marrom-profundo);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.92rem;
-  box-shadow: 0 3px 10px rgba(255, 152, 0, 0.35);
-  border: 2px solid var(--off-white);
+  font-weight: 800;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(252, 156, 46, 0.35);
+  border: 2px solid var(--dourado);
+  flex-shrink: 0;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.topbar__avatar:hover {
-  transform: scale(1.06);
-  box-shadow: 0 4px 14px rgba(255, 152, 0, 0.45);
+.topbar__user-btn:hover .topbar__avatar {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(252, 156, 46, 0.45);
+}
+
+.topbar__avatar-arrow {
+  width: 14px;
+  height: 14px;
+  stroke: var(--marrom);
+  stroke-width: 2.2;
+  transition: transform var(--transition-fast), stroke var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.topbar__user-btn:hover .topbar__avatar-arrow,
+.topbar__user-btn[aria-expanded="true"] .topbar__avatar-arrow {
+  stroke: var(--laranja);
+}
+
+.topbar__user-btn[aria-expanded="true"] .topbar__avatar-arrow {
+  transform: rotate(180deg);
 }
 
 .icone-menu {
