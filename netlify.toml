@@ -8,11 +8,10 @@
   NODE_VERSION = "18"
 
 [[redirects]]
-  # SPA fallback - all routes go to index.html
+  # SPA fallback - rotas não encontradas vão para index.html
   from = "/*"
   to = "/index.html"
   status = 200
-  conditions = {Role = ["admin", "editor"]}
 
 # Headers de segurança
 [[headers]]

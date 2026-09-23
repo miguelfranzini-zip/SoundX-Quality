@@ -8,7 +8,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const apiUrl = process.env.VITE_API_URL || '';
+let apiUrl = (process.env.VITE_API_URL || '').trim();
+if (apiUrl) {
+  apiUrl = apiUrl.replace(/\/+$/, '');
+  if (!apiUrl.endsWith('/api')) {
+    apiUrl += '/api';
+  }
+}
 const outputPath = path.join(__dirname, 'js', 'env-config.js');
 
 const content = `// Auto-gerado no build do Netlify
