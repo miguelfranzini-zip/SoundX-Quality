@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testes Técnicos — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Testes Técnicos</h1>
+              <p>Registre e consulte testes associados a uma inspeção.</p>
+            </div>
+            <button class="btn btn--ghost" id="btn-voltar">Voltar</button>
+          </div>
+
+          <div class="card">
+            <div class="card__title">
+              <h2>Registrar teste</h2>
+            </div>
+
+            <form class="form" id="form-teste" novalidate>
+              <div class="form__grid">
+                <div class="form__grupo">
+                  <label class="form__label" for="id_inspecao">Inspeção *</label>
+                  <select class="form__controle" id="id_inspecao" name="id_inspecao" required>
+                    <option value="">Carregando inspeções...</option>
+                  </select>
+                </div>
+
+                <div class="form__grupo">
+                  <label class="form__label" for="tipo_teste">Tipo de teste *</label>
+                  <select class="form__controle" id="tipo_teste" name="tipo_teste" required>
+                    <option value="">Selecione...</option>
+                    <option value="Áudio L/R">Áudio L/R</option>
+                    <option value="Bluetooth">Bluetooth</option>
+                    <option value="Microfone">Microfone</option>
+                    <option value="Bateria">Bateria</option>
+                  </select>
+                </div>
+
+                <div class="form__grupo">
+                  <label class="form__label" for="parametro_medido">Parâmetro medido</label>
+                  <input
+                    class="form__controle"
+                    type="text"
+                    id="parametro_medido"
+                    name="parametro_medido"
+                    placeholder="Ex.: Frequência de resposta"
+                  >
+                </div>
+
+                <div class="form__grupo">
+                  <label class="form__label" for="resultado">Resultado *</label>
+                  <select class="form__controle" id="resultado" name="resultado" required>
+                    <option value="Passou">Passou</option>
+                    <option value="Não passou">Não passou</option>
+                  </select>
+                </div>
+
+                <div class="form__grupo" style="grid-column: 1 / -1;">
+                  <label class="form__label" for="observacao">Observação</label>
+                  <input
+                    class="form__controle"
+                    type="text"
+                    id="observacao"
+                    name="observacao"
+                    placeholder="Detalhes opcionais sobre o teste"
+                  >
+                </div>
+              </div>
+
+              <div id="alerta-form" class="alerta alerta--erro hidden" role="alert"></div>
+
+              <div class="toolbar">
+                <button type="submit" class="btn btn--primario" id="btn-salvar">Registrar Teste</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card mt-5">
+            <div class="card__title">
+              <h2>Testes da inspeção</h2>
+            </div>
+            <div id="lista-testes"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Editar Teste -->
+  <div class="modal-overlay" id="modal-editar-teste">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-teste-titulo">
+      <div class="modal__header">
+        <h3 id="modal-teste-titulo">Editar Teste</h3>
+        <button class="modal__fechar" id="btn-fechar-modal-teste" aria-label="Fechar">×</button>
+      </div>
+      <form id="form-editar-teste" class="form">
+        <div class="form__grupo">
+          <label class="form__label" for="edit-tipo_teste">Tipo de teste *</label>
+          <select class="form__controle" id="edit-tipo_teste" required>
+            <option value="Áudio L/R">Áudio L/R</option>
+            <option value="Bluetooth">Bluetooth</option>
+            <option value="Microfone">Microfone</option>
+            <option value="Bateria">Bateria</option>
+          </select>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-parametro_medido">Parâmetro medido</label>
+          <input class="form__controle" type="text" id="edit-parametro_medido">
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-resultado">Resultado *</label>
+          <select class="form__controle" id="edit-resultado" required>
+            <option value="Passou">Passou</option>
+            <option value="Não passou">Não passou</option>
+          </select>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-observacao">Observação</label>
+          <input class="form__controle" type="text" id="edit-observacao">
+        </div>
+        <div id="alerta-modal-teste" class="alerta alerta--erro hidden" role="alert"></div>
+        <div style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4);">
+          <button type="button" class="btn btn--secundario" id="btn-cancelar-modal-teste">Cancelar</button>
+          <button type="submit" class="btn btn--primario" id="btn-salvar-modal-teste">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/pages/testes.js"></script>
+</body>
+</html>

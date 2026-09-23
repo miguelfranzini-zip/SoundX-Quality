@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico do Fone — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Histórico do Fone</h1>
+              <p>Rastreabilidade completa do dispositivo.</p>
+            </div>
+            <button class="btn btn--ghost" id="btn-voltar">Voltar para Fones</button>
+          </div>
+
+          <div id="cabeçalho-fone"></div>
+
+          <div class="card mt-5">
+            <div class="tabs" id="tabs">
+              <button class="tab tab--ativa" data-aba="inspecoes">Inspeções</button>
+              <button class="tab" data-aba="testes">Testes</button>
+              <button class="tab" data-aba="manutencoes">Manutenções</button>
+            </div>
+            <div id="conteudo-abas"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/pages/fone-historico.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspeções — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Inspeções de Qualidade</h1>
+              <p>Histórico de inspeções realizadas na produção.</p>
+            </div>
+            <button class="btn btn--primario" id="btn-nova-inspecao">Nova Inspeção</button>
+          </div>
+
+          <div class="tabela-wrapper">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Fone</th>
+                  <th>Inspetor</th>
+                  <th>Resultado</th>
+                  <th>Observação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="corpo-tabela"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Editar Inspeção -->
+  <div class="modal-overlay" id="modal-editar-inspecao">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-inspecao-titulo">
+      <div class="modal__header">
+        <h3 id="modal-inspecao-titulo">Editar Inspeção</h3>
+        <button class="modal__fechar" id="btn-fechar-modal-inspecao" aria-label="Fechar">×</button>
+      </div>
+      <form id="form-editar-inspecao" class="form">
+        <div class="form__grupo">
+          <label class="form__label">Fone</label>
+          <input class="form__controle" type="text" id="edit-inspecao-fone" disabled style="opacity: 0.75;">
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-inspecao-resultado">Resultado Final</label>
+          <select class="form__controle" id="edit-inspecao-resultado" required>
+            <option value="Aprovado">Aprovado</option>
+            <option value="Reprovado / Manutenção">Reprovado / Manutenção</option>
+          </select>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-inspecao-obs">Observações / Parecer</label>
+          <textarea class="form__controle" id="edit-inspecao-obs" rows="3" placeholder="Detalhes ou motivos da reprovação..."></textarea>
+        </div>
+        <div id="alerta-modal-inspecao" class="alerta alerta--erro hidden" role="alert"></div>
+        <div style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4);">
+          <button type="button" class="btn btn--secundario" id="btn-cancelar-modal-inspecao">Cancelar</button>
+          <button type="submit" class="btn btn--primario" id="btn-salvar-modal-inspecao">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/pages/inspecoes.js"></script>
+</body>
+</html>

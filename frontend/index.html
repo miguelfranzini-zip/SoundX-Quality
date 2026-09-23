@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    #aviso-arquivo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: var(--erro);
+      color: #fff;
+      font-weight: 700;
+      text-align: center;
+      padding: var(--space-3) var(--space-4);
+      font-size: 0.9rem;
+    }
+    #aviso-arquivo a { color: #fff; text-decoration: underline; }
+  </style>
+  <script>
+    if (window.location.protocol === 'file:') {
+      var aviso = document.createElement('div');
+      aviso.id = 'aviso-arquivo';
+      aviso.innerHTML =
+        'Arquivo aberto diretamente (file://). Para o sistema funcionar, inicie o servidor e acesse ' +
+        '<a href="http://localhost:3001">http://localhost:3001</a>';
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.insertBefore(aviso, document.body.firstChild);
+      });
+    }
+  </script>
+</head>
+<body>
+  <main class="login">
+    <section class="login__lado-visual">
+      <img src="assets/logo/4.png" alt="Logo SoundX Quality">
+      <h1>SoundX Quality</h1>
+      <div class="soundwaves" aria-hidden="true">
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+      </div>
+      <p>
+        Controle de qualidade, testes técnicos e gestão de manutenção
+        para a linha de produção de fones de ouvido.
+      </p>
+    </section>
+
+    <section class="login__lado-form">
+      <div class="login__card">
+        <img class="login__logo-mobile" src="assets/logo/5.png" alt="Logo SoundX Quality">
+        <div class="login__titulo">
+          <h2>Acessar o sistema</h2>
+          <p>Informe suas credenciais para continuar.</p>
+        </div>
+
+        <form class="form" id="form-login" novalidate>
+          <div class="form__grupo">
+            <label class="form__label" for="email">E-mail</label>
+            <input
+              class="form__controle"
+              type="email"
+              id="email"
+              name="email"
+              placeholder="nome@empresa.com"
+              autocomplete="email"
+              required
+            >
+          </div>
+
+          <div class="form__grupo">
+            <label class="form__label" for="senha">Senha</label>
+            <input
+              class="form__controle"
+              type="password"
+              id="senha"
+              name="senha"
+              placeholder="Sua senha"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+
+          <div id="alerta-login" class="alerta alerta--erro hidden" role="alert"></div>
+
+          <button type="submit" class="btn btn--primario btn--bloco" id="btn-entrar">
+            Entrar
+          </button>
+
+          <div class="demo-logins">
+            <span class="demo-logins__titulo">Acesso rápido para demonstração</span>
+            <div class="demo-logins__botoes">
+              <button type="button" class="demo-btn" data-email="lucas@email.com" data-senha="1234">Inspetor</button>
+              <button type="button" class="demo-btn" data-email="tecnico@soundx.com" data-senha="1234">Técnico</button>
+              <button type="button" class="demo-btn" data-email="admin@soundx.com" data-senha="1234">Admin</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/pages/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,514 @@
+/* =========================================================
+   SOUNDX QUALITY — LAYOUT (SHELL FLUTUANTE / SIDEBAR RETRÁTIL / TOPBAR)
+   ========================================================= */
+
+:root {
+  --sidebar-w: 260px;
+  --sidebar-w-collapsed: 78px;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+}
+
+.app-shell--transicao {
+  transition: grid-template-columns var(--transition-smooth);
+}
+
+.app-shell--recolhida,
+html.sxq-collapsed .app-shell {
+  grid-template-columns: var(--sidebar-w-collapsed) 1fr;
+}
+
+/* ---------- Barra Lateral Flutuante (Floating Glass Sidebar) ---------- */
+.sidebar {
+  position: fixed;
+  top: var(--space-3);
+  bottom: var(--space-3);
+  left: var(--space-3);
+  width: var(--sidebar-w);
+  height: calc(100vh - var(--space-3) * 2);
+  background: rgba(255, 248, 232, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(96, 33, 0, 0.12);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  box-shadow: 0 10px 30px -5px rgba(41, 14, 0, 0.08), 0 2px 8px rgba(41, 14, 0, 0.04);
+  overflow: hidden;
+}
+
+.sidebar--transicao {
+  transition: width var(--transition-smooth), transform var(--transition-smooth), box-shadow var(--transition);
+}
+
+/* ---------- Topo / Brand da Sidebar com Botão Minimizar ---------- */
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 1.1rem var(--space-4);
+  border-bottom: 1px solid rgba(96, 33, 0, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.65), transparent);
+  flex-shrink: 0;
+}
+
+.sidebar__brand-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.sidebar__brand-content img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  transition: transform var(--transition);
+  flex-shrink: 0;
+}
+
+.sidebar__brand-content:hover img {
+  transform: scale(1.06);
+}
+
+.sidebar__brand-content span {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.08rem;
+  letter-spacing: -0.3px;
+  color: var(--marrom);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity var(--transition-fast);
+}
+
+/* Botão de Toggle Minimizar */
+.sidebar__toggle {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: rgba(96, 33, 0, 0.05);
+  border: 1px solid rgba(96, 33, 0, 0.1);
+  color: var(--marrom);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.sidebar__toggle:hover {
+  background: var(--laranja);
+  color: #FFFFFF;
+  border-color: var(--laranja);
+  transform: scale(1.05);
+}
+
+.sidebar__toggle svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  transition: transform var(--transition-smooth);
+}
+
+/* ---------- Navegação da Sidebar ---------- */
+.sidebar__nav {
+  flex: 1;
+  padding: var(--space-3) var(--space-3);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.68rem var(--space-3);
+  margin-bottom: var(--space-1);
+  border-radius: var(--radius-md);
+  color: var(--text-secundario);
+  font-family: var(--font-text);
+  font-weight: 600;
+  font-size: 0.94rem;
+  transition: background var(--transition), color var(--transition), transform var(--transition-fast), box-shadow var(--transition);
+  white-space: nowrap;
+}
+
+.sidebar__item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 4px;
+  height: 20px;
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  background: var(--laranja);
+  transition: transform var(--transition-fast);
+}
+
+.sidebar__item svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.sidebar__item:hover {
+  background: rgba(255, 189, 43, 0.16);
+  color: var(--marrom-profundo);
+  transform: translateX(2px);
+}
+
+.sidebar__item:hover::before {
+  transform: translateY(-50%) scaleY(0.85);
+}
+
+.sidebar__item:hover svg {
+  transform: scale(1.08);
+}
+
+.sidebar__item--active {
+  background: var(--grad-energia);
+  color: var(--marrom-profundo);
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(252, 156, 46, 0.32);
+}
+
+.sidebar__item--active::before {
+  transform: translateY(-50%) scaleY(1);
+  background: var(--marrom-profundo);
+}
+
+.sidebar__item--active svg {
+  stroke-width: 2.3;
+}
+
+/* ---------- Rodapé da Sidebar ---------- */
+.sidebar__footer {
+  margin: var(--space-3);
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(96, 33, 0, 0.12);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  background: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(41, 14, 0, 0.04);
+  flex-shrink: 0;
+  transition: padding var(--transition-smooth), margin var(--transition-smooth);
+}
+
+.sidebar__footer-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.sidebar__footer-user {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--marrom-profundo);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.sidebar__footer-role {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--marrom);
+  margin-top: 2px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn--sair {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.38rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--marrom);
+  background: rgba(96, 33, 0, 0.05);
+  border: 1px solid rgba(96, 33, 0, 0.12);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn--sair svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--marrom);
+  stroke-width: 2.2;
+  flex-shrink: 0;
+}
+
+.btn--sair:hover {
+  background: #FDECEA;
+  border-color: rgba(198, 40, 40, 0.3);
+  color: var(--erro);
+}
+
+.btn--sair:hover svg {
+  stroke: var(--erro);
+}
+
+/* ---------- Estado Recolhido da Sidebar (Collapsed Mode) ---------- */
+.sidebar--recolhida,
+html.sxq-collapsed .sidebar {
+  width: var(--sidebar-w-collapsed);
+}
+
+.sidebar--recolhida .sidebar__brand,
+html.sxq-collapsed .sidebar .sidebar__brand {
+  padding: 0.8rem 0.4rem;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sidebar--recolhida .sidebar__brand-content span,
+html.sxq-collapsed .sidebar .sidebar__brand-content span {
+  display: none;
+}
+
+.sidebar--recolhida .sidebar__toggle svg,
+html.sxq-collapsed .sidebar .sidebar__toggle svg {
+  transform: rotate(180deg);
+}
+
+.sidebar--recolhida .sidebar__item,
+html.sxq-collapsed .sidebar .sidebar__item {
+  padding: 0.72rem 0;
+  justify-content: center;
+}
+
+.sidebar--recolhida .sidebar__item span,
+html.sxq-collapsed .sidebar .sidebar__item span {
+  display: none;
+}
+
+.sidebar--recolhida .sidebar__item::before,
+html.sxq-collapsed .sidebar .sidebar__item::before {
+  left: 2px;
+  height: 16px;
+}
+
+.sidebar--recolhida .sidebar__footer,
+html.sxq-collapsed .sidebar .sidebar__footer {
+  margin: var(--space-2);
+  padding: 0.5rem 0.3rem;
+  justify-content: center;
+}
+
+.sidebar--recolhida .sidebar__footer-info,
+html.sxq-collapsed .sidebar .sidebar__footer-info {
+  display: none;
+}
+
+.sidebar--recolhida .btn--sair,
+html.sxq-collapsed .sidebar .btn--sair {
+  padding: 0.45rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.sidebar--recolhida .btn--sair span,
+html.sxq-collapsed .sidebar .btn--sair span {
+  display: none;
+}
+
+/* ---------- Main Container ---------- */
+.app-main {
+  grid-column: 2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---------- Barra Superior Flutuante (Floating Topbar) ---------- */
+.topbar {
+  position: sticky;
+  top: var(--space-3);
+  z-index: 40;
+  height: 64px;
+  margin: var(--space-3) var(--space-5) 0 var(--space-4);
+  background: rgba(255, 248, 232, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(96, 33, 0, 0.12);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-5);
+  box-shadow: 0 8px 24px -4px rgba(41, 14, 0, 0.06), 0 2px 6px rgba(41, 14, 0, 0.03);
+}
+
+.topbar__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.22rem;
+  color: var(--marrom);
+  letter-spacing: -0.2px;
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.topbar__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background: var(--grad-forte);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  box-shadow: 0 3px 10px rgba(255, 152, 0, 0.35);
+  border: 2px solid var(--off-white);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.topbar__avatar:hover {
+  transform: scale(1.06);
+  box-shadow: 0 4px 14px rgba(255, 152, 0, 0.45);
+}
+
+.icone-menu {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--marrom);
+  padding: var(--space-1);
+}
+
+/* ---------- Conteúdo Principal ---------- */
+.content {
+  flex: 1;
+  padding: var(--space-4) var(--space-5) var(--space-6) var(--space-4);
+  background-color: transparent;
+}
+
+.content__inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  animation: pageEnter var(--transition-smooth) both;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.page-header p {
+  color: var(--text-suave);
+  margin-top: var(--space-1);
+}
+
+/* ---------- Overlay (mobile) ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(41, 14, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+  z-index: 45;
+}
+.overlay--mostrar { opacity: 1; pointer-events: auto; }
+
+/* ---------- Responsivo (Mobile & Tablets) ---------- */
+@media (max-width: 1023px) {
+  .app-shell,
+  .app-shell--recolhida {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    top: var(--space-2);
+    bottom: var(--space-2);
+    left: var(--space-2);
+    width: min(290px, calc(100vw - 20px)) !important;
+    transform: translateX(calc(-100% - 20px));
+    border-radius: var(--radius-lg);
+  }
+  .sidebar--aberta {
+    transform: translateX(0);
+  }
+  .sidebar__toggle {
+    display: none;
+  }
+  .sidebar--recolhida .sidebar__brand-content span,
+  html.sxq-collapsed .sidebar .sidebar__brand-content span,
+  .sidebar--recolhida .sidebar__item span,
+  html.sxq-collapsed .sidebar .sidebar__item span,
+  .sidebar--recolhida .sidebar__footer-info,
+  html.sxq-collapsed .sidebar .sidebar__footer-info,
+  .sidebar--recolhida .btn--sair span,
+  html.sxq-collapsed .sidebar .btn--sair span {
+    display: inline !important;
+  }
+  .sidebar--recolhida .sidebar__item,
+  html.sxq-collapsed .sidebar .sidebar__item {
+    justify-content: flex-start !important;
+    padding: 0.68rem var(--space-3) !important;
+  }
+  .sidebar--recolhida .sidebar__brand,
+  html.sxq-collapsed .sidebar .sidebar__brand {
+    flex-direction: row !important;
+    padding: 1.1rem var(--space-4) !important;
+  }
+  .app-main {
+    grid-column: 1;
+  }
+  .topbar {
+    margin: var(--space-2);
+    padding: 0 var(--space-3);
+    height: 58px;
+    border-radius: var(--radius-md);
+  }
+  .icone-menu {
+    display: inline-flex;
+    cursor: pointer;
+  }
+  .icone-menu svg {
+    width: 22px;
+    height: 22px;
+  }
+  .content {
+    padding: var(--space-3);
+  }
+}

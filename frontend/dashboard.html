@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Dashboard de Qualidade</h1>
+              <p>Indicadores gerais do controle de qualidade.</p>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="kpis"></div>
+
+          <div class="dashboard-grid-detalhes">
+            <!-- Painel de Conformidade e Distribuição -->
+            <div class="card" id="card-progresso">
+              <div class="card__title">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--laranja)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <h2>Índice Geral de Conformidade</h2>
+              </div>
+              <p class="muted">
+                Taxa calculada em tempo real sobre as inspeções executadas na linha de produção.
+              </p>
+
+              <div class="progresso-wrapper">
+                <div style="display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 6px;">
+                  <span>Taxa de Aprovação</span>
+                  <span id="taxa-texto" style="color: var(--marrom);">0%</span>
+                </div>
+                <div class="progresso-barra">
+                  <div class="progresso-valor" id="barra-progresso" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div style="margin-top: var(--space-5);">
+                <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; color: var(--marrom);">
+                  Proporção de Resultados
+                </div>
+                <div class="distribuicao-barra">
+                  <div class="distribuicao-barra__aprovados" id="barra-aprovados" style="width: 50%;"></div>
+                  <div class="distribuicao-barra__reprovados" id="barra-reprovados" style="width: 50%;"></div>
+                </div>
+                <div class="legendas-distribuicao">
+                  <div class="legenda-item">
+                    <span class="legenda-cor legenda-cor--verde"></span>
+                    <span>Aprovados: <strong id="lbl-aprovados">0</strong></span>
+                  </div>
+                  <div class="legenda-item">
+                    <span class="legenda-cor legenda-cor--vermelho"></span>
+                    <span>Reprovados: <strong id="lbl-reprovados">0</strong></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Painel de Ações Rápidas -->
+            <div class="card">
+              <div class="card__title">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--dourado)"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                <h2>Ações da Linha de Produção</h2>
+              </div>
+              <p class="muted">
+                Acesse diretamente as rotinas principais de inspeção, reparo técnico e controle.
+              </p>
+
+              <div class="acoes-rapidas-grid" id="grid-acoes-rapidas"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/pages/dashboard.js"></script>
+</body>
+</html>

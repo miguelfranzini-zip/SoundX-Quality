@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fones — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Fones de Ouvido</h1>
+              <p>Gerencie os fones cadastrados na linha de produção.</p>
+            </div>
+            <div class="toolbar">
+              <div class="busca">
+                <input
+                  class="form__controle"
+                  type="search"
+                  id="busca-fones"
+                  placeholder="Buscar por série ou modelo..."
+                  autocomplete="off"
+                >
+              </div>
+              <button class="btn btn--primario" id="btn-novo-fone">Novo fone</button>
+            </div>
+          </div>
+
+          <div class="tabela-wrapper">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th>Nº de Série</th>
+                  <th>Modelo</th>
+                  <th>Marca</th>
+                  <th>Conexão</th>
+                  <th>Status</th>
+                  <th>Fabricação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="corpo-tabela"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Editar Fone -->
+  <div class="modal-overlay" id="modal-editar-fone">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-fone-titulo">
+      <div class="modal__header">
+        <h3 id="modal-fone-titulo">Editar Fone</h3>
+        <button class="modal__fechar" id="btn-fechar-modal-fone" aria-label="Fechar">×</button>
+      </div>
+      <form id="form-editar-fone" class="form">
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-serie">Número de Série</label>
+          <input class="form__controle" type="text" id="edit-fone-serie" required>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-modelo">Modelo</label>
+          <input class="form__controle" type="text" id="edit-fone-modelo" required>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-marca">Marca</label>
+          <input class="form__controle" type="text" id="edit-fone-marca" required>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-conexao">Tipo de Conexão</label>
+          <select class="form__controle" id="edit-fone-conexao" required>
+            <option value="Bluetooth">Bluetooth</option>
+            <option value="USB-C">USB-C</option>
+            <option value="P3/P2">P3/P2 (3.5mm)</option>
+            <option value="Wireless 2.4GHz">Wireless 2.4GHz</option>
+          </select>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-status">Status</label>
+          <select class="form__controle" id="edit-fone-status" required>
+            <option value="Aguardando inspeção">Aguardando inspeção</option>
+            <option value="Em Análise">Em Análise</option>
+            <option value="Aprovado">Aprovado</option>
+            <option value="Reprovado / Manutenção">Reprovado / Manutenção</option>
+          </select>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-data">Data de Fabricação</label>
+          <input class="form__controle" type="date" id="edit-fone-data">
+        </div>
+        <div id="alerta-modal-fone" class="alerta alerta--erro hidden" role="alert"></div>
+        <div style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4);">
+          <button type="button" class="btn btn--secundario" id="btn-cancelar-modal-fone">Cancelar</button>
+          <button type="submit" class="btn btn--primario" id="btn-salvar-modal-fone">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/pages/fones.js"></script>
+</body>
+</html>
