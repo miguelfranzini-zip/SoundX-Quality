@@ -2,7 +2,7 @@
 [build]
   base = "frontend"
   publish = "."
-  command = "chmod +x build.sh && ./build.sh"
+  command = "node build.mjs"
 
 [build.environment]
   NODE_VERSION = "18"
