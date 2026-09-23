@@ -14,6 +14,7 @@ const inspecaoRoutes = require('./routes/inspecaoRoutes');
 const testeRoutes = require('./routes/testeRoutes');
 const manutencaoRoutes = require('./routes/manutencaoRoutes');
 const userRoutes = require('./routes/userRoutes');
+const userAuthRoutes = require('./routes/userAuthRoutes');
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use('/api/inspecoes', inspecaoRoutes);
 app.use('/api/testes', testeRoutes);
 app.use('/api/manutencao', manutencaoRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/user-auth', userAuthRoutes);
 
 // Health check
 app.get('/api/status', (req, res) => {

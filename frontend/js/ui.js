@@ -97,16 +97,68 @@ export function initShell(tituloAtivo, usuario) {
     <button class="icone-menu" id="btn-menu" aria-label="Abrir menu">${ICONES.menu}</button>
     <span class="topbar__title">${escapeHtml(tituloAtivoHumanizado(tituloAtivo))}</span>
     <div class="topbar__actions">
-      <div class="topbar__avatar" title="${escapeHtml(cargoLabel(usuario.cargo))}">${iniciais}</div>
+      <div class="topbar__user-menu">
+        <button class="topbar__avatar" id="btn-user-menu" aria-label="Menu do usuário" aria-expanded="false" aria-haspopup="true">
+          ${iniciais}
+          <svg class="topbar__avatar-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="topbar__dropdown hidden" id="user-dropdown" role="menu">
+          <div class="topbar__dropdown-header">
+            <strong>${escapeHtml(usuario.nome || 'Usuário')}</strong>
+            <span>${escapeHtml(cargoLabel(usuario.cargo))}</span>
+          </div>
+          <a href="alterar-senha.html" class="topbar__dropdown-item" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Alterar senha
+          </a>
+          <button class="topbar__dropdown-item topbar__dropdown-item--danger" id="btn-sair-topbar" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            Sair
+          </button>
+        </div>
+      </div>
     </div>
   `;
 
-  const btnSair = document.getElementById('btn-sair');
-  if (btnSair) {
-    btnSair.addEventListener('click', () => {
+  // User menu dropdown
+  const btnUserMenu = document.getElementById('btn-user-menu');
+  const userDropdown = document.getElementById('user-dropdown');
+  const btnSairTopbar = document.getElementById('btn-sair-topbar');
+  const btnSairSidebar = document.getElementById('btn-sair');
+
+  function toggleUserMenu() {
+    if (userDropdown) {
+      userDropdown.classList.toggle('hidden');
+      btnUserMenu.setAttribute('aria-expanded', !userDropdown.classList.contains('hidden'));
+    }
+  }
+
+  if (btnUserMenu) {
+    btnUserMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleUserMenu();
+    });
+  }
+
+  if (btnSairTopbar) {
+    btnSairTopbar.addEventListener('click', () => {
       logoutRedireciona();
     });
   }
+
+  if (btnSairSidebar) {
+    btnSairSidebar.addEventListener('click', () => {
+      logoutRedireciona();
+    });
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (userDropdown && !userDropdown.classList.contains('hidden') && !btnUserMenu.contains(e.target)) {
+      userDropdown.classList.add('hidden');
+      btnUserMenu.setAttribute('aria-expanded', 'false');
+    }
+  });
 
   const btnToggle = document.getElementById('btn-toggle-sidebar');
   if (btnToggle) {
