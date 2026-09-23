@@ -55,14 +55,4 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// Acesso rápido por persona para testes e demonstrações
-document.querySelectorAll('.demo-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const emailInput = document.getElementById('email');
-    const senhaInput = document.getElementById('senha');
-    emailInput.value = btn.dataset.email || '';
-    senhaInput.value = btn.dataset.senha || '';
-    esconderAlerta();
-    form.requestSubmit();
-  });
-});
+// Login de demonstração removido — a autenticação agora é 100% real.
