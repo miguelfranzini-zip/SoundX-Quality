@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alterar Senha — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Alterar Senha</h1>
+              <p>Atualize sua senha de acesso ao sistema.</p>
+            </div>
+            <button class="btn btn--ghost" id="btn-voltar">Voltar</button>
+          </div>
+
+          <div class="card" style="max-width: 480px;">
+            <div class="card__title">
+              <h2>Segurança da conta</h2>
+            </div>
+
+            <form class="form" id="form-alterar-senha" novalidate>
+              <div class="form__grid">
+                <div class="form__grupo" style="grid-column: 1 / -1;">
+                  <label class="form__label" for="currentPassword">Senha atual *</label>
+                  <input class="form__controle" type="password" id="currentPassword" name="currentPassword" placeholder="Digite sua senha atual" required autocomplete="current-password">
+                </div>
+
+                <div class="form__grupo" style="grid-column: 1 / -1;">
+                  <label class="form__label" for="newPassword">Nova senha *</label>
+                  <input class="form__controle" type="password" id="newPassword" name="newPassword" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
+                </div>
+
+                <div class="form__grupo" style="grid-column: 1 / -1;">
+                  <label class="form__label" for="confirmPassword">Confirmar nova senha *</label>
+                  <input class="form__controle" type="password" id="confirmPassword" name="confirmPassword" placeholder="Repita a nova senha" required autocomplete="new-password">
+                </div>
+              </div>
+
+              <div id="alerta-form" class="alerta alerta--erro hidden" role="alert"></div>
+              <div id="alerta-sucesso" class="alerta alerta--sucesso hidden" role="alert"></div>
+
+              <div class="toolbar">
+                <button type="submit" class="btn btn--primario" id="btn-salvar">Salvar nova senha</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Configuração de ambiente (gerado no build do Netlify) -->
+  <script src="js/env-config.js"></script>
+  <script type="module" src="js/pages/alterar-senha.js"></script>
+</body>
+</html>

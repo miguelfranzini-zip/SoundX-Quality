@@ -23,6 +23,7 @@ const cadastrarFone = async (req, res) => {
     const query = `
       INSERT INTO fone (numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status)
       VALUES (?, ?, ?, ?, ?, ?)
+      RETURNING id_fone
     `;
     const values = [
       numero_serie,
@@ -40,7 +41,7 @@ const cadastrarFone = async (req, res) => {
       id_fone: resultado.insertId
     });
   } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') {
+    if (error.code === 'ER_DUP_ENTRY' || error.code === '23505' || error.constraint?.includes('numero_serie')) {
       return res.status(400).json({ mensagem: 'Já existe um fone cadastrado com este número de série.' });
     }
     console.error(error);

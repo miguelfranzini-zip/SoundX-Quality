@@ -14,6 +14,7 @@ exports.criarInspecao = async (req, res) => {
     const query = `
       INSERT INTO inspecao (data_inspecao, resultado_final, observacao, id_funcionario, id_fone)
       VALUES (NOW(), ?, ?, ?, ?)
+      RETURNING id_inspecao
     `;
     const [resultado] = await db.query(query, [resultado_final, observacao || '', id_funcionario, id_fone]);
 

@@ -1,4 +1,4 @@
-const mysql = require('mysql2');
+const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
 
@@ -9,33 +9,36 @@ require('dotenv').config();
 let useLocalFallback = false;
 const DATA_FILE = path.resolve(__dirname, '../../local_data.json');
 
-// Dados iniciais padrão caso o banco MySQL não esteja rodando localmente
+// ============================================================
+// Provedor Local (fallback JSON) — mantido intacto
+// ============================================================
+
 function getInitialData() {
   return {
     funcionario: [
-      { id_funcionario: 1, nome: 'Lucas Silva', cpf: '123.456.789-00', cargo: 'Inspetor', email: 'lucas@email.com', senha: '1234' },
-      { id_funcionario: 2, nome: 'Marcos Santos', cpf: '234.567.890-11', cargo: 'Técnico', email: 'tecnico@soundx.com', senha: '1234' },
-      { id_funcionario: 3, nome: 'Carlos Souza', cpf: '345.678.901-22', cargo: 'Admin', email: 'admin@soundx.com', senha: '1234' }
+      { id_funcionario: 1, nome: 'Lucas Silva',   cpf: '123.456.789-00', cargo: 'Inspetor', email: 'lucas@email.com',    senha: '1234' },
+      { id_funcionario: 2, nome: 'Marcos Santos', cpf: '234.567.890-11', cargo: 'Técnico',  email: 'tecnico@soundx.com', senha: '1234' },
+      { id_funcionario: 3, nome: 'Carlos Souza',  cpf: '345.678.901-22', cargo: 'Admin',    email: 'admin@soundx.com',   senha: '1234' }
     ],
     fone: [
-      { id_fone: 1, numero_serie: 'FN001', modelo: 'SoundX Pro', marca: 'SoundX', tipo_conexao: 'Bluetooth', data_fabricacao: '2026-08-20', status: 'Reprovado / Manutenção' },
-      { id_fone: 2, numero_serie: 'SX-2026-001', modelo: 'SoundX 10', marca: 'SoundX', tipo_conexao: 'Bluetooth', data_fabricacao: '2026-09-01', status: 'Reprovado / Manutenção' },
-      { id_fone: 3, numero_serie: 'SX-2026-002', modelo: 'SoundX Studio Pro', marca: 'SoundX', tipo_conexao: 'USB-C', data_fabricacao: '2026-09-05', status: 'Aguardando inspeção' },
-      { id_fone: 4, numero_serie: 'SX-2026-003', modelo: 'SoundX Bass Max', marca: 'SoundX', tipo_conexao: 'USB-C', data_fabricacao: '2026-09-10', status: 'Aprovado' }
+      { id_fone: 1, numero_serie: 'FN001',       modelo: 'SoundX Pro',        marca: 'SoundX', tipo_conexao: 'Bluetooth', data_fabricacao: '2026-08-20', status: 'Reprovado / Manutenção' },
+      { id_fone: 2, numero_serie: 'SX-2026-001', modelo: 'SoundX 10',         marca: 'SoundX', tipo_conexao: 'Bluetooth', data_fabricacao: '2026-09-01', status: 'Reprovado / Manutenção' },
+      { id_fone: 3, numero_serie: 'SX-2026-002', modelo: 'SoundX Studio Pro', marca: 'SoundX', tipo_conexao: 'USB-C',     data_fabricacao: '2026-09-05', status: 'Aguardando inspeção' },
+      { id_fone: 4, numero_serie: 'SX-2026-003', modelo: 'SoundX Bass Max',   marca: 'SoundX', tipo_conexao: 'USB-C',     data_fabricacao: '2026-09-10', status: 'Aprovado' }
     ],
     inspecao: [
       { id_inspecao: 1, id_fone: 1, id_funcionario: 1, data_inspecao: '2026-09-11 10:30:00', resultado_final: 'Reprovado / Manutenção', observacao: 'Falha no canal esquerdo de áudio.' },
       { id_inspecao: 2, id_fone: 2, id_funcionario: 1, data_inspecao: '2026-09-12 14:15:00', resultado_final: 'Reprovado / Manutenção', observacao: 'Bateria descarregando com menos de 30 min.' },
-      { id_inspecao: 3, id_fone: 4, id_funcionario: 1, data_inspecao: '2026-09-13 09:00:00', resultado_final: 'Aprovado', observacao: 'Todos os testes concluídos com sucesso.' }
+      { id_inspecao: 3, id_fone: 4, id_funcionario: 1, data_inspecao: '2026-09-13 09:00:00', resultado_final: 'Aprovado',               observacao: 'Todos os testes concluídos com sucesso.' }
     ],
     teste: [
       { id_teste: 1, id_inspecao: 1, tipo_teste: 'Áudio L/R', parametro_medido: 'Frequência 20Hz-20kHz', resultado: 'Não passou', observacao: 'Driver esquerdo mudo' },
-      { id_teste: 2, id_inspecao: 1, tipo_teste: 'Bluetooth', parametro_medido: 'Sinal 2.4GHz', resultado: 'Passou', observacao: 'Conexão estável' },
-      { id_teste: 3, id_inspecao: 2, tipo_teste: 'Bateria', parametro_medido: 'Capacidade 500mAh', resultado: 'Não passou', observacao: 'Célula com perda de carga' },
-      { id_teste: 4, id_inspecao: 3, tipo_teste: 'Áudio L/R', parametro_medido: 'Resposta plana', resultado: 'Passou', observacao: 'Excelente fidelidade' }
+      { id_teste: 2, id_inspecao: 1, tipo_teste: 'Bluetooth',  parametro_medido: 'Sinal 2.4GHz',         resultado: 'Passou',     observacao: 'Conexão estável' },
+      { id_teste: 3, id_inspecao: 2, tipo_teste: 'Bateria',    parametro_medido: 'Capacidade 500mAh',    resultado: 'Não passou', observacao: 'Célula com perda de carga' },
+      { id_teste: 4, id_inspecao: 3, tipo_teste: 'Áudio L/R', parametro_medido: 'Resposta plana',        resultado: 'Passou',     observacao: 'Excelente fidelidade' }
     ],
     manutencao: [
-      { id_manutencao: 1, id_fone: 1, descricao_defeito: 'Falha no canal esquerdo de áudio.', acao_corretiva: null, status: 'Pendente', data_entrada: '2026-09-11 10:35:00', data_conclusao: null },
+      { id_manutencao: 1, id_fone: 1, descricao_defeito: 'Falha no canal esquerdo de áudio.',         acao_corretiva: null, status: 'Pendente',       data_entrada: '2026-09-11 10:35:00', data_conclusao: null },
       { id_manutencao: 2, id_fone: 2, descricao_defeito: 'Bateria descarregando com menos de 30 min.', acao_corretiva: null, status: 'Em Manutencao', data_entrada: '2026-09-12 14:20:00', data_conclusao: null }
     ]
   };
@@ -72,7 +75,7 @@ const localProvider = {
 
     // 1. SELECT * FROM funcionario [WHERE email = ?]
     if (cleanLower.startsWith('select * from funcionario')) {
-      if (cleanLower.includes('where email = ?')) {
+      if (cleanLower.includes('where email = ?') || cleanLower.includes('where email = $1')) {
         const email = params[0];
         const rows = data.funcionario.filter(f => f.email === email);
         return [rows, []];
@@ -86,13 +89,13 @@ const localProvider = {
       return [rows, []];
     }
 
-    // 3. INSERT INTO fone (numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status)
+    // 3. INSERT INTO fone
     if (cleanLower.startsWith('insert into fone')) {
       const [numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status] = params;
-      // Checa duplicidade
       if (data.fone.some(f => f.numero_serie === numero_serie)) {
         const error = new Error('Já existe um fone com este número de série.');
         error.code = 'ER_DUP_ENTRY';
+        error.constraint = 'fone_numero_serie_key';
         throw error;
       }
       const newId = data.fone.reduce((max, f) => Math.max(max, f.id_fone || 0), 0) + 1;
@@ -111,7 +114,7 @@ const localProvider = {
     }
 
     // 4. SELECT * FROM fone WHERE id_fone = ?
-    if (cleanLower.startsWith('select * from fone where id_fone = ?')) {
+    if (cleanLower.startsWith('select * from fone where id_fone = ?') || cleanLower.startsWith('select * from fone where id_fone = $1')) {
       const id = Number(params[0]);
       const rows = data.fone.filter(f => f.id_fone === id);
       return [rows, []];
@@ -167,24 +170,18 @@ const localProvider = {
     }
 
     // 9. UPDATE fone SET status = ? WHERE id_fone = ?
-    if (cleanLower.startsWith('update fone set status = ? where id_fone = ?')) {
+    if (cleanLower.startsWith('update fone set status = ? where id_fone = ?') || cleanLower.startsWith('update fone set status = $1 where id_fone = $2')) {
       const [status, id_fone] = params;
       const fone = data.fone.find(f => f.id_fone === Number(id_fone));
-      if (fone) {
-        fone.status = status;
-        saveLocalData(data);
-      }
+      if (fone) { fone.status = status; saveLocalData(data); }
       return [{ affectedRows: fone ? 1 : 0 }, []];
     }
 
-    // 10. UPDATE fone SET status = 'Em Análise' WHERE id_fone = ?
+    // 10. UPDATE fone SET status = 'Em Análise'
     if (cleanLower.includes("update fone set status = 'em análise'") || cleanLower.includes("update fone set status = 'em analise'")) {
       const id_fone = Number(params[0]);
       const fone = data.fone.find(f => f.id_fone === id_fone);
-      if (fone) {
-        fone.status = 'Em Análise';
-        saveLocalData(data);
-      }
+      if (fone) { fone.status = 'Em Análise'; saveLocalData(data); }
       return [{ affectedRows: fone ? 1 : 0 }, []];
     }
 
@@ -222,7 +219,7 @@ const localProvider = {
       return [[{ total: data.inspecao.length }], []];
     }
 
-    // 13. Listar inspeções com JOIN fone e LEFT JOIN funcionario
+    // 13. Listar inspeções com JOIN
     if (cleanLower.includes('from inspecao i') && cleanLower.includes('join fone f')) {
       const rows = data.inspecao
         .map(i => {
@@ -261,32 +258,26 @@ const localProvider = {
     }
 
     // 15. SELECT * FROM teste WHERE id_inspecao = ?
-    if (cleanLower.startsWith('select * from teste where id_inspecao = ?')) {
+    if (cleanLower.startsWith('select * from teste where id_inspecao = ?') || cleanLower.startsWith('select * from teste where id_inspecao = $1')) {
       const id = Number(params[0]);
-      const rows = data.teste
-        .filter(t => t.id_inspecao === id)
-        .sort((a, b) => a.id_teste - b.id_teste);
+      const rows = data.teste.filter(t => t.id_inspecao === id).sort((a, b) => a.id_teste - b.id_teste);
       return [rows, []];
     }
 
-    // 16. Fila de manutenção: SELECT m.*, f.modelo, f.numero_serie FROM manutencao m JOIN fone f
+    // 16. Fila de manutenção com JOIN fone
     if (cleanLower.includes('from manutencao m') && cleanLower.includes('join fone f')) {
       const rows = data.manutencao
         .filter(m => m.status !== 'Concluido')
         .map(m => {
           const fone = data.fone.find(f => f.id_fone === m.id_fone) || {};
-          return {
-            ...m,
-            modelo: fone.modelo || '—',
-            numero_serie: fone.numero_serie || '—'
-          };
+          return { ...m, modelo: fone.modelo || '—', numero_serie: fone.numero_serie || '—' };
         })
         .sort((a, b) => new Date(a.data_entrada) - new Date(b.data_entrada));
       return [rows, []];
     }
 
-    // 17. UPDATE manutencao SET acao_corretiva = ?, status = ?, data_conclusao = ? WHERE id_manutencao = ?
-    if (cleanLower.startsWith('update manutencao set acao_corretiva = ?')) {
+    // 17. UPDATE manutencao SET acao_corretiva = ?
+    if (cleanLower.startsWith('update manutencao set acao_corretiva = ?') || cleanLower.startsWith('update manutencao set acao_corretiva = $1')) {
       const [acao_corretiva, status, data_conclusao, id] = params;
       const item = data.manutencao.find(m => m.id_manutencao === Number(id));
       if (item) {
@@ -299,21 +290,21 @@ const localProvider = {
     }
 
     // 18. SELECT id_fone FROM manutencao WHERE id_manutencao = ?
-    if (cleanLower.startsWith('select id_fone from manutencao where id_manutencao = ?')) {
+    if (cleanLower.startsWith('select id_fone from manutencao where id_manutencao = ?') || cleanLower.startsWith('select id_fone from manutencao where id_manutencao = $1')) {
       const id = Number(params[0]);
       const rows = data.manutencao.filter(m => m.id_manutencao === id).map(m => ({ id_fone: m.id_fone }));
       return [rows, []];
     }
 
     // 19. Checagem de fone por número de série duplicado
-    if (cleanLower.includes('from fone where numero_serie = ? and id_fone != ?') || cleanLower.includes('from fone where numero_serie = ? and id_fone <> ?')) {
+    if (cleanLower.includes('from fone where numero_serie = ? and id_fone != ?') || cleanLower.includes('from fone where numero_serie = $1 and id_fone <> $2') || cleanLower.includes('from fone where numero_serie = $1 and id_fone != $2')) {
       const [numSerie, id] = params;
       const rows = data.fone.filter(f => f.numero_serie === numSerie && f.id_fone !== Number(id));
       return [rows, []];
     }
 
     // 20. UPDATE fone completo
-    if (cleanLower.startsWith('update fone set numero_serie = ?')) {
+    if (cleanLower.startsWith('update fone set numero_serie = ?') || cleanLower.startsWith('update fone set numero_serie = $1')) {
       const [numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status, id_fone] = params;
       const fone = data.fone.find(f => f.id_fone === Number(id_fone));
       if (fone) {
@@ -328,8 +319,8 @@ const localProvider = {
       return [{ affectedRows: fone ? 1 : 0 }, []];
     }
 
-    // 21. DELETE FROM fone WHERE id_fone = ? (com CASCADE em memória)
-    if (cleanLower.startsWith('delete from fone where id_fone = ?')) {
+    // 21. DELETE FROM fone WHERE id_fone = ?
+    if (cleanLower.startsWith('delete from fone where id_fone = ?') || cleanLower.startsWith('delete from fone where id_fone = $1')) {
       const id = Number(params[0]);
       const idx = data.fone.findIndex(f => f.id_fone === id);
       if (idx !== -1) {
@@ -345,14 +336,14 @@ const localProvider = {
     }
 
     // 22. SELECT * FROM inspecao WHERE id_inspecao = ?
-    if (cleanLower.startsWith('select * from inspecao where id_inspecao = ?') || cleanLower.startsWith('select id_inspecao, id_fone from inspecao where id_inspecao = ?')) {
+    if (cleanLower.startsWith('select * from inspecao where id_inspecao = ?') || cleanLower.startsWith('select * from inspecao where id_inspecao = $1') || cleanLower.startsWith('select id_inspecao, id_fone from inspecao where id_inspecao = $1')) {
       const id = Number(params[0]);
       const rows = data.inspecao.filter(i => i.id_inspecao === id);
       return [rows, []];
     }
 
-    // 23. UPDATE inspecao SET resultado_final = ?, observacao = ? WHERE id_inspecao = ?
-    if (cleanLower.startsWith('update inspecao set resultado_final = ?')) {
+    // 23. UPDATE inspecao SET resultado_final = ?
+    if (cleanLower.startsWith('update inspecao set resultado_final = ?') || cleanLower.startsWith('update inspecao set resultado_final = $1')) {
       const [resultado_final, observacao, id] = params;
       const inspecao = data.inspecao.find(i => i.id_inspecao === Number(id));
       if (inspecao) {
@@ -364,7 +355,7 @@ const localProvider = {
     }
 
     // 24. DELETE FROM inspecao WHERE id_inspecao = ?
-    if (cleanLower.startsWith('delete from inspecao where id_inspecao = ?')) {
+    if (cleanLower.startsWith('delete from inspecao where id_inspecao = ?') || cleanLower.startsWith('delete from inspecao where id_inspecao = $1')) {
       const id = Number(params[0]);
       const idx = data.inspecao.findIndex(i => i.id_inspecao === id);
       if (idx !== -1) {
@@ -377,14 +368,14 @@ const localProvider = {
     }
 
     // 25. SELECT * FROM teste WHERE id_teste = ?
-    if (cleanLower.startsWith('select * from teste where id_teste = ?') || cleanLower.startsWith('select id_teste from teste where id_teste = ?')) {
+    if (cleanLower.startsWith('select * from teste where id_teste = ?') || cleanLower.startsWith('select * from teste where id_teste = $1') || cleanLower.startsWith('select id_teste from teste where id_teste = $1')) {
       const id = Number(params[0]);
       const rows = data.teste.filter(t => t.id_teste === id);
       return [rows, []];
     }
 
     // 26. UPDATE teste
-    if (cleanLower.startsWith('update teste set tipo_teste = ?')) {
+    if (cleanLower.startsWith('update teste set tipo_teste = ?') || cleanLower.startsWith('update teste set tipo_teste = $1')) {
       const [tipo_teste, parametro_medido, resultado, observacao, id] = params;
       const t = data.teste.find(item => item.id_teste === Number(id));
       if (t) {
@@ -398,7 +389,7 @@ const localProvider = {
     }
 
     // 27. DELETE FROM teste WHERE id_teste = ?
-    if (cleanLower.startsWith('delete from teste where id_teste = ?')) {
+    if (cleanLower.startsWith('delete from teste where id_teste = ?') || cleanLower.startsWith('delete from teste where id_teste = $1')) {
       const id = Number(params[0]);
       const idx = data.teste.findIndex(t => t.id_teste === id);
       if (idx !== -1) {
@@ -410,14 +401,14 @@ const localProvider = {
     }
 
     // 28. SELECT * FROM manutencao WHERE id_manutencao = ?
-    if (cleanLower.startsWith('select * from manutencao where id_manutencao = ?') || cleanLower.startsWith('select id_manutencao from manutencao where id_manutencao = ?')) {
+    if (cleanLower.startsWith('select * from manutencao where id_manutencao = ?') || cleanLower.startsWith('select * from manutencao where id_manutencao = $1') || cleanLower.startsWith('select id_manutencao from manutencao where id_manutencao = $1')) {
       const id = Number(params[0]);
       const rows = data.manutencao.filter(m => m.id_manutencao === id);
       return [rows, []];
     }
 
-    // 29. UPDATE manutencao com descricao_defeito
-    if (cleanLower.startsWith('update manutencao set descricao_defeito = ?')) {
+    // 29. UPDATE manutencao SET descricao_defeito = ?
+    if (cleanLower.startsWith('update manutencao set descricao_defeito = ?') || cleanLower.startsWith('update manutencao set descricao_defeito = $1')) {
       const [descricao_defeito, acao_corretiva, status, data_conclusao, id] = params;
       const item = data.manutencao.find(m => m.id_manutencao === Number(id));
       if (item) {
@@ -431,7 +422,7 @@ const localProvider = {
     }
 
     // 30. DELETE FROM manutencao WHERE id_manutencao = ?
-    if (cleanLower.startsWith('delete from manutencao where id_manutencao = ?')) {
+    if (cleanLower.startsWith('delete from manutencao where id_manutencao = ?') || cleanLower.startsWith('delete from manutencao where id_manutencao = $1')) {
       const id = Number(params[0]);
       const idx = data.manutencao.findIndex(m => m.id_manutencao === id);
       if (idx !== -1) {
@@ -443,7 +434,7 @@ const localProvider = {
     }
 
     // 31. SELECT ordens abertas de manutencao por fone
-    if (cleanLower.includes('from manutencao where id_fone = ? and status !=') || cleanLower.includes('from manutencao where id_fone = ? and status <>')) {
+    if (cleanLower.includes('from manutencao where id_fone = ? and status !=') || cleanLower.includes('from manutencao where id_fone = $1 and status !=') || cleanLower.includes("from manutencao where id_fone = $1 and status <> 'concluido'")) {
       const id = Number(params[0]);
       const rows = data.manutencao.filter(m => m.id_fone === id && m.status !== 'Concluido');
       return [rows, []];
@@ -454,30 +445,67 @@ const localProvider = {
   }
 };
 
-// Inicialização da Pool MySQL
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : '',
-  database: process.env.DB_NAME || 'controle_qualidade_fones',
-  port: Number(process.env.DB_PORT) || 3306,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+// ============================================================
+// Pool PostgreSQL (Supabase)
+// ============================================================
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }  // necessário para Supabase
 });
 
-const promisePool = pool.promise();
-
-pool.getConnection((err, connection) => {
+// Testa conexão na inicialização
+pool.connect((err, client, release) => {
   if (err) {
     useLocalFallback = true;
-    console.log('⚡ Nota: Servidor MySQL não detectado (127.0.0.1:3306).');
-    console.log('💾 Provedor de Banco de Dados Local ativado com sucesso! Dados persistidos em local_data.json.');
+    console.log('⚡ Nota: Supabase não acessível. Detalhes:', err.message);
+    console.log('💾 Provedor de Banco de Dados Local ativado! Dados persistidos em local_data.json.');
   } else {
-    console.log('✅ Conectado ao banco MySQL (controle_qualidade_fones) com sucesso!');
-    connection.release();
+    console.log('✅ Conectado ao Supabase (PostgreSQL) com sucesso!');
+    release();
   }
 });
+
+// ============================================================
+// Adaptador pg → interface mysql2 compatível
+// ============================================================
+//
+// mysql2 retorna: [rows, fields]
+// pg retorna:     { rows, fields, rowCount }
+//
+// Para INSERT o código usa result[0].insertId — em pg usamos
+// RETURNING id e mapeamos para o mesmo formato.
+//
+// Para UPDATE/DELETE o código usa result[0].affectedRows — em pg
+// usamos rowCount.
+//
+// Para SELECT o código usa result[0] como array de linhas.
+
+async function pgQuery(sql, params = []) {
+  // Converte placeholders MySQL (?) para PostgreSQL ($1, $2, ...)
+  let pgSql = sql;
+  let i = 0;
+  pgSql = pgSql.replace(/\?/g, () => `$${++i}`);
+
+  const result = await pool.query(pgSql, params);
+
+  const cleanLower = sql.replace(/\s+/g, ' ').trim().toLowerCase();
+
+  // INSERT com RETURNING id_* → simula {insertId, affectedRows}
+  if (cleanLower.startsWith('insert') && result.rows && result.rows.length > 0) {
+    const row = result.rows[0];
+    const idKey = Object.keys(row).find(k => k.startsWith('id_'));
+    return [{ insertId: idKey ? row[idKey] : null, affectedRows: result.rowCount }, []];
+  }
+
+  // UPDATE / DELETE → simula {affectedRows}
+  if (cleanLower.startsWith('update') || cleanLower.startsWith('delete')) {
+    return [{ affectedRows: result.rowCount }, []];
+  }
+
+  // SELECT → retorna array de linhas
+  return [result.rows || [], []];
+}
 
 module.exports = {
   async query(sql, params) {
@@ -485,11 +513,16 @@ module.exports = {
       return localProvider.query(sql, params);
     }
     try {
-      return await promisePool.query(sql, params);
+      return await pgQuery(sql, params);
     } catch (error) {
-      if (error.code === 'ECONNREFUSED' || error.code === 'PROTOCOL_CONNECTION_LOST') {
+      if (
+        error.code === 'ECONNREFUSED' ||
+        error.code === 'ENOTFOUND' ||
+        error.code === 'PROTOCOL_CONNECTION_LOST' ||
+        error.message?.includes('connect ETIMEDOUT')
+      ) {
         useLocalFallback = true;
-        console.log('⚡ Alternando para o provedor de dados local devido a erro de conexão MySQL.');
+        console.log('⚡ Alternando para o provedor de dados local devido a erro de conexão Supabase.');
         return localProvider.query(sql, params);
       }
       throw error;

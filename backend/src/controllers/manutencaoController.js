@@ -9,7 +9,7 @@ exports.criarManutencao = async (req, res) => {
   }
 
   try {
-    const query = 'INSERT INTO manutencao (id_fone, descricao_defeito) VALUES (?, ?)';
+    const query = 'INSERT INTO manutencao (id_fone, descricao_defeito) VALUES (?, ?) RETURNING id_manutencao';
     const [resultado] = await db.query(query, [id_fone, descricao_defeito]);
 
     res.status(201).json({

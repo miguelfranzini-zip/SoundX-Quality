@@ -14,6 +14,7 @@ exports.cadastrarTeste = async (req, res) => {
     const query = `
       INSERT INTO teste (id_inspecao, tipo_teste, parametro_medido, resultado, observacao)
       VALUES (?, ?, ?, ?, ?)
+      RETURNING id_teste
     `;
     const [resDb] = await db.query(query, [
       id_inspecao, 
