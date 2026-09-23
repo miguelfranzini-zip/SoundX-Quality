@@ -16,11 +16,25 @@ const manutencaoRoutes = require('./routes/manutencaoRoutes');
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+const allowedOrigins = [
+  'http://localhost:5500',
+  'http://localhost:5501',
+  'http://127.0.0.1:5500',
+  'http://127.0.0.1:5501',
+  process.env.FRONTEND_URL
+].filter(Boolean);
 
-// Front-end (pasta publica do projeto)
-app.use(express.static(path.resolve(__dirname, '../../frontend')));
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+app.use(express.json());
 
 // Rotas da API
 app.use('/api/auth', authRoutes);
@@ -34,4 +48,5 @@ app.get('/api/status', (req, res) => {
   res.json({ status: 'online', versao: '1.0.0', timestamp: new Date() });
 });
 
+// Vercel precisa que o app seja exportado, não iniciado com listen
 module.exports = app;
