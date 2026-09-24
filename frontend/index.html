@@ -100,11 +100,41 @@
             Entrar
           </button>
 
+          <div class="api-status-wrapper" style="margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid var(--borda, rgba(0,0,0,0.1)); text-align: center; font-size: 0.8rem; color: var(--texto-secundario, #666);">
+            <div id="api-status-indicator" style="display: inline-flex; align-items: center; gap: 0.4rem; justify-content: center;">
+              <span id="api-status-dot" style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ff9800;"></span>
+              <span id="api-status-text">Verificando conexão com o backend...</span>
+            </div>
+            <div style="margin-top: 0.35rem;">
+              <button type="button" id="btn-config-api" style="background: none; border: none; color: var(--primaria, #ff9800); text-decoration: underline; cursor: pointer; font-size: 0.78rem;">
+                ⚙️ Configurar URL do Backend
+              </button>
+            </div>
+          </div>
 
         </form>
       </div>
     </section>
   </main>
+
+  <!-- Modal de Configuração da URL da API -->
+  <dialog id="modal-config-api" style="border: 1px solid var(--borda, #ccc); border-radius: 8px; padding: 1.5rem; max-width: 480px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.2); background: #fff; color: var(--marrom-profundo, #290E00); margin: auto;">
+    <h3 style="margin-top: 0; font-family: 'Garet', sans-serif; font-size: 1.15rem; color: var(--primaria, #FF9800);">⚙️ Conexão com o Backend (Vercel)</h3>
+    <p style="font-size: 0.85rem; line-height: 1.4; color: #555;">
+      Se o frontend no Netlify não estiver alcançando o backend no Vercel, informe abaixo a URL do seu backend:
+    </p>
+    <div style="margin-bottom: 1rem;">
+      <label for="input-api-url" style="display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.3rem;">URL do Backend Vercel:</label>
+      <input type="url" id="input-api-url" placeholder="https://seu-backend.vercel.app" style="width: 100%; padding: 0.55rem; border: 1px solid #ccc; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box;">
+      <span style="font-size: 0.72rem; color: #777;">Exemplo: <code>https://seu-backend.vercel.app</code></span>
+    </div>
+    <div id="modal-api-feedback" style="font-size: 0.8rem; margin-bottom: 1rem; padding: 0.5rem; border-radius: 4px; display: none;"></div>
+    <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+      <button type="button" class="btn" id="btn-fechar-modal-api" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Cancelar</button>
+      <button type="button" class="btn" id="btn-testar-api" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #eee; border: 1px solid #ccc;">Testar</button>
+      <button type="button" class="btn btn--primario" id="btn-salvar-api" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Salvar e Conectar</button>
+    </div>
+  </dialog>
 
   <div id="toast-container" class="toast-container"></div>
 

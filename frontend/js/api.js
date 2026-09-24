@@ -14,6 +14,23 @@ export function logoutRedireciona() {
   window.location.href = 'index.html';
 }
 
+export async function testarStatusApi(urlAlvo) {
+  const base = urlAlvo ? urlAlvo.replace(/\/+$/, '') : API_URL;
+  const statusEndpoint = base.endsWith('/api') ? `${base}/status` : `${base}/api/status`;
+  
+  try {
+    const res = await fetch(statusEndpoint, { method: 'GET' });
+    const cType = res.headers.get('content-type') || '';
+    if (!cType.includes('application/json')) {
+      return { ok: false, mensagem: 'Servidor respondeu, mas retornou HTML em vez de JSON.' };
+    }
+    const json = await res.json();
+    return { ok: res.ok, dados: json, endpoint: statusEndpoint };
+  } catch (err) {
+    return { ok: false, mensagem: err.message || 'Falha de rede ou CORS.' };
+  }
+}
+
 export async function api(path, { method = 'GET', body } = {}) {
   const token = getToken();
 
@@ -29,7 +46,13 @@ export async function api(path, { method = 'GET', body } = {}) {
   try {
     resposta = await fetch(`${API_URL}${path}`, opcoes);
   } catch {
-    throw new Error('Não foi possível conectar ao servidor.');
+    throw new Error(`Não foi possível conectar ao servidor (${API_URL}). Verifique se o backend no Vercel está ativo.`);
+  }
+
+  // Se o servidor retornou HTML (fallback padrão do Netlify para rotas não encontradas)
+  const contentType = resposta.headers.get('content-type') || '';
+  if (contentType.includes('text/html')) {
+    throw new Error('A API retornou HTML em vez de JSON. A URL do backend não está configurada corretamente no Netlify.');
   }
 
   if (resposta.status === 401) {

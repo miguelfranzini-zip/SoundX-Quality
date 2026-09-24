@@ -7,7 +7,20 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 require('dotenv').config();
 
 let useLocalFallback = false;
-const DATA_FILE = path.resolve(__dirname, '../../local_data.json');
+let DATA_FILE = path.resolve(__dirname, '../../local_data.json');
+
+// No ambiente serverless do Vercel, apenas a pasta /tmp permite escrita
+if (process.env.VERCEL) {
+  DATA_FILE = path.join('/tmp', 'local_data.json');
+  try {
+    const bundledPath = path.resolve(__dirname, '../../local_data.json');
+    if (!fs.existsSync(DATA_FILE) && fs.existsSync(bundledPath)) {
+      fs.copyFileSync(bundledPath, DATA_FILE);
+    }
+  } catch (e) {
+    // Ignora falha de cópia inicial
+  }
+}
 
 // ============================================================
 // Provedor Local (fallback JSON) — mantido intacto
@@ -509,7 +522,7 @@ async function pgQuery(sql, params = []) {
 
 module.exports = {
   async query(sql, params) {
-    if (useLocalFallback) {
+    if (useLocalFallback || !process.env.DATABASE_URL) {
       return localProvider.query(sql, params);
     }
     try {
