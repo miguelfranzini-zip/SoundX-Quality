@@ -69,7 +69,7 @@
       "marca": "SoundX",
       "tipo_conexao": "USB-C",
       "data_fabricacao": "2026-09-16T18:52:18.602Z",
-      "status": "Em Análise"
+      "status": "Aprovado"
     },
     {
       "id_fone": 6,
@@ -91,12 +91,12 @@
     },
     {
       "id_fone": 8,
-      "numero_serie": "SX-TEST-1789589174062",
+      "numero_serie": "SX-TEST-1789589174062 abc",
       "modelo": "SoundX Ultra ANC",
       "marca": "SoundX",
       "tipo_conexao": "USB-C",
-      "data_fabricacao": "2026-09-16T20:06:14.063Z",
-      "status": "Em Análise"
+      "data_fabricacao": "2026-09-16",
+      "status": "Aprovado"
     },
     {
       "id_fone": 9,
@@ -138,7 +138,7 @@
       "id_fone": 5,
       "id_funcionario": 1,
       "data_inspecao": "2026-09-16 18:52:18",
-      "resultado_final": "Reprovado / Manutenção",
+      "resultado_final": "Aprovado",
       "observacao": "Distorção no driver direito acima de 80dB"
     },
     {
@@ -246,6 +246,22 @@
       "parametro_medido": "Distorção Harmônica THD",
       "resultado": "Não passou",
       "observacao": "THD medido em 3.2% (limite máx 1%)"
+    },
+    {
+      "id_teste": 10,
+      "id_inspecao": 7,
+      "tipo_teste": "Bluetooth",
+      "parametro_medido": "",
+      "resultado": "Não passou",
+      "observacao": ""
+    },
+    {
+      "id_teste": 11,
+      "id_inspecao": 7,
+      "tipo_teste": "Bluetooth",
+      "parametro_medido": "as",
+      "resultado": "Não passou",
+      "observacao": ""
     }
   ],
   "manutencao": [
@@ -253,8 +269,8 @@
       "id_manutencao": 1,
       "id_fone": 1,
       "descricao_defeito": "Falha no canal esquerdo de áudio.",
-      "acao_corretiva": null,
-      "status": "Pendente",
+      "acao_corretiva": "",
+      "status": "Em Manutencao",
       "data_entrada": "2026-09-11 10:35:00",
       "data_conclusao": null
     },
