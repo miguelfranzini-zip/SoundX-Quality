@@ -86,11 +86,16 @@ const localProvider = {
     const cleanSql = sql.replace(/\s+/g, ' ').trim();
     const cleanLower = cleanSql.toLowerCase();
 
-    // 1. SELECT * FROM funcionario [WHERE email = ?]
-    if (cleanLower.startsWith('select * from funcionario')) {
+    // 1. SELECT FROM funcionario (inclui SELECT * e SELECT com colunas específicas)
+    if (cleanLower.startsWith('select') && cleanLower.includes('from funcionario')) {
       if (cleanLower.includes('where email = ?') || cleanLower.includes('where email = $1')) {
         const email = params[0];
         const rows = data.funcionario.filter(f => f.email === email);
+        return [rows, []];
+      }
+      if (cleanLower.includes('where cpf = ?') || cleanLower.includes('where cpf = $1')) {
+        const cpf = params[0];
+        const rows = data.funcionario.filter(f => f.cpf === cpf);
         return [rows, []];
       }
       return [data.funcionario, []];
@@ -127,7 +132,8 @@ const localProvider = {
     }
 
     // 4. SELECT * FROM fone WHERE id_fone = ?
-    if (cleanLower.startsWith('select * from fone where id_fone = ?') || cleanLower.startsWith('select * from fone where id_fone = $1')) {
+    // 4b. SELECT id_fone FROM fone WHERE id_fone = ? (usado pelo excluirFone)
+    if (cleanLower.startsWith('select * from fone where id_fone = ?') || cleanLower.startsWith('select * from fone where id_fone = $1') || cleanLower.startsWith('select id_fone from fone where id_fone = ?') || cleanLower.startsWith('select id_fone from fone where id_fone = $1')) {
       const id = Number(params[0]);
       const rows = data.fone.filter(f => f.id_fone === id);
       return [rows, []];
@@ -450,6 +456,42 @@ const localProvider = {
     if (cleanLower.includes('from manutencao where id_fone = ? and status !=') || cleanLower.includes('from manutencao where id_fone = $1 and status !=') || cleanLower.includes("from manutencao where id_fone = $1 and status <> 'concluido'")) {
       const id = Number(params[0]);
       const rows = data.manutencao.filter(m => m.id_fone === id && m.status !== 'Concluido');
+      return [rows, []];
+    }
+
+    // 32. INSERT INTO funcionario (criação de usuário pelo Admin)
+    if (cleanLower.startsWith('insert into funcionario')) {
+      const [nome, cpf, cargo, email, senha] = params;
+      if (data.funcionario.some(f => f.email === email)) {
+        const error = new Error('Já existe um usuário com este e-mail.');
+        error.code = 'ER_DUP_ENTRY';
+        error.constraint = 'funcionario_email_key';
+        throw error;
+      }
+      if (cpf && data.funcionario.some(f => f.cpf === cpf)) {
+        const error = new Error('Já existe um usuário com este CPF.');
+        error.code = 'ER_DUP_ENTRY';
+        error.constraint = 'funcionario_cpf_key';
+        throw error;
+      }
+      const newId = data.funcionario.reduce((max, f) => Math.max(max, f.id_funcionario || 0), 0) + 1;
+      const novo = {
+        id_funcionario: newId,
+        nome: nome.trim(),
+        cpf: cpf || null,
+        cargo: cargo,
+        email: email.trim().toLowerCase(),
+        senha: senha  // já está hashado pelo controller
+      };
+      data.funcionario.push(novo);
+      saveLocalData(data);
+      return [{ insertId: newId, affectedRows: 1 }, []];
+    }
+
+    // 33. SELECT id_funcionario FROM funcionario WHERE cpf = ? (verificação de CPF duplicado)
+    if (cleanLower.includes('from funcionario where cpf = ?') || cleanLower.includes('from funcionario where cpf = $1')) {
+      const cpf = params[0];
+      const rows = data.funcionario.filter(f => f.cpf === cpf);
       return [rows, []];
     }
 

@@ -15,6 +15,7 @@ const testeRoutes = require('./routes/testeRoutes');
 const manutencaoRoutes = require('./routes/manutencaoRoutes');
 const userRoutes = require('./routes/userRoutes');
 const userAuthRoutes = require('./routes/userAuthRoutes');
+const authMiddleware = require('./middlewares/authMiddleware');
 
 const app = express();
 
@@ -108,6 +109,51 @@ app.use('/api/user-auth', userAuthRoutes);
 // Health check
 app.get('/api/status', (req, res) => {
   res.json({ status: 'online', versao: '1.0.0', timestamp: new Date() });
+});
+
+// Reset administrativo do banco de dados local (mantém apenas os usuários seed)
+const db = require('./config/database');
+app.post('/api/admin/reset-dados', authMiddleware, (req, res) => {
+  const cargoNormalizado = String(req.usuario?.cargo || '').toLowerCase();
+  if (cargoNormalizado !== 'admin' && cargoNormalizado !== 'gerente') {
+    return res.status(403).json({ mensagem: 'Apenas Admin/Gerente pode resetar os dados.' });
+  }
+
+  try {
+    const dbModule = require('./config/database');
+    // Acessa o localProvider para resetar os dados
+    const localProvider = require('./config/database');
+    
+    // Precisamos resetar o arquivo local_data.json
+    const fs = require('fs');
+    const path = require('path');
+    const DATA_FILE = process.env.VERCEL 
+      ? path.join('/tmp', 'local_data.json')
+      : path.resolve(__dirname, '../../local_data.json');
+    
+    // Reinicia com os dados iniciais (apenas funcionários)
+    const dadosIniciais = {
+      funcionario: [
+        { id_funcionario: 1, nome: 'Lucas Silva',   cpf: '123.456.789-00', cargo: 'Inspetor', email: 'lucas@email.com',    senha: '1234' },
+        { id_funcionario: 2, nome: 'Marcos Santos', cpf: '234.567.890-11', cargo: 'Técnico',  email: 'tecnico@soundx.com', senha: '1234' },
+        { id_funcionario: 3, nome: 'Carlos Souza',  cpf: '345.678.901-22', cargo: 'Admin',    email: 'admin@soundx.com',   senha: '1234' }
+      ],
+      fone: [],
+      inspecao: [],
+      teste: [],
+      manutencao: []
+    };
+    
+    fs.writeFileSync(DATA_FILE, JSON.stringify(dadosIniciais, null, 2), 'utf-8');
+    
+    res.json({ 
+      mensagem: 'Dados resetados com sucesso. Mantidos apenas os usuários existentes.',
+      dados: dadosIniciais.funcionario
+    });
+  } catch (error) {
+    console.error('Erro ao resetar dados:', error);
+    res.status(500).json({ mensagem: 'Erro ao resetar dados.' });
+  }
 });
 
 // Tratamento de erros padrão retornando JSON

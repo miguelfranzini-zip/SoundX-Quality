@@ -23,6 +23,14 @@
       "cargo": "Admin",
       "email": "admin@soundx.com",
       "senha": "1234"
+    },
+    {
+      "id_funcionario": 4,
+      "nome": "Teste User",
+      "cpf": null,
+      "cargo": "Inspetor",
+      "email": "teste@email.com",
+      "senha": "$2b$10$WsXmC7l1gAwJZZ43sh5xT.b1MQDUsyuxOYk8psPQfB2t1yJfQ.qni"
     }
   ],
   "fone": [
@@ -106,6 +114,15 @@
       "tipo_conexao": "USB-C",
       "data_fabricacao": "2026-09-16T20:17:22.040Z",
       "status": "Em Análise"
+    },
+    {
+      "id_fone": 10,
+      "numero_serie": "TEST-001",
+      "modelo": "SoundX Teste",
+      "marca": "SoundX",
+      "tipo_conexao": "Bluetooth",
+      "data_fabricacao": "2026-09-29T11:21:36.975Z",
+      "status": "Aguardando inspeção"
     }
   ],
   "inspecao": [
