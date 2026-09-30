@@ -1,0 +1,12 @@
+# Netlify Redirects para SoundX Quality
+# 
+# IMPORTANTE: 
+# 1. Para proxy de API funcionar, o backend (Vercel) deve permitir CORS do domínio Netlify
+# 2. A variável VITE_API_URL no Netlify deve apontar para o backend (ex: https://seu-backend.vercel.app)
+
+# Proxy para API (opção A - via Netlify proxy)
+# Descomente se quiser proxy no Netlify (requer CORS configurado no backend)
+#/api/*  https://SEU-BACKEND.vercel.app/api/:splat  200
+
+# SPA Fallback - redireciona tudo para index.html (exceto arquivos estáticos)
+/*    /index.html   200

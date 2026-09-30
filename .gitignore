@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Local data (desenvolvimento)
+local_data.json
+backend/local_data.json
+backend/arquivo.db
+
+# Vercel
+.vercel
+
+# Netlify
+.netlify
+
+# Test coverage
+coverage/
