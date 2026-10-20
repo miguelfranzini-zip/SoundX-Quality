@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const pool = require('../config/database');
+const db = require('../config/database');
 
 exports.changePassword = async (req, res) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
@@ -18,8 +18,8 @@ exports.changePassword = async (req, res) => {
   }
 
   try {
-    const userResult = await pool.query('SELECT senha FROM usuarios WHERE id = $1', [userId]);
-    const user = userResult.rows[0];
+    const [rows] = await db.query('SELECT senha FROM funcionario WHERE id_funcionario = ?', [userId]);
+    const user = rows && rows[0];
 
     if (!user) {
       return res.status(404).json({ message: 'Usuário não encontrado' });
@@ -40,7 +40,7 @@ exports.changePassword = async (req, res) => {
     // Hash da nova senha
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    await pool.query('UPDATE usuarios SET senha = $1 WHERE id = $2', [hashedPassword, userId]);
+    await db.query('UPDATE funcionario SET senha = ? WHERE id_funcionario = ?', [hashedPassword, userId]);
 
     res.json({ message: 'Senha alterada com sucesso!' });
   } catch (error) {

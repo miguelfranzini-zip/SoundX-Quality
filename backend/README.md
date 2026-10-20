@@ -11,20 +11,16 @@ API REST para controle de qualidade, registro de testes técnicos e gestão de m
    ```
 
 2. **Configurar Variáveis de Ambiente:**
-   Crie um arquivo `.env` na raiz do backend:
+   Crie um arquivo `.env` na raiz do backend (ou use o fallback local automático):
    ```bash
    PORT=3001
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=
-   DB_NAME=controle_qualidade_fones
-   JWT_SECRET=soundx_secret_key
+   DATABASE_URL=postgresql://postgres:senha@host.supabase.co:5432/postgres?sslmode=require
+   JWT_SECRET=soundx_secret_key_2026
+   FRONTEND_URL=http://localhost:3001
    ```
+   > **Nota de Resiliência:** Caso a variável `DATABASE_URL` não seja informada ou o banco PostgreSQL esteja indisponível, a API ativa automaticamente o **Provedor Local JSON (`local_data.json`)**, permitindo execução completa e persistente sem dependência de banco externo.
 
-3. **Iniciar o Banco de Dados:**
-   Execute o script `database.sql` no phpMyAdmin (XAMPP) ou MySQL Workbench.
-
-4. **Executar o servidor:**
+3. **Executar o servidor:**
    ```bash
    npm start
    ```
@@ -36,14 +32,17 @@ API REST para controle de qualidade, registro de testes técnicos e gestão de m
 | Método | Endpoint                 | Protegido | Cargos Permitidos     | Descrição                                   |
 | ------ | ------------------------ | --------- | --------------------- | ------------------------------------------- |
 | POST   | /api/auth/login          | Não       | Público               | Autenticação e geração de token JWT         |
+| POST   | /api/user-auth/change-password | Sim | Todos autenticados    | Alteração de senha do usuário conectado     |
+| GET    | /api/users               | Sim       | Admin                 | Lista todos os usuários cadastrados         |
+| POST   | /api/users               | Sim       | Admin                 | Cadastra novo usuário/funcionário           |
 | GET    | /api/fones               | Sim       | Todos autenticados    | Lista todos os fones cadastrados            |
-| POST   | /api/fones               | Sim       | Admin, Inspetor       | Cadastra um novo fone                       |
+| POST   | /api/fones               | Sim       | Admin, Inspetor       | Cadastra um novo fone (com número e lote)   |
 | PUT    | /api/fones/:id           | Sim       | Admin, Inspetor       | Atualiza dados de um fone                   |
 | DELETE | /api/fones/:id           | Sim       | Admin                 | Exclui um fone e histórico em cascata      |
 | GET    | /api/fones/:id/historico | Sim       | Todos autenticados    | Exibe a rastreabilidade completa do fone    |
 | GET    | /api/inspecoes           | Sim       | Todos autenticados    | Lista o histórico geral de inspeções        |
 | GET    | /api/inspecoes/dashboard | Sim       | Todos autenticados    | Métricas e indicadores em tempo real        |
-| POST   | /api/inspecoes           | Sim       | Admin, Inspetor       | Registra uma nova inspeção                  |
+| POST   | /api/inspecoes           | Sim       | Admin, Inspetor       | Registra nova inspeção (+ checklist e foto) |
 | PUT    | /api/inspecoes/:id       | Sim       | Admin, Inspetor       | Atualiza parecer/resultado da inspeção      |
 | DELETE | /api/inspecoes/:id       | Sim       | Admin                 | Exclui uma inspeção e seus testes           |
 | GET    | /api/testes/inspecao/:id | Sim       | Todos autenticados    | Lista testes de uma inspeção                |
@@ -54,6 +53,7 @@ API REST para controle de qualidade, registro de testes técnicos e gestão de m
 | POST   | /api/manutencao          | Sim       | Todos autenticados    | Abre ordem de serviço de manutenção manual  |
 | PUT    | /api/manutencao/:id      | Sim       | Admin, Técnico        | Atualiza status, ação corretiva e defeito   |
 | DELETE | /api/manutencao/:id      | Sim       | Admin                 | Exclui ordem de manutenção                  |
+| POST   | /api/admin/reset-dados   | Sim       | Admin, Gerente        | Restaura base para estado inicial           |
 
 > **Nota:** Usuários com cargo `Admin` ou `Gerente` possuem acesso irrestrito a todas as rotas protegidas.
 

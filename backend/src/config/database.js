@@ -7,13 +7,13 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 require('dotenv').config();
 
 let useLocalFallback = false;
-let DATA_FILE = path.resolve(__dirname, '../../local_data.json');
+let DATA_FILE = path.resolve(__dirname, '../../../local_data.json');
 
 // No ambiente serverless do Vercel, apenas a pasta /tmp permite escrita
 if (process.env.VERCEL) {
   DATA_FILE = path.join('/tmp', 'local_data.json');
   try {
-    const bundledPath = path.resolve(__dirname, '../../local_data.json');
+    const bundledPath = path.resolve(__dirname, '../../../local_data.json');
     if (!fs.existsSync(DATA_FILE) && fs.existsSync(bundledPath)) {
       fs.copyFileSync(bundledPath, DATA_FILE);
     }
@@ -34,10 +34,10 @@ function getInitialData() {
       { id_funcionario: 3, nome: 'Carlos Souza',  cpf: '345.678.901-22', cargo: 'Admin',    email: 'admin@soundx.com',   senha: '1234' }
     ],
     fone: [
-      { id_fone: 1, numero_serie: 'FN001',       modelo: 'SoundX Pro',        marca: 'SoundX', tipo_conexao: 'Bluetooth', data_fabricacao: '2026-08-20', status: 'Reprovado / Manutenção' },
-      { id_fone: 2, numero_serie: 'SX-2026-001', modelo: 'SoundX 10',         marca: 'SoundX', tipo_conexao: 'Bluetooth', data_fabricacao: '2026-09-01', status: 'Reprovado / Manutenção' },
-      { id_fone: 3, numero_serie: 'SX-2026-002', modelo: 'SoundX Studio Pro', marca: 'SoundX', tipo_conexao: 'USB-C',     data_fabricacao: '2026-09-05', status: 'Aguardando inspeção' },
-      { id_fone: 4, numero_serie: 'SX-2026-003', modelo: 'SoundX Bass Max',   marca: 'SoundX', tipo_conexao: 'USB-C',     data_fabricacao: '2026-09-10', status: 'Aprovado' }
+      { id_fone: 1, numero_serie: 'FN001',       modelo: 'SoundX Pro',        marca: 'SoundX', tipo_conexao: 'Bluetooth', lote: 'LT-2026-A', data_fabricacao: '2026-08-20', status: 'Reprovado / Manutenção' },
+      { id_fone: 2, numero_serie: 'SX-2026-001', modelo: 'SoundX 10',         marca: 'SoundX', tipo_conexao: 'Bluetooth', lote: 'LT-2026-A', data_fabricacao: '2026-09-01', status: 'Reprovado / Manutenção' },
+      { id_fone: 3, numero_serie: 'SX-2026-002', modelo: 'SoundX Studio Pro', marca: 'SoundX', tipo_conexao: 'USB-C',     lote: 'LT-2026-B', data_fabricacao: '2026-09-05', status: 'Aguardando inspeção' },
+      { id_fone: 4, numero_serie: 'SX-2026-003', modelo: 'SoundX Bass Max',   marca: 'SoundX', tipo_conexao: 'USB-C',     lote: 'LT-2026-B', data_fabricacao: '2026-09-10', status: 'Aprovado' }
     ],
     inspecao: [
       { id_inspecao: 1, id_fone: 1, id_funcionario: 1, data_inspecao: '2026-09-11 10:30:00', resultado_final: 'Reprovado / Manutenção', observacao: 'Falha no canal esquerdo de áudio.' },
@@ -88,6 +88,11 @@ const localProvider = {
 
     // 1. SELECT FROM funcionario (inclui SELECT * e SELECT com colunas específicas)
     if (cleanLower.startsWith('select') && cleanLower.includes('from funcionario')) {
+      if (cleanLower.includes('where id_funcionario = ?') || cleanLower.includes('where id_funcionario = $1')) {
+        const id = Number(params[0]);
+        const rows = data.funcionario.filter(f => f.id_funcionario === id);
+        return [rows, []];
+      }
       if (cleanLower.includes('where email = ?') || cleanLower.includes('where email = $1')) {
         const email = params[0];
         const rows = data.funcionario.filter(f => f.email === email);
@@ -109,7 +114,14 @@ const localProvider = {
 
     // 3. INSERT INTO fone
     if (cleanLower.startsWith('insert into fone')) {
-      const [numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status] = params;
+      // Suporta assinatura com ou sem lote
+      let numero_serie, modelo, marca, tipo_conexao, lote, data_fabricacao, status;
+      if (cleanLower.includes('lote')) {
+        [numero_serie, modelo, marca, tipo_conexao, lote, data_fabricacao, status] = params;
+      } else {
+        [numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status] = params;
+      }
+
       if (data.fone.some(f => f.numero_serie === numero_serie)) {
         const error = new Error('Já existe um fone com este número de série.');
         error.code = 'ER_DUP_ENTRY';
@@ -123,6 +135,7 @@ const localProvider = {
         modelo,
         marca: marca || 'SoundX',
         tipo_conexao: tipo_conexao || 'Bluetooth',
+        lote: lote || 'LT-2026-A',
         data_fabricacao: data_fabricacao || new Date().toISOString().slice(0, 10),
         status: status || 'Aguardando inspeção'
       };
@@ -173,7 +186,13 @@ const localProvider = {
 
     // 8. INSERT INTO inspecao
     if (cleanLower.startsWith('insert into inspecao')) {
-      const [resultado_final, observacao, id_funcionario, id_fone] = params;
+      let resultado_final, observacao, foto_url, id_funcionario, id_fone;
+      if (cleanLower.includes('foto_url')) {
+        [resultado_final, observacao, foto_url, id_funcionario, id_fone] = params;
+      } else {
+        [resultado_final, observacao, id_funcionario, id_fone] = params;
+        foto_url = null;
+      }
       const newId = data.inspecao.reduce((max, i) => Math.max(max, i.id_inspecao || 0), 0) + 1;
       const nova = {
         id_inspecao: newId,
@@ -181,7 +200,8 @@ const localProvider = {
         id_funcionario: Number(id_funcionario),
         data_inspecao: new Date().toISOString().replace('T', ' ').slice(0, 19),
         resultado_final,
-        observacao: observacao || ''
+        observacao: observacao || '',
+        foto_url: foto_url || null
       };
       data.inspecao.push(nova);
       saveLocalData(data);
@@ -250,6 +270,7 @@ const localProvider = {
             data_inspecao: i.data_inspecao,
             resultado_final: i.resultado_final,
             observacao: i.observacao,
+            foto_url: i.foto_url || null,
             fone_modelo: fone.modelo || '—',
             fone_serie: fone.numero_serie || '—',
             inspetor: func.nome || 'Inspetor'
@@ -324,13 +345,19 @@ const localProvider = {
 
     // 20. UPDATE fone completo
     if (cleanLower.startsWith('update fone set numero_serie = ?') || cleanLower.startsWith('update fone set numero_serie = $1')) {
-      const [numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status, id_fone] = params;
+      let numero_serie, modelo, marca, tipo_conexao, lote, data_fabricacao, status, id_fone;
+      if (cleanLower.includes('lote = ?') || cleanLower.includes('lote = $')) {
+        [numero_serie, modelo, marca, tipo_conexao, lote, data_fabricacao, status, id_fone] = params;
+      } else {
+        [numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status, id_fone] = params;
+      }
       const fone = data.fone.find(f => f.id_fone === Number(id_fone));
       if (fone) {
         fone.numero_serie = numero_serie;
         fone.modelo = modelo;
         fone.marca = marca;
         fone.tipo_conexao = tipo_conexao;
+        if (lote !== undefined) fone.lote = lote;
         fone.data_fabricacao = data_fabricacao;
         fone.status = status;
         saveLocalData(data);
@@ -493,6 +520,17 @@ const localProvider = {
       const cpf = params[0];
       const rows = data.funcionario.filter(f => f.cpf === cpf);
       return [rows, []];
+    }
+
+    // 34. UPDATE funcionario SET senha (alteração de senha)
+    if (cleanLower.startsWith('update funcionario set senha = ?') || cleanLower.startsWith('update funcionario set senha = $1')) {
+      const [senha, id_funcionario] = params;
+      const func = data.funcionario.find(f => f.id_funcionario === Number(id_funcionario));
+      if (func) {
+        func.senha = senha;
+        saveLocalData(data);
+      }
+      return [{ affectedRows: func ? 1 : 0 }, []];
     }
 
     console.warn('Query SQL não mapeada no provedor local:', sql, params);

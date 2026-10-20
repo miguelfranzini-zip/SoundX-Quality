@@ -112,17 +112,50 @@ function desenharAcoesRapidas() {
     .join('');
 }
 
+let ultimosDadosDashboard = null;
+
 async function carregar() {
   showSkeleton(kpisEl, 5);
 
   try {
     const dados = await api('/inspecoes/dashboard');
+    ultimosDadosDashboard = dados;
     desenharKpis(dados);
     desenharAcoesRapidas();
   } catch (erro) {
     kpisEl.innerHTML = '';
     toast(erro.message, 'erro');
   }
+}
+
+const btnExportarRelatorio = document.getElementById('btn-exportar-relatorio');
+if (btnExportarRelatorio) {
+  btnExportarRelatorio.addEventListener('click', () => {
+    if (!ultimosDadosDashboard) {
+      toast('Carregando métricas para exportação...', 'info');
+      return;
+    }
+
+    const d = ultimosDadosDashboard;
+    const relatorioCsv = [
+      'Indicador;Valor',
+      `Total de Fones Cadastrados;${d.total_fones_cadastrados ?? 0}`,
+      `Total de Inspeções Realizadas;${d.total_inspecoes_realizadas ?? 0}`,
+      `Fones Aprovados;${d.fones_aprovados ?? 0}`,
+      `Fones Reprovados;${d.fones_reprovados ?? 0}`,
+      `Taxa Geral de Aprovação;${d.taxa_aprovacao ?? '0%'}`,
+      `Data de Emissão;${new Date().toLocaleString('pt-BR')}`
+    ].join('\n');
+
+    const blob = new Blob(['\uFEFF' + relatorioCsv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `soundx_relatorio_indicadores_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Relatório analítico exportado com sucesso!', 'sucesso');
+  });
 }
 
 carregar();

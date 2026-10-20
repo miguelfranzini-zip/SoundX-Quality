@@ -26,6 +26,38 @@ document.getElementById('btn-nova-inspecao').addEventListener('click', () => {
   window.location.href = 'inspecao-form.html';
 });
 
+const btnExportarInspecoes = document.getElementById('btn-exportar-inspecoes');
+if (btnExportarInspecoes) {
+  btnExportarInspecoes.addEventListener('click', () => {
+    if (!inspecoesCache.length) {
+      toast('Nenhuma inspeção disponível para exportar.', 'aviso');
+      return;
+    }
+
+    const cabecalhos = ['ID Inspeção', 'Data', 'Modelo Fone', 'Nº Série', 'Inspetor', 'Resultado', 'Observação', 'Foto URL'];
+    const linhas = inspecoesCache.map(i => [
+      i.id_inspecao,
+      `"${i.data_inspecao ? new Date(i.data_inspecao).toLocaleString('pt-BR') : ''}"`,
+      `"${i.fone_modelo || ''}"`,
+      `"${i.fone_serie || ''}"`,
+      `"${i.inspetor || ''}"`,
+      `"${i.resultado_final || ''}"`,
+      `"${(i.observacao || '').replace(/"/g, '""')}"`,
+      `"${i.foto_url || ''}"`
+    ]);
+
+    const conteudoCsv = [cabecalhos.join(';'), ...linhas.map(l => l.join(';'))].join('\n');
+    const blob = new Blob(['\uFEFF' + conteudoCsv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `soundx_inspecoes_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Relatório CSV de inspeções exportado com sucesso!', 'sucesso');
+  });
+}
+
 function renderizar(lista) {
   if (!lista.length) {
     corpoTabela.innerHTML = `
@@ -48,6 +80,10 @@ function renderizar(lista) {
         : '';
       const linkTestes = `<button class="btn btn--ghost btn--pequeno" data-ver-testes="${inspecao.id_inspecao}">Testes</button>`;
 
+      const linkFoto = inspecao.foto_url
+        ? `<div style="margin-top: 4px;"><a href="${escapeHtml(inspecao.foto_url)}" target="_blank" rel="noopener" class="badge badge--info" title="Visualizar evidência fotográfica">📸 Ver Foto</a></div>`
+        : '';
+
       return `
       <tr>
         <td>${formatarData(inspecao.data_inspecao)}</td>
@@ -57,7 +93,10 @@ function renderizar(lista) {
         </td>
         <td>${escapeHtml(inspecao.inspetor || '—')}</td>
         <td>${badgeStatus(inspecao.resultado_final)}</td>
-        <td>${escapeHtml(inspecao.observacao || '—')}</td>
+        <td>
+          ${escapeHtml(inspecao.observacao || '—')}
+          ${linkFoto}
+        </td>
         <td>
           <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
             ${linkFone}

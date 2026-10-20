@@ -34,10 +34,11 @@
                   class="form__controle"
                   type="search"
                   id="busca-fones"
-                  placeholder="Buscar por série ou modelo..."
+                  placeholder="Buscar por série, modelo ou lote..."
                   autocomplete="off"
                 >
               </div>
+              <button class="btn btn--secundario" id="btn-exportar-fones" title="Exportar fones para CSV">Exportar CSV</button>
               <button class="btn btn--primario" id="btn-novo-fone">Novo fone</button>
             </div>
           </div>
@@ -49,6 +50,7 @@
                   <th>Nº de Série</th>
                   <th>Modelo</th>
                   <th>Marca</th>
+                  <th>Lote</th>
                   <th>Conexão</th>
                   <th>Status</th>
                   <th>Fabricação</th>
@@ -82,6 +84,10 @@
         <div class="form__grupo">
           <label class="form__label" for="edit-fone-marca">Marca</label>
           <input class="form__controle" type="text" id="edit-fone-marca" required>
+        </div>
+        <div class="form__grupo">
+          <label class="form__label" for="edit-fone-lote">Lote de Produção</label>
+          <input class="form__controle" type="text" id="edit-fone-lote" placeholder="Ex: LT-2026-A" required>
         </div>
         <div class="form__grupo">
           <label class="form__label" for="edit-fone-conexao">Tipo de Conexão</label>

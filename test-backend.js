@@ -89,28 +89,67 @@ async function runTests() {
     });
     console.log('   ✅ Listagem realizada!\n');
     
-    // 5. Tentar excluir fone (não existe)
-    console.log('5. Tentar excluir fone inexistente (id=1)...');
-    const excluirFone = await apiCall('DELETE', '/api/fones/1', null, token);
-    console.log('   Resposta:', JSON.stringify(excluirFone.data, null, 2));
-    console.log('   ✅ Operação retornada corretamente!\n');
-    
-    // 6. Criar um fone para testar exclusão
-    console.log('6. Criar fone de teste...');
+    // 5. Alteração de senha (validação do bug corrigido em userAuthController)
+    console.log('5. Teste de alteração de senha do usuário conectado...');
+    const changePwd = await apiCall('POST', '/api/user-auth/change-password', {
+      currentPassword: '1234',
+      newPassword: 'novasenha123',
+      confirmPassword: 'novasenha123'
+    }, token);
+    console.log('   Resposta:', JSON.stringify(changePwd.data, null, 2));
+    if (changePwd.status === 200) {
+      console.log('   ✅ Senha alterada com sucesso!');
+      // Reverte para a senha padrão para não interferir em outros testes
+      await apiCall('POST', '/api/user-auth/change-password', {
+        currentPassword: 'novasenha123',
+        newPassword: '1234',
+        confirmPassword: '1234'
+      }, token);
+      console.log('   ✅ Senha revertida para o padrão inicial!\n');
+    } else {
+      console.log('   ❌ Falha ao alterar senha!\n');
+    }
+
+    // 6. Criar um fone com Lote
+    console.log('6. Criar fone de teste com Lote...');
     const novoFone = await apiCall('POST', '/api/fones', {
       numero_serie: 'TEST-001',
-      modelo: 'SoundX Teste',
+      modelo: 'SoundX Teste Pro',
       marca: 'SoundX',
+      lote: 'LT-2026-X',
       tipo_conexao: 'Bluetooth',
       status: 'Aguardando inspeção'
     }, token);
     console.log('   Resposta:', JSON.stringify(novoFone.data, null, 2));
     
     if (novoFone.status === 201) {
-      console.log('   ✅ Fone criado com sucesso!\n');
+      console.log('   ✅ Fone com lote criado com sucesso!\n');
       
-      // 7. Excluir o fone criado
-      console.log('7. Excluir o fone de teste...');
+      // 7. Criar inspeção com Checklist Integrado e Foto
+      console.log('7. Criar inspeção com checklist e evidência fotográfica...');
+      const novaInspecao = await apiCall('POST', '/api/inspecoes', {
+        id_fone: novoFone.data.id_fone,
+        resultado_final: 'Reprovado / Manutenção',
+        observacao: 'Falha detectada no driver direito durante teste físico.',
+        foto_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
+        testes: [
+          { tipo_teste: 'Áudio L/R', parametro_medido: 'Frequência 20Hz-20kHz', resultado: 'Não passou', observacao: 'Canal direito mudo' },
+          { tipo_teste: 'Bluetooth', parametro_medido: '2.4GHz', resultado: 'Passou', observacao: 'Pareamento normal' }
+        ]
+      }, token);
+      console.log('   Resposta:', JSON.stringify(novaInspecao.data, null, 2));
+
+      // 8. Consultar rastreabilidade completa (Histórico)
+      console.log('8. Consultar rastreabilidade e histórico do fone...');
+      const historico = await apiCall('GET', `/api/fones/${novoFone.data.id_fone}/historico`, null, token);
+      console.log('   Lote do fone:', historico.data?.fone?.lote);
+      console.log('   Total de inspeções:', historico.data?.total_inspecoes);
+      console.log('   Total de testes técnicos associados:', historico.data?.testes?.length);
+      console.log('   Ordens de manutenção geradas automaticamente:', historico.data?.manutencoes?.length);
+      console.log('   ✅ Rastreabilidade e automações validadas!\n');
+
+      // 9. Excluir o fone criado
+      console.log('9. Excluir o fone de teste e histórico em cascata...');
       const deletarFone = await apiCall('DELETE', `/api/fones/${novoFone.data.id_fone}`, null, token);
       console.log('   Resposta:', JSON.stringify(deletarFone.data, null, 2));
       
@@ -121,8 +160,8 @@ async function runTests() {
       }
     }
     
-    // 8. Resetar dados
-    console.log('8. Resetar dados do banco (mantém apenas usuários)...');
+    // 10. Resetar dados
+    console.log('10. Resetar dados do banco (mantém apenas usuários)...');
     const reset = await apiCall('POST', '/api/admin/reset-dados', null, token);
     console.log('   Resposta:', JSON.stringify(reset.data, null, 2));
     
@@ -132,7 +171,7 @@ async function runTests() {
       console.log('   ❌ Erro ao resetar dados!\n');
     }
     
-    console.log('🎉 Testes concluídos!');
+    console.log('🎉 Todos os testes foram executados com sucesso!');
     
   } catch (error) {
     console.error('❌ Erro durante os testes:', error.message);

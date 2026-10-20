@@ -55,12 +55,65 @@
               </div>
 
               <div class="form__grupo">
-                <label class="form__label" for="observacao">Observação</label>
+                <label class="form__label" for="foto_url">Link da Foto / Evidência (opcional)</label>
+                <input
+                  class="form__controle"
+                  type="url"
+                  id="foto_url"
+                  name="foto_url"
+                  placeholder="https://exemplo.com/evidencia.jpg ou caminho da imagem"
+                >
+              </div>
+
+              <!-- Checklist Técnico Integrado -->
+              <div class="card mt-4" style="background: var(--bg-suave); border: 1px solid var(--borda);">
+                <div class="card__title">
+                  <h3 style="font-size: 1.05rem; margin-bottom: var(--space-2);">Checklist Técnico de Qualidade</h3>
+                  <p class="muted" style="font-size: 0.85rem;">Avalie os itens fundamentais durante o teste físico:</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-3); margin-top: var(--space-3);">
+                  <div class="form__grupo">
+                    <label class="form__label" for="chk_audio">1. Áudio L/R (Frequência)</label>
+                    <select class="form__controle" id="chk_audio">
+                      <option value="Passou">Passou (Sem ruído/distorção)</option>
+                      <option value="Não passou">Não passou (Falha/Mudo)</option>
+                    </select>
+                  </div>
+
+                  <div class="form__grupo">
+                    <label class="form__label" for="chk_mic">2. Microfone & Ruído</label>
+                    <select class="form__controle" id="chk_mic">
+                      <option value="Passou">Passou (Captação nítida)</option>
+                      <option value="Não passou">Não passou (Ruído/Chiado)</option>
+                    </select>
+                  </div>
+
+                  <div class="form__grupo">
+                    <label class="form__label" for="chk_conexao">3. Conectividade / Pareamento</label>
+                    <select class="form__controle" id="chk_conexao">
+                      <option value="Passou">Passou (Estável)</option>
+                      <option value="Não passou">Não passou (Queda/Intermitente)</option>
+                    </select>
+                  </div>
+
+                  <div class="form__grupo">
+                    <label class="form__label" for="chk_bateria">4. Bateria & Consumo</label>
+                    <select class="form__controle" id="chk_bateria">
+                      <option value="Passou">Passou (Tensão normal)</option>
+                      <option value="Não passou">Não passou (Perda de carga)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form__grupo mt-4">
+                <label class="form__label" for="observacao">Observação Técnica</label>
                 <textarea
                   class="form__controle"
                   id="observacao"
                   name="observacao"
-                  placeholder="Descreva evidências, falhas ou pontos observados..."
+                  placeholder="Descreva evidências, falhas ou observações sobre o checklist..."
                 ></textarea>
               </div>
 

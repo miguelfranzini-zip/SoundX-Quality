@@ -4,8 +4,8 @@
 const fs = require('fs');
 const path = require('path');
 
-// Determina o caminho do local_data.json
-const DATA_FILE = path.resolve(__dirname, '../local_data.json');
+// Determina o caminho do local_data.json na raiz do projeto
+const DATA_FILE = path.resolve(__dirname, 'local_data.json');
 
 console.log('📀 Resetando banco de dados local...\n');
 

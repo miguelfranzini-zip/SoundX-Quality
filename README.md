@@ -114,32 +114,43 @@ O sistema possui controle de acesso refinado baseado nos perfis operacionais e a
 
 ## 🚀 Como Executar o Sistema Localmente
 
-### 1. Iniciar o Banco de Dados (MySQL via XAMPP)
-1. Abra o **XAMPP Control Panel** e dê **Start** em **Apache** e **MySQL**.
-2. Acesse o phpMyAdmin em [http://localhost/phpmyadmin](http://localhost/phpmyadmin).
-3. Na aba **SQL**, execute o script localizado em [`backend/database.sql`](file:///c:/Users/Aluno/Desktop/SoundX-Quality-main/backend/database.sql).
+O sistema possui arquitetura resiliente com **zero-configuração inicial obrigatória**: caso não haja um banco PostgreSQL configurado, o servidor ativa automaticamente o provedor local de dados persistentes (`local_data.json`).
 
-### 2. Iniciar o Servidor (Back-end + Front-end integrado)
-1. Abra o terminal na pasta do backend:
+### 1. Iniciar o Servidor (Back-end + Front-end integrado)
+1. Abra o terminal na raiz do projeto ou na pasta do backend:
    ```bash
    cd backend
    npm install
    npm start
    ```
-2. O servidor iniciará na porta **3001**.
+2. O servidor iniciará na porta **3001**:
+   - Back-end API: `http://localhost:3001/api`
+   - Front-end SPA: `http://localhost:3001`
+
+### 2. (Opcional) Conectar ao PostgreSQL / Supabase
+1. Crie um arquivo `backend/.env` baseado no `backend/.env.example`.
+2. Configure sua string de conexão:
+   ```env
+   DATABASE_URL=postgresql://postgres:senha@host.supabase.co:5432/postgres?sslmode=require
+   JWT_SECRET=soundx_secret_key_2026
+   ```
+3. Execute o script DDL localizado em [`backend/database.sql`](file:///c:/Users/Aluno/Documents/SoundX-Quality/backend/database.sql).
 
 ### 3. Acessar a Aplicação
 Abra seu navegador e acesse:
 👉 **[http://localhost:3001](http://localhost:3001)**
 
-> *Dica de teste:* Na tela de login, utilize os botões de **Acesso Rápido** para alternar instantaneamente entre os perfis de **Inspetor**, **Técnico** e **Admin**.
+> *Credenciais de Teste:*
+> - **Inspetor:** `lucas@email.com` | Senha: `1234`
+> - **Técnico:** `tecnico@soundx.com` | Senha: `1234`
+> - **Admin:** `admin@soundx.com` | Senha: `1234`
 
 ---
 
 ## 🛠️ Tecnologias
-- **Front-end:** HTML5 semântico, CSS3 Moderno (Tokens, Variáveis, Flexbox, Grid), JavaScript Vanilla (ES Modules)
-- **Back-end:** Node.js, Express 5, JWT (`jsonwebtoken`), Criptografia (`bcryptjs`), MySQL2
-- **Banco de Dados:** MySQL 8.0+ / MariaDB (via XAMPP) com fallback local em JSON
+- **Front-end:** HTML5 semântico, CSS3 Moderno (Design Tokens, Variáveis, Flexbox, Grid), JavaScript Vanilla (ES Modules)
+- **Back-end:** Node.js, Express 5, JWT (`jsonwebtoken`), Criptografia (`bcryptjs`), Driver PostgreSQL (`pg`)
+- **Banco de Dados:** PostgreSQL (Supabase) com provedor de contingência local em JSON (`local_data.json`)
 - **Controle de Versão:** Git & GitHub
 
 ---

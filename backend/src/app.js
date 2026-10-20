@@ -43,8 +43,12 @@ app.use(cors({
       }
     }
 
-    // Permite refletir a origem para compatibilidade máxima com deploy no Netlify
-    return callback(null, true);
+    // Em ambiente de desenvolvimento, aceita requisições locais ou do mesmo host
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Bloqueado pela política CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],

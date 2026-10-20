@@ -28,7 +28,7 @@ function renderizar(lista) {
   if (!lista.length) {
     corpoTabela.innerHTML = `
       <tr>
-        <td colspan="7">
+        <td colspan="8">
           <div class="empty-state">
             <h3>Nenhum fone encontrado</h3>
             <p>Nenhum fone cadastrado no sistema ou ajuste o termo de busca.</p>
@@ -46,6 +46,7 @@ function renderizar(lista) {
         <td><strong>${escapeHtml(fone.numero_serie || '—')}</strong></td>
         <td>${escapeHtml(fone.modelo || '—')}</td>
         <td>${escapeHtml(fone.marca || '—')}</td>
+        <td><span class="badge badge--info">${escapeHtml(fone.lote || '—')}</span></td>
         <td>${escapeHtml(fone.tipo_conexao || '—')}</td>
         <td>${badgeStatus(fone.status)}</td>
         <td>${formatarDataCurta(fone.data_fabricacao)}</td>
@@ -87,6 +88,7 @@ function filtrar(termo) {
     String(fone.numero_serie || '').toLowerCase().includes(t) ||
     String(fone.modelo || '').toLowerCase().includes(t) ||
     String(fone.marca || '').toLowerCase().includes(t) ||
+    String(fone.lote || '').toLowerCase().includes(t) ||
     String(fone.tipo_conexao || '').toLowerCase().includes(t)
   );
   renderizar(resultado);
@@ -103,6 +105,7 @@ function abrirModalEdicao(fone) {
   document.getElementById('edit-fone-serie').value = fone.numero_serie || '';
   document.getElementById('edit-fone-modelo').value = fone.modelo || '';
   document.getElementById('edit-fone-marca').value = fone.marca || 'SoundX';
+  document.getElementById('edit-fone-lote').value = fone.lote || 'LT-2026-A';
   document.getElementById('edit-fone-conexao').value = fone.tipo_conexao || 'Bluetooth';
   document.getElementById('edit-fone-status').value = fone.status || 'Aguardando inspeção';
 
@@ -144,6 +147,7 @@ if (formEditarFone) {
       numero_serie: document.getElementById('edit-fone-serie').value.trim(),
       modelo: document.getElementById('edit-fone-modelo').value.trim(),
       marca: document.getElementById('edit-fone-marca').value.trim(),
+      lote: document.getElementById('edit-fone-lote').value.trim() || 'LT-2026-A',
       tipo_conexao: document.getElementById('edit-fone-conexao').value,
       status: document.getElementById('edit-fone-status').value,
       data_fabricacao: document.getElementById('edit-fone-data').value || null,
@@ -223,10 +227,43 @@ btnNovoFone.addEventListener('click', () => {
   window.location.href = 'fone-cadastro.html';
 });
 
+// Exportar Catálogo de Fones em CSV
+const btnExportar = document.getElementById('btn-exportar-fones');
+if (btnExportar) {
+  btnExportar.addEventListener('click', () => {
+    if (!fones.length) {
+      toast('Nenhum dado disponível para exportar.', 'aviso');
+      return;
+    }
+
+    const cabecalhos = ['ID', 'Nº de Série', 'Modelo', 'Marca', 'Lote', 'Conexão', 'Status', 'Data Fabricação'];
+    const linhas = fones.map(f => [
+      f.id_fone,
+      `"${f.numero_serie || ''}"`,
+      `"${f.modelo || ''}"`,
+      `"${f.marca || ''}"`,
+      `"${f.lote || ''}"`,
+      `"${f.tipo_conexao || ''}"`,
+      `"${f.status || ''}"`,
+      `"${f.data_fabricacao ? new Date(f.data_fabricacao).toISOString().slice(0, 10) : ''}"`
+    ]);
+
+    const conteudoCsv = [cabecalhos.join(';'), ...linhas.map(l => l.join(';'))].join('\n');
+    const blob = new Blob(['\uFEFF' + conteudoCsv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `soundx_fones_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Relatório CSV de fones exportado com sucesso!', 'sucesso');
+  });
+}
+
 async function carregar() {
   corpoTabela.innerHTML = `
     <tr>
-      <td colspan="7">
+      <td colspan="8">
         <div class="skeleton skeleton--linha"></div>
         <div class="skeleton skeleton--linha"></div>
         <div class="skeleton skeleton--linha"></div>

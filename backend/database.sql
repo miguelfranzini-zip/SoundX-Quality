@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS fone (
     modelo         VARCHAR(100) NOT NULL,
     marca          VARCHAR(100) DEFAULT 'SoundX',
     tipo_conexao   VARCHAR(50)  DEFAULT 'Bluetooth',
+    lote           VARCHAR(50)  DEFAULT 'LT-2026-A',
     data_fabricacao DATE        DEFAULT CURRENT_DATE,
     status         VARCHAR(50)  DEFAULT 'Aguardando inspeção'
 );
@@ -32,6 +33,7 @@ CREATE TABLE IF NOT EXISTS inspecao (
     data_inspecao  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     resultado_final VARCHAR(50) NOT NULL,
     observacao     TEXT,
+    foto_url       TEXT,
     CONSTRAINT fk_inspecao_fone FOREIGN KEY (id_fone) REFERENCES fone(id_fone) ON DELETE CASCADE,
     CONSTRAINT fk_inspecao_func FOREIGN KEY (id_funcionario) REFERENCES funcionario(id_funcionario) ON DELETE SET NULL
 );
@@ -73,10 +75,10 @@ VALUES
 ON CONFLICT (email) DO UPDATE SET nome = EXCLUDED.nome, cargo = EXCLUDED.cargo;
 
 -- Fones iniciais para testes
-INSERT INTO fone (numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status)
+INSERT INTO fone (numero_serie, modelo, marca, tipo_conexao, lote, data_fabricacao, status)
 VALUES
-    ('FN001',       'SoundX Pro',        'SoundX', 'Bluetooth', '2026-08-20', 'Reprovado / Manutenção'),
-    ('SX-2026-001', 'SoundX 10',         'SoundX', 'Bluetooth', '2026-09-01', 'Reprovado / Manutenção'),
-    ('SX-2026-002', 'SoundX Studio Pro', 'SoundX', 'USB-C',     '2026-09-05', 'Aguardando inspeção'),
-    ('SX-2026-003', 'SoundX Bass Max',   'SoundX', 'USB-C',     '2026-09-10', 'Aprovado')
-ON CONFLICT (numero_serie) DO UPDATE SET modelo = EXCLUDED.modelo;
+    ('FN001',       'SoundX Pro',        'SoundX', 'Bluetooth', 'LT-2026-A', '2026-08-20', 'Reprovado / Manutenção'),
+    ('SX-2026-001', 'SoundX 10',         'SoundX', 'Bluetooth', 'LT-2026-A', '2026-09-01', 'Reprovado / Manutenção'),
+    ('SX-2026-002', 'SoundX Studio Pro', 'SoundX', 'USB-C',     'LT-2026-B', '2026-09-05', 'Aguardando inspeção'),
+    ('SX-2026-003', 'SoundX Bass Max',   'SoundX', 'USB-C',     'LT-2026-B', '2026-09-10', 'Aprovado')
+ON CONFLICT (numero_serie) DO UPDATE SET modelo = EXCLUDED.modelo, lote = EXCLUDED.lote;

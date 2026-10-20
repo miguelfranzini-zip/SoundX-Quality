@@ -13,7 +13,7 @@ const listarFones = async (req, res) => {
 
 // Cadastrar novo fone
 const cadastrarFone = async (req, res) => {
-  const { numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status } = req.body;
+  const { numero_serie, modelo, marca, tipo_conexao, lote, data_fabricacao, status } = req.body;
 
   if (!numero_serie || !modelo) {
     return res.status(400).json({ mensagem: 'Número de série e modelo são obrigatórios.' });
@@ -21,8 +21,8 @@ const cadastrarFone = async (req, res) => {
 
   try {
     const query = `
-      INSERT INTO fone (numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO fone (numero_serie, modelo, marca, tipo_conexao, lote, data_fabricacao, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
       RETURNING id_fone
     `;
     const values = [
@@ -30,6 +30,7 @@ const cadastrarFone = async (req, res) => {
       modelo,
       marca || 'SoundX',
       tipo_conexao || 'Bluetooth',
+      lote || 'LT-2026-A',
       data_fabricacao || new Date(),
       status || 'Aguardando inspeção'
     ];
@@ -101,7 +102,7 @@ const obterHistorico = async (req, res) => {
 // Atualizar dados de um fone
 const atualizarFone = async (req, res) => {
   const { id } = req.params;
-  const { numero_serie, modelo, marca, tipo_conexao, data_fabricacao, status } = req.body;
+  const { numero_serie, modelo, marca, tipo_conexao, lote, data_fabricacao, status } = req.body;
 
   if (!modelo) {
     return res.status(400).json({ mensagem: 'O modelo do fone é obrigatório.' });
@@ -125,7 +126,7 @@ const atualizarFone = async (req, res) => {
 
     const query = `
       UPDATE fone 
-      SET numero_serie = ?, modelo = ?, marca = ?, tipo_conexao = ?, data_fabricacao = ?, status = ?
+      SET numero_serie = ?, modelo = ?, marca = ?, tipo_conexao = ?, lote = ?, data_fabricacao = ?, status = ?
       WHERE id_fone = ?
     `;
     const values = [
@@ -133,6 +134,7 @@ const atualizarFone = async (req, res) => {
       modelo,
       marca || foneAtual.marca || 'SoundX',
       tipo_conexao || foneAtual.tipo_conexao || 'Bluetooth',
+      lote || foneAtual.lote || 'LT-2026-A',
       data_fabricacao || foneAtual.data_fabricacao,
       status || foneAtual.status || 'Aguardando inspeção',
       id

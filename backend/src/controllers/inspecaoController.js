@@ -1,8 +1,8 @@
 const db = require('../config/database');
 
-// 1. Registrar uma nova inspeção
+// 1. Registrar uma nova inspeção (com suporte a checklist e evidência fotográfica)
 exports.criarInspecao = async (req, res) => {
-  const { id_fone, resultado_final, observacao } = req.body;
+  const { id_fone, resultado_final, observacao, foto_url, testes } = req.body;
   const id_funcionario = req.usuarioId; // Obtido automaticamente pelo token JWT
 
   if (!id_fone || !resultado_final) {
@@ -12,11 +12,25 @@ exports.criarInspecao = async (req, res) => {
   try {
     // Salva a inspeção no banco
     const query = `
-      INSERT INTO inspecao (data_inspecao, resultado_final, observacao, id_funcionario, id_fone)
-      VALUES (NOW(), ?, ?, ?, ?)
+      INSERT INTO inspecao (data_inspecao, resultado_final, observacao, foto_url, id_funcionario, id_fone)
+      VALUES (NOW(), ?, ?, ?, ?, ?)
       RETURNING id_inspecao
     `;
-    const [resultado] = await db.query(query, [resultado_final, observacao || '', id_funcionario, id_fone]);
+    const [resultado] = await db.query(query, [resultado_final, observacao || '', foto_url || null, id_funcionario, id_fone]);
+    const id_inspecao = resultado.insertId;
+
+    // Se foram fornecidos testes técnicos do checklist, registra-os automaticamente
+    if (Array.isArray(testes) && testes.length > 0) {
+      for (const t of testes) {
+        if (t.tipo_teste && t.resultado) {
+          await db.query(
+            `INSERT INTO teste (id_inspecao, tipo_teste, parametro_medido, resultado, observacao)
+             VALUES (?, ?, ?, ?, ?)`,
+            [id_inspecao, t.tipo_teste, t.parametro_medido || '', t.resultado, t.observacao || '']
+          );
+        }
+      }
+    }
 
     // Atualiza o status do fone automaticamente no estoque
     const novoStatus = resultado_final === 'Aprovado' ? 'Aprovado' : 'Reprovado / Manutenção';
@@ -33,7 +47,7 @@ exports.criarInspecao = async (req, res) => {
 
     res.status(201).json({
       mensagem: 'Inspeção de qualidade registrada com sucesso!',
-      id_inspecao: resultado.insertId,
+      id_inspecao,
       status_fone_atualizado: novoStatus
     });
   } catch (error) {
@@ -78,6 +92,7 @@ exports.listarInspecoes = async (req, res) => {
         i.data_inspecao,
         i.resultado_final,
         i.observacao,
+        i.foto_url,
         f.modelo AS fone_modelo,
         f.numero_serie AS fone_serie,
         func.nome AS inspetor

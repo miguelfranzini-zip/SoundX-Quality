@@ -32,6 +32,7 @@ form.addEventListener('submit', async (e) => {
   const numero_serie = document.getElementById('numero_serie').value.trim();
   const modelo = document.getElementById('modelo').value.trim();
   const marca = document.getElementById('marca').value.trim();
+  const lote = document.getElementById('lote').value.trim() || 'LT-2026-A';
   const tipo_conexao = document.getElementById('tipo_conexao').value;
   const data_fabricacao = document.getElementById('data_fabricacao').value;
   const status = document.getElementById('status').value;
@@ -51,6 +52,7 @@ form.addEventListener('submit', async (e) => {
         numero_serie,
         modelo,
         marca,
+        lote,
         tipo_conexao,
         data_fabricacao: data_fabricacao || new Date().toISOString().slice(0, 10),
         status,
