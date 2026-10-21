@@ -195,6 +195,9 @@ export function initShell(tituloAtivo, usuario) {
       overlay.classList.remove('overlay--mostrar');
     });
   }
+
+  // Inicializa tooltips flutuantes globais
+  initTooltips();
 }
 
 function tituloAtivoHumanizado(id) {
@@ -343,4 +346,140 @@ export function confirmarAcao({
     overlay.querySelector('#btn-cancelar-confirmacao').onclick = () => fechar(false);
     overlay.querySelector('#btn-executar-confirmacao').onclick = () => fechar(true);
   });
+}
+
+/* ---------- Tooltip Global Flutuante (evita corte em tabelas/overflow) ---------- */
+export function initTooltips() {
+  if (typeof document === 'undefined') return;
+
+  // Marca no body que o sistema de tooltips JS está ativo para desabilitar o pseudo-elemento CSS
+  document.body.classList.add('has-global-tooltips');
+
+  let bubble = document.getElementById('sxq-floating-tooltip');
+  if (!bubble) {
+    bubble = document.createElement('div');
+    bubble.id = 'sxq-floating-tooltip';
+    bubble.className = 'sxq-tooltip-bubble';
+    bubble.setAttribute('role', 'tooltip');
+    bubble.innerHTML = '<span class="sxq-tooltip-text"></span><div class="sxq-tooltip-arrow"></div>';
+    document.body.appendChild(bubble);
+  }
+
+  const textEl = bubble.querySelector('.sxq-tooltip-text');
+  const arrowEl = bubble.querySelector('.sxq-tooltip-arrow');
+  let alvoAtual = null;
+
+  function mostrarTooltip(el) {
+    alvoAtual = el;
+    const texto = el.getAttribute('data-tooltip') || el.dataset.tooltip || el.getAttribute('title') || el.dataset.origTitle;
+    if (!texto || !texto.trim()) return;
+
+    // Se o elemento possuir o atributo title nativo, remove temporariamente para não duplicar com tooltip do navegador
+    if (el.hasAttribute('title')) {
+      el.dataset.origTitle = el.getAttribute('title');
+      el.removeAttribute('title');
+    }
+
+    textEl.textContent = texto.trim();
+    bubble.className = 'sxq-tooltip-bubble';
+    bubble.style.display = 'block';
+
+    const rect = el.getBoundingClientRect();
+    const bubbleRect = bubble.getBoundingClientRect();
+    const padding = 12;
+
+    // Determina se deve abrir para cima ou para baixo:
+    // Se estiver dentro de um <th>, com classe .tooltip-hint--bottom,
+    // ou se o espaço superior for insuficiente (< bubbleRect.height + 20)
+    const isInsideTh = Boolean(el.closest('th'));
+    const isBottomPref = el.classList.contains('tooltip-hint--bottom');
+    const spaceAbove = rect.top;
+    const deveAbrirAbaixo = isInsideTh || isBottomPref || spaceAbove < (bubbleRect.height + 18);
+
+    let top = 0;
+    if (deveAbrirAbaixo) {
+      top = rect.bottom + 8;
+      bubble.classList.add('sxq-tooltip-bubble--bottom');
+    } else {
+      top = rect.top - bubbleRect.height - 8;
+      bubble.classList.add('sxq-tooltip-bubble--top');
+    }
+
+    // Alinhamento horizontal inteligente
+    let left = rect.left + (rect.width / 2) - (bubbleRect.width / 2);
+
+    // Ajusta para não vazar a tela à esquerda ou à direita
+    if (left < padding) {
+      left = padding;
+    } else if (left + bubbleRect.width > window.innerWidth - padding) {
+      left = window.innerWidth - bubbleRect.width - padding;
+    }
+
+    bubble.style.top = `${Math.round(top)}px`;
+    bubble.style.left = `${Math.round(left)}px`;
+
+    // Posiciona a setinha alinhada com o centro do elemento alvo
+    const arrowCenter = rect.left + (rect.width / 2) - left;
+    const clampedArrow = Math.max(12, Math.min(bubbleRect.width - 12, arrowCenter));
+    arrowEl.style.left = `${Math.round(clampedArrow)}px`;
+
+    // Ativa visibilidade com animação
+    requestAnimationFrame(() => {
+      bubble.classList.add('sxq-tooltip-bubble--visible');
+    });
+  }
+
+  function esconderTooltip() {
+    if (!bubble) return;
+    bubble.classList.remove('sxq-tooltip-bubble--visible');
+    bubble.style.display = 'none';
+
+    if (alvoAtual && alvoAtual.dataset.origTitle) {
+      alvoAtual.setAttribute('title', alvoAtual.dataset.origTitle);
+      delete alvoAtual.dataset.origTitle;
+    }
+    alvoAtual = null;
+  }
+
+  // Delegação de eventos globais
+  document.addEventListener('mouseover', (e) => {
+    const hint = e.target.closest('.tooltip-hint, [data-tooltip]');
+    if (hint) {
+      mostrarTooltip(hint);
+    }
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    const hint = e.target.closest('.tooltip-hint, [data-tooltip]');
+    if (hint && alvoAtual === hint) {
+      esconderTooltip();
+    }
+  });
+
+  document.addEventListener('focusin', (e) => {
+    const hint = e.target.closest('.tooltip-hint, [data-tooltip]');
+    if (hint) {
+      mostrarTooltip(hint);
+    }
+  });
+
+  document.addEventListener('focusout', (e) => {
+    const hint = e.target.closest('.tooltip-hint, [data-tooltip]');
+    if (hint && alvoAtual === hint) {
+      esconderTooltip();
+    }
+  });
+
+  // Oculta ao rolar a página ou redimensionar a janela
+  window.addEventListener('scroll', esconderTooltip, { passive: true });
+  window.addEventListener('resize', esconderTooltip, { passive: true });
+}
+
+// Inicializa automaticamente se executado no navegador
+if (typeof window !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTooltips);
+  } else {
+    initTooltips();
+  }
 }

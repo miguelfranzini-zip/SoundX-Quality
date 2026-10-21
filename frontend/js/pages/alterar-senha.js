@@ -1,5 +1,5 @@
 import { API_URL, SESSION_KEY } from '../config.js';
-import { toast, initShell } from '../ui.js?v=2';
+import { toast, initShell } from '../ui.js?v=3';
 import { guardPagina } from '../auth.js';
 
 document.addEventListener('DOMContentLoaded', async () => {

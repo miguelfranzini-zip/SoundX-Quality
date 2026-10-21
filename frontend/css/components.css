@@ -1273,12 +1273,15 @@ textarea.form__controle { min-height: 96px; resize: vertical; }
   transform: translateX(-50%) translateY(0);
 }
 
+/* Para cabeçalhos de tabela ou elementos explicitamente marcados como bottom */
+th .tooltip-hint::after,
 .tooltip-hint--bottom::after {
   bottom: auto;
   top: calc(100% + 9px);
   transform: translateX(-50%) translateY(-5px);
 }
 
+th .tooltip-hint::before,
 .tooltip-hint--bottom::before {
   bottom: auto;
   top: calc(100% + 3px);
@@ -1287,9 +1290,106 @@ textarea.form__controle { min-height: 96px; resize: vertical; }
   transform: translateX(-50%) translateY(-5px);
 }
 
+th .tooltip-hint:hover::after,
+th .tooltip-hint:hover::before,
+th .tooltip-hint:focus::after,
+th .tooltip-hint:focus::before,
 .tooltip-hint--bottom:hover::after,
 .tooltip-hint--bottom:hover::before,
 .tooltip-hint--bottom:focus::after,
 .tooltip-hint--bottom:focus::before {
   transform: translateX(-50%) translateY(0);
+}
+
+/* Colunas à esquerda da tabela não devem cortar o balão à esquerda */
+th:first-child .tooltip-hint::after,
+th:nth-child(2) .tooltip-hint::after {
+  left: 0;
+  transform: translateY(-5px);
+}
+
+th:first-child .tooltip-hint::before,
+th:nth-child(2) .tooltip-hint::before {
+  left: 6px;
+  transform: translateY(-5px);
+}
+
+th:first-child .tooltip-hint:hover::after,
+th:first-child .tooltip-hint:focus::after,
+th:nth-child(2) .tooltip-hint:hover::after,
+th:nth-child(2) .tooltip-hint:focus::after {
+  transform: translateY(0);
+}
+
+th:first-child .tooltip-hint:hover::before,
+th:first-child .tooltip-hint:focus::before,
+th:nth-child(2) .tooltip-hint:hover::before,
+th:nth-child(2) .tooltip-hint:focus::before {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   TOOLTIP GLOBAL FLUTUANTE (DOM BODY — ZERO CORTE POR OVERFLOW)
+   ========================================================= */
+.sxq-tooltip-bubble {
+  position: fixed;
+  z-index: 999999;
+  display: none;
+  background: #1F150D;
+  color: #FFF6E3;
+  font-family: var(--font-text, -apple-system, sans-serif);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  padding: 8px 13px;
+  border-radius: 8px;
+  max-width: 280px;
+  width: max-content;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 3px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 189, 43, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  transform: translateY(4px);
+}
+
+.sxq-tooltip-bubble--visible {
+  opacity: 1;
+  transform: translateY(0) !important;
+}
+
+.sxq-tooltip-bubble--top {
+  transform: translateY(4px);
+}
+
+.sxq-tooltip-bubble--bottom {
+  transform: translateY(-4px);
+}
+
+.sxq-tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.sxq-tooltip-bubble--top .sxq-tooltip-arrow {
+  bottom: -6px;
+  border-width: 6px 6px 0 6px;
+  border-color: #1F150D transparent transparent transparent;
+  transform: translateX(-50%);
+}
+
+.sxq-tooltip-bubble--bottom .sxq-tooltip-arrow {
+  top: -6px;
+  border-width: 0 6px 6px 6px;
+  border-color: transparent transparent #1F150D transparent;
+  transform: translateX(-50%);
+}
+
+/* Quando o tooltip flutuante JS está ativo, desativa os pseudo-elementos CSS para não duplicar */
+body.has-global-tooltips .tooltip-hint::after,
+body.has-global-tooltips .tooltip-hint::before {
+  display: none !important;
 }

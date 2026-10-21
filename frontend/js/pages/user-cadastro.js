@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { toast, initShell, emptyState, escapeHtml, confirmarAcao } from '../ui.js?v=2';
+import { toast, initShell, emptyState, escapeHtml, confirmarAcao } from '../ui.js?v=3';
 import { guardPagina } from '../auth.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
