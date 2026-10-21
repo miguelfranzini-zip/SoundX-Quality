@@ -53,6 +53,9 @@
 
     if (targetId === 'apresentacao') {
       document.body.classList.add('slides-mode-active');
+      if (typeof showSlide === 'function') {
+        showSlide(currentSlide);
+      }
     } else {
       document.body.classList.remove('slides-mode-active');
     }
@@ -277,9 +280,25 @@
 
     slides.forEach((slide, idx) => {
       const active = idx === currentSlide;
-      slide.classList.toggle('slide-item--active', active);
-      slide.hidden = !active;
+      if (active) {
+        slide.classList.remove('slide-item--active');
+        void slide.offsetWidth; // Força reflow para reiniciar animações em cascata
+        slide.classList.add('slide-item--active');
+        slide.hidden = false;
+        slide.scrollTop = 0;
+      } else {
+        slide.classList.remove('slide-item--active');
+        slide.hidden = true;
+      }
     });
+
+    // Atualiza barra de progresso do topo
+    const progressBarEl = document.getElementById('slides-progress-bar');
+    if (progressBarEl) {
+      const total = slides.length - 1;
+      const pct = total > 0 ? (currentSlide / total) * 100 : 0;
+      progressBarEl.style.width = `${pct}%`;
+    }
 
     // Atualiza controles e contadores
     if (counterPill) {

@@ -14,9 +14,9 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/docs.css">
+  <link rel="stylesheet" href="css/layout.css?v=3">
+  <link rel="stylesheet" href="css/components.css?v=3">
+  <link rel="stylesheet" href="css/docs.css?v=3">
 </head>
 <body class="docs-body">
   <div class="docs-progress" id="docs-progress" aria-hidden="true"></div>
@@ -214,9 +214,14 @@
                   <!-- Botão Sair dos Slides -->
                   <button type="button" class="slides-btn-ctrl slides-btn-ctrl--exit" id="btn-slide-exit" title="Sair da apresentação e voltar ao manual técnico (Esc)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    <span>Voltar ao Manual (Esc)</span>
+                    <span>Sair dos Slides (Esc)</span>
                   </button>
                 </div>
+              </div>
+
+              <!-- Barra de Progresso da Apresentação -->
+              <div class="slides-progress-track" aria-hidden="true">
+                <div class="slides-progress-bar" id="slides-progress-bar"></div>
               </div>
 
               <!-- Barra de Pesquisa Rápida de Dúvidas (Contextual) -->
@@ -4296,6 +4301,6 @@ await tx.query('UPDATE fone SET status = ? WHERE id_fone = ?', [
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg>
   </button>
 
-  <script src="js/docs.js" defer></script>
+  <script src="js/docs.js?v=3" defer></script>
 </body>
 </html>
