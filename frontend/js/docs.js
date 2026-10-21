@@ -422,18 +422,25 @@
     }
   });
 
-  // Links diretos dentro de cada slide para o capítulo correspondente
+  // Links diretos dentro de cada slide ou card de resumo para o capítulo correspondente
   document.addEventListener('click', (e) => {
-    const linkDuvida = e.target.closest('[data-duvida-tab]');
-    if (linkDuvida) {
+    const linkTarget = e.target.closest('[data-duvida-tab], [data-jump-tab]');
+    if (linkTarget) {
       e.preventDefault();
-      const tabId = linkDuvida.dataset.duvidaTab;
+      const tabId = linkTarget.dataset.duvidaTab || linkTarget.dataset.jumpTab;
       activate(tabId, { scroll: true });
     }
   });
 
   /* ---------- Base de Conhecimento para Pesquisa Rápida de Dúvidas ---------- */
   const DOC_SEARCH_INDEX = [
+    {
+      termos: ['resumo', 'sinopse', 'sumario', 'revisao', 'overview', 'topicos', 'capitulos', 'matriz', 'sintese'],
+      titulo: 'Resumo Geral de Todos os Tópicos',
+      capitulo: 'resumo',
+      badge: 'Resumo Executivo',
+      resumo: 'Visão consolidada da arquitetura, fluxo industrial, banco de dados, regras de negócio e infraestrutura.'
+    },
     {
       termos: ['transacao', 'transacoes', 'acid', 'atomicidade', 'withtransaction', 'rollback', 'commit'],
       titulo: 'Transações Atômicas & Integridade ACID',

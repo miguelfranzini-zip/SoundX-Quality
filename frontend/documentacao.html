@@ -79,6 +79,11 @@
           <span>Diagnóstico</span>
           <span class="docs-nav__num">08</span>
         </button>
+        <button type="button" class="sidebar__item" data-doc-link="resumo" title="Resumo Executivo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span>Resumo Geral</span>
+          <span class="docs-nav__num">09</span>
+        </button>
       </nav>
 
       <div class="sidebar__footer docs-sidebar__footer">
@@ -183,6 +188,10 @@
               <button class="docs-tab" id="tab-diagnostico" role="tab" data-doc-tab="diagnostico" data-doc-label="Diagnóstico" aria-selected="false" aria-controls="panel-diagnostico" tabindex="-1">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.7 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4M12 17h.01"></path></svg>
                 <span>Diagnóstico</span>
+              </button>
+              <button class="docs-tab" id="tab-resumo" role="tab" data-doc-tab="resumo" data-doc-label="Resumo Geral" aria-selected="false" aria-controls="panel-resumo" tabindex="-1">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>Resumo</span>
               </button>
             </div>
           </div>
@@ -4321,6 +4330,369 @@ await tx.query('UPDATE fone SET status = ? WHERE id_fone = ?', [
                 <div class="docs-callout__body">
                   <span class="docs-callout__title">Critério de “pronto”</span>
                   <p>O sistema está confiável quando o estado do fone, o laudo mais recente e a fila de manutenção nunca se contradizem; quando nenhuma falha de banco troca silenciosamente de provedor; e quando um usuário sem permissão recebe 403 em qualquer rota, não apenas no menu.</p>
+                </div>
+              </div>
+            </section>
+          </section>
+
+          <!-- ==================== 09 · RESUMO EXECUTIVO DE CADA TÓPICO ==================== -->
+          <section class="docs-panel" id="panel-resumo" data-doc-panel="resumo" role="tabpanel" aria-labelledby="tab-resumo" tabindex="0">
+            <section class="docs-section">
+              <div class="docs-section__head">
+                <span class="docs-section__num">09</span>
+                <div>
+                  <h2>Resumo Geral de Cada Tópico</h2>
+                  <p class="docs-section__sub">Visão consolidada e rápida de toda a engenharia, regras de negócio, banco de dados e arquitetura do SoundX Quality em um só lugar.</p>
+                </div>
+              </div>
+
+              <!-- Cartões de Visão Rápida do Sistema -->
+              <div class="docs-grid docs-grid--3 docs-mb-4">
+                <div class="docs-card docs-card--accent">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18M8 4v5"></path></svg>
+                    </span>
+                    <div>
+                      <h4>14 Páginas Web Puras</h4>
+                      <p>Frontend Vanilla SPA</p>
+                    </div>
+                  </div>
+                  <p class="docs-small">Zero frameworks pesados ou etapas complexas de compilação. Código leve, performático e carregamento em milissegundos.</p>
+                </div>
+
+                <div class="docs-card docs-card--accent">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="6" rx="2"></rect><rect x="3" y="14" width="18" height="6" rx="2"></rect><line x1="7" y1="7" x2="7.01" y2="7"></line><line x1="7" y1="17" x2="7.01" y2="17"></line></svg>
+                    </span>
+                    <div>
+                      <h4>23 Endpoints REST</h4>
+                      <p>Backend Node.js &amp; Express</p>
+                    </div>
+                  </div>
+                  <p class="docs-small">API desacoplada em controladores e rotas dedicadas para fones, laudos, testes, manutenções, usuários e autenticação.</p>
+                </div>
+
+                <div class="docs-card docs-card--accent">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"></path></svg>
+                    </span>
+                    <div>
+                      <h4>5 Tabelas &amp; ACID</h4>
+                      <p>Supabase + Fallback JSON</p>
+                    </div>
+                  </div>
+                  <p class="docs-small">Transações tudo-ou-nada no PostgreSQL e contingência automática caso a conexão com a nuvem seja interrompida.</p>
+                </div>
+              </div>
+
+              <!-- Grade de Resumo de Cada Capítulo (00 ao 08) -->
+              <div class="docs-section__head docs-mt-5">
+                <span class="docs-section__num">9.1</span>
+                <div>
+                  <h3>Resumo Tópico por Tópico</h3>
+                  <p class="docs-section__sub">O essencial de cada capítulo para consulta rápida de desenvolvedores, auditores e gestores da fábrica.</p>
+                </div>
+              </div>
+
+              <div class="docs-grid docs-grid--2">
+                <!-- Tópico 00 -->
+                <article class="docs-card">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    </span>
+                    <div>
+                      <span class="docs-badge docs-badge--route">Capítulo 00</span>
+                      <h4>Apresentação Executiva (Deck de Slides)</h4>
+                    </div>
+                  </div>
+                  <p><strong>Objetivo:</strong> Comunicar o valor do SoundX Quality para clientes, diretoria e auditores de maneira direta, profissional e visual.</p>
+                  <ul class="docs-list docs-mt-2">
+                    <li><strong>11 Telas Estratégicas:</strong> Capa, diagnóstico de refugo, ecossistema unificado, stack ágil, fluxo em 4 passos, RBAC, 4 testes, oficina e resultados.</li>
+                    <li><strong>Visual Limpo &amp; Acessível:</strong> Textos em tópicos curtos, fontes grandes legíveis à distância e zero emojis (ícones SVG padronizados).</li>
+                    <li><strong>Atalhos de Teclado:</strong> Setas de navegação, <kbd>Espaço</kbd>, tela cheia com tecla <kbd>F</kbd> e saída rápida com <kbd>Esc</kbd>.</li>
+                  </ul>
+                  <div class="docs-card__footer docs-mt-3">
+                    <button type="button" class="btn btn--secundario btn--pequeno" data-jump-tab="apresentacao">Abrir Apresentação (Slides) →</button>
+                  </div>
+                </article>
+
+                <!-- Tópico 01 -->
+                <article class="docs-card">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M3.6 9h16.8M3.6 15h16.8M12 3a17 17 0 0 1 0 18M12 3a17 17 0 0 0 0 18"></path></svg>
+                    </span>
+                    <div>
+                      <span class="docs-badge docs-badge--table">Capítulo 01</span>
+                      <h4>Visão Geral &amp; O Ciclo do Fone</h4>
+                    </div>
+                  </div>
+                  <p><strong>Objetivo:</strong> Centralizar o fone como a entidade principal de negócio com rastreabilidade absoluta de início ao fim.</p>
+                  <ul class="docs-list docs-mt-2">
+                    <li><strong>4 Estados Determinísticos:</strong> <em>Aguardando inspeção</em> &rarr; <em>Aprovado</em> ou <em>Reprovado / Manutenção</em> &rarr; <em>Em Análise</em> &rarr; <em>Reteste</em>.</li>
+                    <li><strong>Fila Fechada de Qualidade:</strong> O técnico de manutenção conserta a peça, mas apenas a equipe de inspeção tem o poder de emitir aprovação final.</li>
+                    <li><strong>Rastreabilidade Unitária:</strong> Cada fone tem número de série único, lote de montagem e registro inalterável da sua vida fabril.</li>
+                  </ul>
+                  <div class="docs-card__footer docs-mt-3">
+                    <button type="button" class="btn btn--secundario btn--pequeno" data-jump-tab="visao-geral">Ver Capítulo 01 Completo →</button>
+                  </div>
+                </article>
+
+                <!-- Tópico 02 -->
+                <article class="docs-card">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"></path></svg>
+                    </span>
+                    <div>
+                      <span class="docs-badge docs-badge--db">Capítulo 02</span>
+                      <h4>Banco de Dados &amp; Armazenamento</h4>
+                    </div>
+                  </div>
+                  <p><strong>Objetivo:</strong> Persistência confiável com integridade referencial estrita e resiliência em caso de falha de conexão.</p>
+                  <ul class="docs-list docs-mt-2">
+                    <li><strong>Modelo Relacional (5 Tabelas):</strong> <span class="docs-inline">fones</span>, <span class="docs-inline">inspecoes</span>, <span class="docs-inline">testes</span>, <span class="docs-inline">manutencoes</span> e <span class="docs-inline">usuarios</span>.</li>
+                    <li><strong>Auto-Migração de Colunas:</strong> Verificação e criação dinâmica de colunas como <span class="docs-inline">foto_url</span> e <span class="docs-inline">lote</span> sem quebrar o banco.</li>
+                    <li><strong>Fallback JSON Local:</strong> Se a URL do Supabase não for informada ou oscilar, o sistema ativa o provedor local persistente sem travar.</li>
+                  </ul>
+                  <div class="docs-card__footer docs-mt-3">
+                    <button type="button" class="btn btn--secundario btn--pequeno" data-jump-tab="banco">Ver Capítulo 02 Completo →</button>
+                  </div>
+                </article>
+
+                <!-- Tópico 03 -->
+                <article class="docs-card">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="6" rx="2"></rect><rect x="3" y="14" width="18" height="6" rx="2"></rect><path d="M7 7h.01M7 17h.01M11 7h6M11 17h6"></path></svg>
+                    </span>
+                    <div>
+                      <span class="docs-badge docs-badge--auth">Capítulo 03</span>
+                      <h4>Backend &amp; API REST</h4>
+                    </div>
+                  </div>
+                  <p><strong>Objetivo:</strong> Camada de aplicação em Node.js com Express 5, transações ACID e validação rigorosa de entradas.</p>
+                  <ul class="docs-list docs-mt-2">
+                    <li><strong>Transação Atômica de Laudo:</strong> Grava laudo, testes técnicos, atualiza estoque e abre/conclui O.S. num bloco único tudo-ou-nada.</li>
+                    <li><strong>Reconciliação Automática na Exclusão:</strong> Ao deletar uma inspeção, o fone retorna ao status anterior mais recente de forma autolimpante.</li>
+                    <li><strong>Prevenção de Duplicidade:</strong> Regra mandatória de no máximo 1 Ordem de Serviço aberta simultaneamente por fone.</li>
+                  </ul>
+                  <div class="docs-card__footer docs-mt-3">
+                    <button type="button" class="btn btn--secundario btn--pequeno" data-jump-tab="backend">Ver Capítulo 03 Completo →</button>
+                  </div>
+                </article>
+
+                <!-- Tópico 04 -->
+                <article class="docs-card">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18M8 4v5M8 13l-2 2 2 2M16 13l2 2-2 2M13 12l-2 6"></path></svg>
+                    </span>
+                    <div>
+                      <span class="docs-badge docs-badge--table">Capítulo 04</span>
+                      <h4>Frontend &amp; Interface do Usuário</h4>
+                    </div>
+                  </div>
+                  <p><strong>Objetivo:</strong> Experiência de uso instantânea para o operador de bancada com alta legibilidade e zero burocracia.</p>
+                  <ul class="docs-list docs-mt-2">
+                    <li><strong>Tooltips Flutuantes Globais:</strong> Ajuda <span class="docs-inline">(!)</span> em todos os formulários e tabelas sem corte lateral por <span class="docs-inline">overflow</span>.</li>
+                    <li><strong>Laudo Auditável para Impressão:</strong> Formato para impressão física ou PDF com histórico de testes, O.S. e assinaturas.</li>
+                    <li><strong>Exportação CSV (RFC 4180):</strong> Download de planilhas formatadas com codificação UTF-8 com BOM prontas para Excel e ERPs.</li>
+                  </ul>
+                  <div class="docs-card__footer docs-mt-3">
+                    <button type="button" class="btn btn--secundario btn--pequeno" data-jump-tab="frontend">Ver Capítulo 04 Completo →</button>
+                  </div>
+                </article>
+
+                <!-- Tópico 05 -->
+                <article class="docs-card">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 0 0 0 18h1.5a2.5 2.5 0 0 0 0-5H12a2 2 0 0 1 0-4h3.5A5.5 5.5 0 0 0 21 6.5 3.5 3.5 0 0 0 17.5 3H12z"></path><circle cx="7.5" cy="9" r=".8" fill="currentColor"></circle><circle cx="10" cy="6.5" r=".8" fill="currentColor"></circle><circle cx="14" cy="6" r=".8" fill="currentColor"></circle></svg>
+                    </span>
+                    <div>
+                      <span class="docs-badge docs-badge--route">Capítulo 05</span>
+                      <h4>Design System &amp; Identidade Visual</h4>
+                    </div>
+                  </div>
+                  <p><strong>Objetivo:</strong> Coerência estética baseada na regra <em>"Garet comunica nos títulos, Muli explica no corpo"</em>.</p>
+                  <ul class="docs-list docs-mt-2">
+                    <li><strong>Paleta Oficial SoundX:</strong> Laranja vibrante, Dourado suave, Marrom profundo e fundos Off-White de alto contraste.</li>
+                    <li><strong>Tokens CSS Canônicos:</strong> Tipografia, bordas arredondadas e sombras estruturadas centralizadas em <span class="docs-inline">tokens.css</span>.</li>
+                    <li><strong>Feedback Imediato:</strong> Indicadores de carregamento, estados desabilitados e toasts flutuantes para cada ação.</li>
+                  </ul>
+                  <div class="docs-card__footer docs-mt-3">
+                    <button type="button" class="btn btn--secundario btn--pequeno" data-jump-tab="design">Ver Capítulo 05 Completo →</button>
+                  </div>
+                </article>
+
+                <!-- Tópico 06 -->
+                <article class="docs-card">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6.05 11A22.35 22.35 0 0 1 12 15z"></path></svg>
+                    </span>
+                    <div>
+                      <span class="docs-badge docs-badge--deploy">Capítulo 06</span>
+                      <h4>Deploy &amp; Configuração de Ambiente</h4>
+                    </div>
+                  </div>
+                  <p><strong>Objetivo:</strong> Distribuição rápida em nuvem (Netlify + Vercel/Render) com resolução dinâmica de API.</p>
+                  <ul class="docs-list docs-mt-2">
+                    <li><strong>Injeção via build.mjs:</strong> Script que lê variáveis do Netlify e gera <span class="docs-inline">env-config.js</span> automaticamente.</li>
+                    <li><strong>Resolução Inteligente (config.js):</strong> Detecta se é localhost, domínio Netlify ou permite sobrescrita via console.</li>
+                    <li><strong>Comando no Console:</strong> Qualquer desenvolvedor pode rodar <span class="docs-inline">setBackendUrl("https://...")</span> para testes rápidos.</li>
+                  </ul>
+                  <div class="docs-card__footer docs-mt-3">
+                    <button type="button" class="btn btn--secundario btn--pequeno" data-jump-tab="deploy">Ver Capítulo 06 Completo →</button>
+                  </div>
+                </article>
+
+                <!-- Tópico 07 -->
+                <article class="docs-card">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                    </span>
+                    <div>
+                      <span class="docs-badge docs-badge--critical">Capítulo 07</span>
+                      <h4>Segurança &amp; Governança (RBAC)</h4>
+                    </div>
+                  </div>
+                  <p><strong>Objetivo:</strong> Blindagem contra acessos indevidos, adulteração de laudos e deleções acidentais.</p>
+                  <ul class="docs-list docs-mt-2">
+                    <li><strong>3 Personas Segregadas:</strong> <em>Inspetor</em> (cadastra e testa), <em>Técnico</em> (oficina e reteste) e <em>Admin</em> (gestão total).</li>
+                    <li><strong>Exclusividade de DELETE (RNF08):</strong> Apenas administradores possuem acesso a rotas de exclusão de registros e usuários.</li>
+                    <li><strong>Salvaguarda Anti-Exclusão:</strong> Bloqueio estrito de autoexclusão e proteção mandatória que impede deletar o único Admin do sistema.</li>
+                  </ul>
+                  <div class="docs-card__footer docs-mt-3">
+                    <button type="button" class="btn btn--secundario btn--pequeno" data-jump-tab="seguranca">Ver Capítulo 07 Completo →</button>
+                  </div>
+                </article>
+
+                <!-- Tópico 08 -->
+                <article class="docs-card">
+                  <div class="docs-card__head">
+                    <span class="docs-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.7 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4M12 17h.01"></path></svg>
+                    </span>
+                    <div>
+                      <span class="docs-badge docs-badge--warn">Capítulo 08</span>
+                      <h4>Diagnóstico, Testes &amp; Troubleshooting</h4>
+                    </div>
+                  </div>
+                  <p><strong>Objetivo:</strong> Roteiro de resolução de problemas, histórico de bugs corrigidos e testes automatizados.</p>
+                  <ul class="docs-list docs-mt-2">
+                    <li><strong>Suíte Automatizada:</strong> Script <span class="docs-inline">node backend/test-app-completo.js</span> cobrindo banco, rotas, login e sintaxe dos 17 scripts JS.</li>
+                    <li><strong>Bug do Fuso Horário Corrigido:</strong> Parsing local de data de fabricação evitando que o fone retroceda 1 dia ao salvar.</li>
+                    <li><strong>Matriz de Riscos:</strong> 35 pontos auditados com priorização para garantir certificação fabril contínua.</li>
+                  </ul>
+                  <div class="docs-card__footer docs-mt-3">
+                    <button type="button" class="btn btn--secundario btn--pequeno" data-jump-tab="diagnostico">Ver Capítulo 08 Completo →</button>
+                  </div>
+                </article>
+              </div>
+
+              <!-- Tabela Sinótica do Sistema -->
+              <div class="docs-section__head docs-mt-5">
+                <span class="docs-section__num">9.2</span>
+                <div>
+                  <h3>Matriz Sinótica da Arquitetura</h3>
+                  <p class="docs-section__sub">Resumo comparativo das tecnologias, responsabilidades e regras críticas de cada subsistema.</p>
+                </div>
+              </div>
+
+              <div class="docs-table-wrap">
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Capítulo</th>
+                      <th>Subsistema</th>
+                      <th>Tecnologia Chave</th>
+                      <th>Responsabilidade Principal</th>
+                      <th>Regra de Ouro / Blindagem</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>00</strong></td>
+                      <td>Apresentação</td>
+                      <td>HTML5 Canvas + CSS Docs</td>
+                      <td>Comunicação executiva e visual para diretoria</td>
+                      <td>Zero emojis; navegação acessível por teclado (<kbd>F</kbd> / <kbd>Esc</kbd>)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>01</strong></td>
+                      <td>Ciclo do Fone</td>
+                      <td>Workflow Industrial</td>
+                      <td>Rastrear cada fone do estoque até expedição</td>
+                      <td>Apenas inspetores de qualidade podem emitir laudo final de aprovação</td>
+                    </tr>
+                    <tr>
+                      <td><strong>02</strong></td>
+                      <td>Banco de Dados</td>
+                      <td>PostgreSQL + JSON Fallback</td>
+                      <td>Persistência de fones, testes, laudos e O.S.</td>
+                      <td>Integridade referencial estrita e contingência local automática</td>
+                    </tr>
+                    <tr>
+                      <td><strong>03</strong></td>
+                      <td>Backend API</td>
+                      <td>Node.js + Express 5</td>
+                      <td>Regras de negócio, transações e 23 endpoints</td>
+                      <td>Transações ACID atômicas tudo-ou-nada via <span class="docs-inline">withTransaction</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>04</strong></td>
+                      <td>Frontend</td>
+                      <td>Vanilla JS SPA + ES Modules</td>
+                      <td>14 telas com interface amigável para bancada</td>
+                      <td>Tooltips globais sem corte e laudo auditável para impressão</td>
+                    </tr>
+                    <tr>
+                      <td><strong>05</strong></td>
+                      <td>Design System</td>
+                      <td>CSS Tokens + Garet/Muli</td>
+                      <td>Identidade visual coesa da marca SoundX</td>
+                      <td>Alto contraste visual, estados de foco e microinterações táteis</td>
+                    </tr>
+                    <tr>
+                      <td><strong>06</strong></td>
+                      <td>Deploy</td>
+                      <td>Netlify + Vercel / Render</td>
+                      <td>Hospedagem ágil sem custos de infraestrutura pesada</td>
+                      <td>Detecção automática de ambiente e injeção no build</td>
+                    </tr>
+                    <tr>
+                      <td><strong>07</strong></td>
+                      <td>Segurança</td>
+                      <td>JWT + Bcrypt (10 rounds)</td>
+                      <td>Controle de permissões granular por função</td>
+                      <td>Exclusão exclusiva de administradores com trava de último admin</td>
+                    </tr>
+                    <tr>
+                      <td><strong>08</strong></td>
+                      <td>Diagnóstico</td>
+                      <td>Test Runner Node.js nativo</td>
+                      <td>Garantia de 100% de disponibilidade operacional</td>
+                      <td>Execução preventiva de diagnóstico antes de qualquer deploy</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Callout de Encerramento -->
+              <div class="docs-callout docs-callout--success docs-mt-5">
+                <span class="docs-callout__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </span>
+                <div class="docs-callout__body">
+                  <span class="docs-callout__title">Sistema 100% Documentado e Auditado</span>
+                  <p>Este manual reúne o conhecimento acumulado de todos os 74 arquivos do repositório SoundX Quality. Para consultar o detalhamento técnico completo de qualquer item, utilize os botões em cada cartão ou navegue diretamente pelo menu lateral esquerdo.</p>
                 </div>
               </div>
             </section>
