@@ -237,6 +237,11 @@ export function formatarData(valor) {
 
 export function formatarDataCurta(valor) {
   if (!valor) return '—';
+  // DATE no formato YYYY-MM-DD: parse direto para evitar recuo de dia por fuso UTC (-03:00)
+  if (typeof valor === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+    const [ano, mes, dia] = valor.split('-');
+    return `${dia}/${mes}/${ano}`;
+  }
   const data = new Date(valor);
   if (Number.isNaN(data.getTime())) return valor;
   return data.toLocaleDateString('pt-BR');

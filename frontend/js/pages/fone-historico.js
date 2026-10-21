@@ -227,6 +227,10 @@ if (btnImprimir) {
     }
     const fone = historico.fone;
     const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast('O navegador bloqueou a janela do laudo. Por favor, permita popups neste site.', 'aviso');
+      return;
+    }
     const inspecoesHtml = (historico.inspecoes || []).map(i => `
       <tr>
         <td>${formatarData(i.data_inspecao)}</td>

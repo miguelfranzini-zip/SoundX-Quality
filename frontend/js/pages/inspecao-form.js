@@ -85,6 +85,17 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
+  if (foto_url && !foto_url.startsWith('http://') && !foto_url.startsWith('https://')) {
+    exibirAlerta('A URL da foto deve ser segura e iniciar com http:// ou https://');
+    return;
+  }
+
+  const temFalha = [resAudio, resMic, resConexao, resBateria].some(r => r === 'Não passou');
+  if (temFalha && resultado_final === 'Aprovado') {
+    exibirAlerta('Inconsistência: Não é permitido aprovar um fone quando houver testes reprovados no checklist.');
+    return;
+  }
+
   btnSalvar.disabled = true;
   btnSalvar.textContent = 'Registrando...';
 

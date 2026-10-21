@@ -26,6 +26,18 @@ document.getElementById('btn-nova-inspecao').addEventListener('click', () => {
   window.location.href = 'inspecao-form.html';
 });
 
+function celulaCsv(valor) {
+  const texto = valor == null ? '' : String(valor);
+  return `"${texto.replace(/"/g, '""')}"`;
+}
+
+function linkFotoSeguro(url) {
+  if (!url || typeof url !== 'string') return '';
+  const u = url.trim();
+  if (!u.startsWith('http://') && !u.startsWith('https://')) return '';
+  return `<div style="margin-top: 4px;"><a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer" class="badge badge--info" title="Visualizar evidência fotográfica">📸 Ver Foto</a></div>`;
+}
+
 const btnExportarInspecoes = document.getElementById('btn-exportar-inspecoes');
 if (btnExportarInspecoes) {
   btnExportarInspecoes.addEventListener('click', () => {
@@ -36,22 +48,24 @@ if (btnExportarInspecoes) {
 
     const cabecalhos = ['ID Inspeção', 'Data', 'Modelo Fone', 'Nº Série', 'Inspetor', 'Resultado', 'Observação', 'Foto URL'];
     const linhas = inspecoesCache.map(i => [
-      i.id_inspecao,
-      `"${i.data_inspecao ? new Date(i.data_inspecao).toLocaleString('pt-BR') : ''}"`,
-      `"${i.fone_modelo || ''}"`,
-      `"${i.fone_serie || ''}"`,
-      `"${i.inspetor || ''}"`,
-      `"${i.resultado_final || ''}"`,
-      `"${(i.observacao || '').replace(/"/g, '""')}"`,
-      `"${i.foto_url || ''}"`
+      celulaCsv(i.id_inspecao),
+      celulaCsv(i.data_inspecao ? new Date(i.data_inspecao).toLocaleString('pt-BR') : ''),
+      celulaCsv(i.fone_modelo),
+      celulaCsv(i.fone_serie),
+      celulaCsv(i.inspetor),
+      celulaCsv(i.resultado_final),
+      celulaCsv(i.observacao),
+      celulaCsv(i.foto_url)
     ]);
 
     const conteudoCsv = [cabecalhos.join(';'), ...linhas.map(l => l.join(';'))].join('\n');
     const blob = new Blob(['\uFEFF' + conteudoCsv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+    const d = new Date();
+    const dataLocalNome = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     a.href = url;
-    a.download = `soundx_inspecoes_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `soundx_inspecoes_${dataLocalNome}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast('Relatório CSV de inspeções exportado com sucesso!', 'sucesso');
@@ -80,9 +94,7 @@ function renderizar(lista) {
         : '';
       const linkTestes = `<button class="btn btn--ghost btn--pequeno" data-ver-testes="${inspecao.id_inspecao}">Testes</button>`;
 
-      const linkFoto = inspecao.foto_url
-        ? `<div style="margin-top: 4px;"><a href="${escapeHtml(inspecao.foto_url)}" target="_blank" rel="noopener" class="badge badge--info" title="Visualizar evidência fotográfica">📸 Ver Foto</a></div>`
-        : '';
+      const linkFoto = linkFotoSeguro(inspecao.foto_url);
 
       return `
       <tr>

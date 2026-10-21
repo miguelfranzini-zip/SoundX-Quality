@@ -541,20 +541,43 @@ body.docs-body {
 }
 
 .docs-card--dark {
-  background: linear-gradient(135deg, #3d1706 0%, #602100 100%);
-  border-color: rgba(255, 189, 43, 0.22);
-  color: #f8e5ca;
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, #2b1104 0%, #461802 100%) !important;
+  border: 1.5px solid rgba(255, 189, 43, 0.45) !important;
+  color: #fff8e8 !important;
+  box-shadow: 0 10px 28px rgba(35, 12, 1, 0.35) !important;
 }
 
 .docs-card--dark h3,
 .docs-card--dark h4 {
-  color: #ffe2af;
+  color: #ffbd2b !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .docs-card--dark p,
+.docs-card--dark .docs-card__head p {
+  color: #fedfbb !important;
+}
+
+.docs-card--dark .docs-list li,
 .docs-card--dark li {
-  color: #f1d6b5;
+  color: #fff8e8 !important;
+}
+
+.docs-card--dark strong,
+.docs-card--dark .docs-list strong,
+.docs-card--dark .docs-list li strong {
+  color: #ffbd2b !important;
+}
+
+.docs-card--dark .docs-list li::before {
+  background: #ff9800 !important;
+  box-shadow: 0 0 0 3px rgba(255, 189, 43, 0.45) !important;
+}
+
+.docs-card--dark .docs-badge {
+  background: rgba(255, 189, 43, 0.22) !important;
+  color: #ffbd2b !important;
+  border: 1px solid rgba(255, 189, 43, 0.5) !important;
 }
 
 .docs-card--accent {
@@ -1788,6 +1811,623 @@ body.docs-body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================
+   SOUNDX QUALITY — APRESENTAÇÃO EXECUTIVA DE SLIDES (TELA INTEIRA)
+   Palco de apresentação imersivo 16:9 widescreen
+   ========================================================= */
+
+#panel-apresentacao.docs-panel--ativo {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: radial-gradient(circle at 50% 12%, #2f1204 0%, #150600 80%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  animation: slideFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes slideFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideCardIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.slides-shell {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100vw;
+  height: 100vh;
+  padding: 0.9rem 1.8rem 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: 0;
+}
+
+/* Barra Superior do Apresentador (Floating Glass) */
+.slides-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0.65rem 1.4rem;
+  background: rgba(35, 13, 2, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 189, 43, 0.28);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
+  max-width: 1380px;
+  width: 100%;
+  margin: 0 auto;
+  z-index: 100;
+  flex-wrap: wrap;
+}
+
+.slides-topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.slides-topbar__logo {
+  height: 30px;
+  width: auto;
+  filter: drop-shadow(0 2px 8px rgba(255, 189, 43, 0.35));
+}
+
+.slides-counter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.slides-counter__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.35rem 0.8rem;
+  font-family: var(--fonte-titulo);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--marrom-profundo);
+  background: var(--grad-energia);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 2px 8px rgba(255, 189, 43, 0.4);
+}
+
+.slides-counter__text {
+  font-family: var(--fonte-corpo);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #fff8e8;
+  letter-spacing: 0.01em;
+}
+
+.slides-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Botões da barra superior */
+.slides-btn-duvidas {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0.42rem 0.9rem;
+  font-family: var(--fonte-corpo);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #fff8e8;
+  background: rgba(255, 189, 43, 0.18);
+  border: 1px solid rgba(255, 189, 43, 0.35);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.22s var(--ease-spring);
+}
+
+.slides-btn-duvidas:hover {
+  background: rgba(255, 189, 43, 0.32);
+  border-color: var(--laranja);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(255, 152, 0, 0.3);
+}
+
+.slides-btn-duvidas svg {
+  width: 15px;
+  height: 15px;
+  stroke: #ffbd2b;
+}
+
+.slides-btn-duvidas[aria-expanded="true"] {
+  background: var(--grad-energia);
+  color: var(--marrom-profundo);
+  border-color: transparent;
+  box-shadow: 0 3px 10px rgba(255, 189, 43, 0.4);
+}
+
+.slides-btn-duvidas[aria-expanded="true"] svg {
+  stroke: var(--marrom-profundo);
+}
+
+.slides-btn-ctrl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.42rem 0.85rem;
+  font-family: var(--fonte-corpo);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #fff8e8;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.slides-btn-ctrl svg {
+  width: 14px;
+  height: 14px;
+  stroke: #ffbd2b;
+}
+
+.slides-btn-ctrl:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 189, 43, 0.5);
+  transform: translateY(-1px);
+}
+
+.slides-btn-ctrl--exit svg {
+  stroke: #ff9e9e;
+}
+
+.slides-btn-ctrl--exit:hover {
+  background: rgba(220, 53, 69, 0.25);
+  border-color: rgba(220, 53, 69, 0.55);
+  color: #ffe6e6;
+}
+
+/* Modal flutuante de dúvidas */
+.slides-search-wrap {
+  position: absolute;
+  top: 72px;
+  right: 2rem;
+  width: 520px;
+  max-width: 90vw;
+  z-index: 200;
+  background: #fffdf8;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
+  border: 1.5px solid var(--laranja);
+  padding: 0.85rem;
+  animation: docsPanelIn 0.22s var(--ease-spring);
+}
+
+.slides-search-box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.65rem 1rem;
+  background: #fff;
+  border: 1.5px solid var(--laranja);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(255, 152, 0, 0.15);
+}
+
+.slides-search-icon {
+  width: 18px;
+  height: 18px;
+  stroke: var(--laranja);
+  flex-shrink: 0;
+}
+
+.slides-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--fonte-corpo);
+  font-size: 0.95rem;
+  color: var(--marrom-profundo);
+  outline: none;
+}
+
+.slides-search-input::placeholder {
+  color: rgba(96, 33, 0, 0.45);
+}
+
+.slides-search-close {
+  border: none;
+  background: rgba(96, 33, 0, 0.08);
+  color: var(--marrom);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: background 0.18s;
+}
+
+.slides-search-close:hover {
+  background: rgba(96, 33, 0, 0.18);
+}
+
+.slides-search-results {
+  margin-top: 0.65rem;
+  max-height: 380px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.slides-search-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-suave);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+  text-decoration: none;
+}
+
+.slides-search-item:hover {
+  background: #fff;
+  border-color: rgba(255, 152, 0, 0.45);
+  box-shadow: 0 3px 10px rgba(96, 33, 0, 0.06);
+  transform: translateX(3px);
+}
+
+.slides-search-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.slides-search-item__title {
+  font-family: var(--fonte-titulo);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--marrom-profundo);
+}
+
+.slides-search-item__badge {
+  font-size: 0.72rem;
+  padding: 0.18rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 189, 43, 0.22);
+  color: var(--marrom);
+  font-weight: 600;
+}
+
+.slides-search-item__desc {
+  font-size: 0.82rem;
+  color: var(--text-secundario);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Viewport / Palco de Apresentação */
+.slides-viewport {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1380px;
+  margin: 0 auto;
+  position: relative;
+  min-height: 0;
+  padding: 0.6rem 0;
+  overflow: visible;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Slide 16:9 Canvas */
+.slide-item {
+  display: none;
+  width: 100%;
+  height: 100%;
+  max-height: 720px;
+  background: #fffdf9;
+  border-radius: 24px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 189, 43, 0.25);
+  padding: 2.2rem 2.8rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: slideCardIn 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-item--active {
+  display: flex;
+}
+
+.slide-item__head {
+  margin-bottom: var(--space-4);
+}
+
+.slide-item__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fonte-titulo);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--laranja-forte);
+  margin-bottom: 0.35rem;
+}
+
+.slide-item__title {
+  font-family: var(--fonte-titulo);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--marrom-profundo);
+  margin: 0 0 0.35rem;
+  line-height: 1.2;
+}
+
+.slide-item__sub {
+  font-size: 1.1rem;
+  color: var(--text-secundario);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.slide-item__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+/* Estilos de cards dentro do slide para máximo contraste */
+.slide-item .docs-card {
+  background: #ffffff;
+  border: 1px solid rgba(96, 33, 0, 0.12);
+  box-shadow: 0 4px 18px rgba(96, 33, 0, 0.05);
+}
+
+.slide-item .docs-card h3,
+.slide-item .docs-card h4 {
+  color: var(--marrom-profundo);
+  font-weight: 700;
+}
+
+.slide-item .docs-card p,
+.slide-item .docs-card li {
+  color: #4a1800;
+}
+
+/* Capa especial */
+.slide-item--capa {
+  background: linear-gradient(135deg, rgba(255, 248, 232, 0.98), rgba(254, 239, 206, 0.95)),
+              radial-gradient(circle at top right, rgba(255, 189, 43, 0.25), transparent 60%);
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.slide-capa__logo {
+  width: 95px;
+  height: 95px;
+  margin-bottom: var(--space-4);
+  filter: drop-shadow(0 8px 20px rgba(96, 33, 0, 0.2));
+}
+
+.slide-capa__title {
+  font-family: var(--fonte-titulo);
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--marrom-profundo);
+  margin: 0 0 var(--space-2);
+  line-height: 1.15;
+}
+
+.slide-capa__sub {
+  font-size: 1.2rem;
+  max-width: 720px;
+  margin: 0 auto var(--space-6);
+  color: var(--marrom);
+  line-height: 1.55;
+}
+
+.slide-capa__features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--space-3);
+  max-width: 920px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.slide-capa__feat {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 1.1rem 1.2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 152, 0, 0.35);
+  box-shadow: 0 4px 14px rgba(96, 33, 0, 0.06);
+  text-align: left;
+}
+
+.slide-capa__feat strong {
+  display: block;
+  font-family: var(--fonte-titulo);
+  color: var(--marrom-profundo);
+  font-size: 0.92rem;
+  margin-bottom: 3px;
+}
+
+.slide-capa__feat p {
+  font-size: 0.82rem;
+  color: var(--text-secundario);
+  margin: 0;
+}
+
+/* Rodapé do Slide */
+.slide-item__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  border-top: 1px solid rgba(96, 33, 0, 0.08);
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.slide-item__hint {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secundario);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slide-item__link-duvida {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--fonte-corpo);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--laranja-forte);
+  text-decoration: none;
+  cursor: pointer;
+  background: rgba(255, 152, 0, 0.10);
+  border: 1px solid rgba(255, 152, 0, 0.25);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-pill);
+  transition: all 0.2s ease;
+}
+
+.slide-item__link-duvida:hover {
+  background: var(--laranja);
+  color: #fff;
+  border-color: var(--laranja);
+  transform: translateX(3px);
+}
+
+/* Painel Inferior de Navegação dos Slides (Deck) */
+.slides-bottom-deck {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0.55rem 1.5rem;
+  background: rgba(35, 13, 2, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 189, 43, 0.25);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
+  max-width: 1380px;
+  width: 100%;
+  margin: 0 auto;
+  z-index: 100;
+}
+
+.slides-dots-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.slides-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.slide-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 248, 232, 0.25);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.22s var(--ease-spring);
+}
+
+.slide-dot:hover {
+  background: var(--laranja);
+  transform: scale(1.3);
+}
+
+.slide-dot--active {
+  width: 28px;
+  border-radius: var(--radius-pill);
+  background: var(--grad-energia);
+  box-shadow: 0 2px 8px rgba(255, 189, 43, 0.6);
+}
+
+.slides-kbd-hint {
+  font-size: 0.76rem;
+  color: rgba(255, 248, 232, 0.65);
+  font-family: var(--fonte-corpo);
+  text-align: center;
+}
+
+.slides-kbd-hint strong {
+  color: #ffbd2b;
+  font-weight: 700;
+  background: rgba(255, 189, 43, 0.16);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Responsividade dos slides */
+@media (max-width: 768px) {
+  .slide-item {
+    padding: 1.4rem 1.2rem;
+  }
+  .slide-item__title {
+    font-size: 1.35rem;
+  }
+  .slide-capa__title {
+    font-size: 1.65rem;
+  }
+  .slide-item--active {
+    min-height: 480px;
   }
 }
 

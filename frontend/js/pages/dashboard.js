@@ -150,8 +150,10 @@ if (btnExportarRelatorio) {
     const blob = new Blob(['\uFEFF' + relatorioCsv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+    const agora = new Date();
+    const dataLocalNome = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
     a.href = url;
-    a.download = `soundx_relatorio_indicadores_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `soundx_relatorio_indicadores_${dataLocalNome}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast('Relatório analítico exportado com sucesso!', 'sucesso');

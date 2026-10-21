@@ -42,8 +42,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       tabelaWrapper.innerHTML = `
-        <div class="table-responsive">
-          <table class="table">
+        <div class="tabela-wrapper">
+          <table class="tabela">
             <thead>
               <tr>
                 <th>Nome</th>

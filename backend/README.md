@@ -1,5 +1,8 @@
 # 🎧 SoundX Quality — Backend API
 
+> 🌐 **Frontend Oficial (Netlify):** [https://soundxquality.netlify.app/](https://soundxquality.netlify.app/)  
+> 🚀 **API em Produção (Vercel):** [https://sound-x-quality.vercel.app](https://sound-x-quality.vercel.app)
+
 API REST para controle de qualidade, registro de testes técnicos e gestão de manutenção na linha de produção de fones de ouvido.
 
 ## 🚀 Como Executar o Projeto
@@ -53,9 +56,17 @@ API REST para controle de qualidade, registro de testes técnicos e gestão de m
 | POST   | /api/manutencao          | Sim       | Todos autenticados    | Abre ordem de serviço de manutenção manual  |
 | PUT    | /api/manutencao/:id      | Sim       | Admin, Técnico        | Atualiza status, ação corretiva e defeito   |
 | DELETE | /api/manutencao/:id      | Sim       | Admin                 | Exclui ordem de manutenção                  |
-| POST   | /api/admin/reset-dados   | Sim       | Admin, Gerente        | Restaura base para estado inicial           |
+| POST   | /api/admin/reset-dados   | Sim       | Admin                 | Restaura base para estado inicial (senhas protegidas) |
 
-> **Nota:** Usuários com cargo `Admin` ou `Gerente` possuem acesso irrestrito a todas as rotas protegidas.
+> **Nota de RBAC:** Apenas usuários com perfil `Admin` têm autorização para exclusões destrutivas (DELETE) e reset de base, preservando a auditoria da fábrica.
+
+## 🧪 Testes Automatizados
+
+Para rodar a suíte completa de testes de integração (16 validações cobrindo autenticação, transações, invariante de O.S., coerência de checklist e sanitização de URLs):
+
+```bash
+npm test
+```
 
 ## 🧪 Exemplos de Payloads (Thunder Client)
 

@@ -14,7 +14,13 @@ module.exports = (req, res, next) => {
 
   const token = parts[1];
 
-  jwt.verify(token, process.env.JWT_SECRET || 'soundx_secret_key_2026', (err, decoded) => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    console.error('ERRO CRÍTICO DE SEGURANÇA: JWT_SECRET não configurado nas variáveis de ambiente!');
+    return res.status(500).json({ mensagem: 'Erro interno de configuração: JWT_SECRET não configurado.' });
+  }
+
+  jwt.verify(token, secret, (err, decoded) => {
     if (err) {
       return res.status(401).json({ mensagem: 'Token inválido ou expirado.' });
     }

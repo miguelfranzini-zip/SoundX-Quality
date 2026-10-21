@@ -9,7 +9,7 @@ exports.login = async (req, res) => {
     const [rows] = await db.query('SELECT * FROM funcionario WHERE email = ?', [email]);
 
     if (rows.length === 0) {
-      return res.status(401).json({ mensagem: 'Usuário não encontrado.' });
+      return res.status(401).json({ mensagem: 'E-mail ou senha inválidos.' });
     }
 
     const funcionario = rows[0];
@@ -23,12 +23,18 @@ exports.login = async (req, res) => {
     }
 
     if (!senhaCorreta) {
-      return res.status(401).json({ mensagem: 'Senha incorreta.' });
+      return res.status(401).json({ mensagem: 'E-mail ou senha inválidos.' });
+    }
+
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('ERRO CRÍTICO DE SEGURANÇA: JWT_SECRET não configurado nas variáveis de ambiente!');
+      return res.status(500).json({ mensagem: 'Erro interno de configuração: JWT_SECRET não configurado.' });
     }
 
     const token = jwt.sign(
       { id: funcionario.id_funcionario, cargo: funcionario.cargo },
-      process.env.JWT_SECRET || 'soundx_secret_key_2026',
+      secret,
       { expiresIn: '8h' }
     );
 

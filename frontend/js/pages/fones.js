@@ -227,7 +227,12 @@ btnNovoFone.addEventListener('click', () => {
   window.location.href = 'fone-cadastro.html';
 });
 
-// Exportar Catálogo de Fones em CSV
+// Exportar Catálogo de Fones em CSV (RFC 4180)
+function celulaCsv(valor) {
+  const texto = valor == null ? '' : String(valor);
+  return `"${texto.replace(/"/g, '""')}"`;
+}
+
 const btnExportar = document.getElementById('btn-exportar-fones');
 if (btnExportar) {
   btnExportar.addEventListener('click', () => {
@@ -238,22 +243,24 @@ if (btnExportar) {
 
     const cabecalhos = ['ID', 'Nº de Série', 'Modelo', 'Marca', 'Lote', 'Conexão', 'Status', 'Data Fabricação'];
     const linhas = fones.map(f => [
-      f.id_fone,
-      `"${f.numero_serie || ''}"`,
-      `"${f.modelo || ''}"`,
-      `"${f.marca || ''}"`,
-      `"${f.lote || ''}"`,
-      `"${f.tipo_conexao || ''}"`,
-      `"${f.status || ''}"`,
-      `"${f.data_fabricacao ? new Date(f.data_fabricacao).toISOString().slice(0, 10) : ''}"`
+      celulaCsv(f.id_fone),
+      celulaCsv(f.numero_serie),
+      celulaCsv(f.modelo),
+      celulaCsv(f.marca),
+      celulaCsv(f.lote),
+      celulaCsv(f.tipo_conexao),
+      celulaCsv(f.status),
+      celulaCsv(formatarDataCurta(f.data_fabricacao))
     ]);
 
     const conteudoCsv = [cabecalhos.join(';'), ...linhas.map(l => l.join(';'))].join('\n');
     const blob = new Blob(['\uFEFF' + conteudoCsv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+    const d = new Date();
+    const dataLocalNome = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     a.href = url;
-    a.download = `soundx_fones_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `soundx_fones_${dataLocalNome}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast('Relatório CSV de fones exportado com sucesso!', 'sucesso');

@@ -14,8 +14,8 @@ router.get('/dashboard', inspecaoController.obterDashboard);
 
 // Rotas de listagem, criação, edição e exclusão de inspeções
 router.get('/', inspecaoController.listarInspecoes);
-router.post('/', checkRole('Inspetor'), inspecaoController.criarInspecao);
-router.put('/:id', checkRole('Inspetor'), validarIDParam, inspecaoController.atualizarInspecao);
+router.post('/', checkRole('Inspetor', 'Gerente'), inspecaoController.criarInspecao);
+router.put('/:id', checkRole('Inspetor', 'Gerente'), validarIDParam, inspecaoController.atualizarInspecao);
 router.delete('/:id', checkRole('Admin'), validarIDParam, inspecaoController.excluirInspecao);
 
 module.exports = router;

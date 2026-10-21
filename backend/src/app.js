@@ -35,12 +35,16 @@ app.use(cors({
       return callback(null, true);
     }
 
-    // Se houver FRONTEND_URL configurada nas variáveis de ambiente
+    const allowedOrigins = [
+      'https://soundxquality.netlify.app',
+      'https://sound-x-quality.vercel.app'
+    ];
     if (process.env.FRONTEND_URL) {
-      const allowed = process.env.FRONTEND_URL.trim().replace(/\/+$/, '').toLowerCase();
-      if (origin.toLowerCase() === allowed) {
-        return callback(null, true);
-      }
+      allowedOrigins.push(process.env.FRONTEND_URL.trim().replace(/\/+$/, '').toLowerCase());
+    }
+    const cleanOrigin = origin.toLowerCase().trim().replace(/\/+$/, '');
+    if (allowedOrigins.some(o => o.toLowerCase().trim().replace(/\/+$/, '') === cleanOrigin)) {
+      return callback(null, true);
     }
 
     // Em ambiente de desenvolvimento, aceita requisições locais ou do mesmo host
@@ -110,25 +114,26 @@ app.use('/api/manutencao', manutencaoRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/user-auth', userAuthRoutes);
 
-// Health check
+// Health check & Diagnóstico do Provedor
+const db = require('./config/database');
 app.get('/api/status', (req, res) => {
-  res.json({ status: 'online', versao: '1.0.0', timestamp: new Date() });
+  const providerInfo = db.getProviderStatus ? db.getProviderStatus() : {};
+  res.json({
+    status: 'online',
+    versao: '1.0.0',
+    ...providerInfo,
+    timestamp: new Date()
+  });
 });
 
 // Reset administrativo do banco de dados local (mantém apenas os usuários seed)
-const db = require('./config/database');
 app.post('/api/admin/reset-dados', authMiddleware, (req, res) => {
   const cargoNormalizado = String(req.usuario?.cargo || '').toLowerCase();
-  if (cargoNormalizado !== 'admin' && cargoNormalizado !== 'gerente') {
-    return res.status(403).json({ mensagem: 'Apenas Admin/Gerente pode resetar os dados.' });
+  if (cargoNormalizado !== 'admin') {
+    return res.status(403).json({ mensagem: 'Apenas Administrador pode resetar os dados.' });
   }
 
   try {
-    const dbModule = require('./config/database');
-    // Acessa o localProvider para resetar os dados
-    const localProvider = require('./config/database');
-    
-    // Precisamos resetar o arquivo local_data.json
     const fs = require('fs');
     const path = require('path');
     const DATA_FILE = process.env.VERCEL 
@@ -152,7 +157,12 @@ app.post('/api/admin/reset-dados', authMiddleware, (req, res) => {
     
     res.json({ 
       mensagem: 'Dados resetados com sucesso. Mantidos apenas os usuários existentes.',
-      dados: dadosIniciais.funcionario
+      dados: dadosIniciais.funcionario.map(u => ({
+        id_funcionario: u.id_funcionario,
+        nome: u.nome,
+        email: u.email,
+        cargo: u.cargo
+      }))
     });
   } catch (error) {
     console.error('Erro ao resetar dados:', error);

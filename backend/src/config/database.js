@@ -152,8 +152,8 @@ const localProvider = {
       return [rows, []];
     }
 
-    // 5. Histórico: inspeções de um fone
-    if (cleanLower.includes('from inspecao i') && cleanLower.includes('where i.id_fone = ?')) {
+    // 5. Histórico: inspeções de um fone (com ou sem alias i)
+    if (cleanLower.includes('from inspecao') && (cleanLower.includes('where id_fone = ?') || cleanLower.includes('where id_fone = $1') || cleanLower.includes('where i.id_fone = ?') || cleanLower.includes('where i.id_fone = $1'))) {
       const id = Number(params[0]);
       const rows = data.inspecao
         .filter(i => i.id_fone === id)
@@ -161,7 +161,7 @@ const localProvider = {
           const func = data.funcionario.find(f => f.id_funcionario === i.id_funcionario);
           return { ...i, inspetor: func ? func.nome : 'Inspetor' };
         })
-        .sort((a, b) => new Date(b.data_inspecao) - new Date(a.data_inspecao));
+        .sort((a, b) => new Date(b.data_inspecao || 0) - new Date(a.data_inspecao || 0) || (b.id_inspecao - a.id_inspecao));
       return [rows, []];
     }
 
@@ -243,6 +243,14 @@ const localProvider = {
     }
 
     // 12. Dashboard counts
+    if (cleanLower.includes("select count(*) as total from fone where status = 'aprovado'")) {
+      const c = data.fone.filter(f => f.status === 'Aprovado').length;
+      return [[{ total: c }], []];
+    }
+    if (cleanLower.includes("select count(*) as total from fone where status != 'aprovado'") || cleanLower.includes("from fone where status <> 'aprovado'") || cleanLower.includes("where status like '%reprovado%'")) {
+      const c = data.fone.filter(f => (f.status || '').toLowerCase().includes('reprovado')).length;
+      return [[{ total: c }], []];
+    }
     if (cleanLower.includes('select count(*) as total from fone')) {
       return [[{ total: data.fone.length }], []];
     }
@@ -381,8 +389,8 @@ const localProvider = {
       return [{ affectedRows: 0 }, []];
     }
 
-    // 22. SELECT * FROM inspecao WHERE id_inspecao = ?
-    if (cleanLower.startsWith('select * from inspecao where id_inspecao = ?') || cleanLower.startsWith('select * from inspecao where id_inspecao = $1') || cleanLower.startsWith('select id_inspecao, id_fone from inspecao where id_inspecao = $1')) {
+    // 22. SELECT FROM inspecao WHERE id_inspecao = ?
+    if (cleanLower.includes('from inspecao where id_inspecao = ?') || cleanLower.includes('from inspecao where id_inspecao = $1')) {
       const id = Number(params[0]);
       const rows = data.inspecao.filter(i => i.id_inspecao === id);
       return [rows, []];
@@ -484,6 +492,31 @@ const localProvider = {
       const id = Number(params[0]);
       const rows = data.manutencao.filter(m => m.id_fone === id && m.status !== 'Concluido');
       return [rows, []];
+    }
+
+    // 31b. UPDATE manutencao (conclusão em lote por fone)
+    if (cleanLower.startsWith('update manutencao set status') && cleanLower.includes('where id_fone =')) {
+      const idFone = Number(params[0]);
+      let count = 0;
+      data.manutencao.forEach(m => {
+        if (m.id_fone === idFone && m.status !== 'Concluido') {
+          m.status = 'Concluido';
+          m.data_conclusao = new Date().toISOString().replace('T', ' ').slice(0, 19);
+          count++;
+        }
+      });
+      if (count > 0) saveLocalData(data);
+      return [{ affectedRows: count }, []];
+    }
+
+    // 31c. DELETE manutencao por fone (reconciliação ao excluir inspeção)
+    if (cleanLower.startsWith('delete from manutencao where id_fone =')) {
+      const idFone = Number(params[0]);
+      const before = data.manutencao.length;
+      data.manutencao = data.manutencao.filter(m => !(m.id_fone === idFone && (cleanLower.includes('status =') ? m.status === 'Pendente' : true)));
+      const diff = before - data.manutencao.length;
+      if (diff > 0) saveLocalData(data);
+      return [{ affectedRows: diff }, []];
     }
 
     // 32. INSERT INTO funcionario (criação de usuário pelo Admin)
@@ -600,6 +633,58 @@ async function pgQuery(sql, params = []) {
   return [result.rows || [], []];
 }
 
+async function withTransaction(callback) {
+  if (useLocalFallback || !process.env.DATABASE_URL) {
+    // Snapshot para rollback seguro no provedor local
+    const snapshot = JSON.parse(JSON.stringify(loadLocalData()));
+    try {
+      const tx = {
+        query: (sql, params) => localProvider.query(sql, params)
+      };
+      return await callback(tx);
+    } catch (err) {
+      saveLocalData(snapshot);
+      throw err;
+    }
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const tx = {
+      query: async (sql, params = []) => {
+        let pgSql = sql;
+        let i = 0;
+        pgSql = pgSql.replace(/\?/g, () => `$${++i}`);
+
+        const result = await client.query(pgSql, params);
+        const cleanLower = sql.replace(/\s+/g, ' ').trim().toLowerCase();
+
+        if (cleanLower.startsWith('insert') && result.rows && result.rows.length > 0) {
+          const row = result.rows[0];
+          const idKey = Object.keys(row).find(k => k.startsWith('id_'));
+          return [{ insertId: idKey ? row[idKey] : null, affectedRows: result.rowCount }, []];
+        }
+
+        if (cleanLower.startsWith('update') || cleanLower.startsWith('delete')) {
+          return [{ affectedRows: result.rowCount }, []];
+        }
+
+        return [result.rows || [], []];
+      }
+    };
+
+    const resultado = await callback(tx);
+    await client.query('COMMIT');
+    return resultado;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   async query(sql, params) {
     if (useLocalFallback || !process.env.DATABASE_URL) {
@@ -614,11 +699,24 @@ module.exports = {
         error.code === 'PROTOCOL_CONNECTION_LOST' ||
         error.message?.includes('connect ETIMEDOUT')
       ) {
-        useLocalFallback = true;
-        console.log('⚡ Alternando para o provedor de dados local devido a erro de conexão Supabase.');
-        return localProvider.query(sql, params);
+        if (process.env.NODE_ENV !== 'production') {
+          useLocalFallback = true;
+          console.log('⚡ Alternando para o provedor de dados local devido a erro de conexão Supabase.');
+          return localProvider.query(sql, params);
+        } else {
+          const falha = new Error('Banco de dados indisponível.');
+          falha.status = 503;
+          throw falha;
+        }
       }
       throw error;
     }
+  },
+  withTransaction,
+  getProviderStatus() {
+    return {
+      provedor: (useLocalFallback || !process.env.DATABASE_URL) ? 'local_json' : 'postgresql_supabase',
+      database_url_configurada: Boolean(process.env.DATABASE_URL)
+    };
   }
 };

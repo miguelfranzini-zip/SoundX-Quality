@@ -17,11 +17,7 @@ export function normalizeApiUrl(url) {
 }
 
 export function getResolvedApiUrl() {
-  if (isLocalDev) {
-    return `http://localhost:${BACKEND_PORT}/api`;
-  }
-
-  // 1. Configuração salva manualmente no navegador (permite conectar na hora sem novo deploy)
+  // 1. Configuração salva manualmente no navegador (prioridade máxima inclusive em localhost)
   try {
     const custom = localStorage.getItem('sxq_custom_api_url');
     if (custom && custom.trim()) {
@@ -29,12 +25,21 @@ export function getResolvedApiUrl() {
     }
   } catch (e) {}
 
+  if (isLocalDev) {
+    return `http://localhost:${BACKEND_PORT}/api`;
+  }
+
   // 2. Injetada no build do Netlify via VITE_API_URL / API_URL / BACKEND_URL
   if (window.__ENV_API_URL && window.__ENV_API_URL.trim()) {
     return normalizeApiUrl(window.__ENV_API_URL);
   }
 
-  // 3. Fallback same-origin
+  // 3. Fallback inteligente quando hospedado no Netlify (conecta à API no Vercel)
+  if (window.location.hostname.includes('netlify.app')) {
+    return 'https://sound-x-quality.vercel.app/api';
+  }
+
+  // 4. Fallback same-origin
   return `${window.location.origin}/api`;
 }
 

@@ -1,6 +1,8 @@
 # SoundX Quality — Sistema de Controle de Qualidade de Fones de Ouvido
 
-> Repositório: *[https://github.com/miguelfranzini-zip/SoundX-Quality]*
+> Repositório: [https://github.com/miguelfranzini-zip/SoundX-Quality](https://github.com/miguelfranzini-zip/SoundX-Quality)  
+> 🌐 **Frontend em Produção:** [https://soundxquality.netlify.app/](https://soundxquality.netlify.app/)  
+> 🚀 **API / Backend em Produção:** [https://sound-x-quality.vercel.app](https://sound-x-quality.vercel.app)
 
 ## 📌 Escopo do Projeto
 
@@ -16,7 +18,7 @@ Prover um sistema web completo para gerenciar, avaliar, registrar e rastrear tod
 - **Gerentes de Qualidade:** Gerenciam permissões, cadastram testes/critérios, acompanham dashboards e relatórios analíticos.
 
 ### Solução
-Aplicação web integrada a um banco de dados relacional MySQL (`controle_qualidade_fones`), estruturada com Design System minimalista e sofisticado. A solução oferece rotinas de cadastro, execução de checklists de inspeção, anexação de evidências, histórico de reparos e painéis de indicadores em tempo real, com controle de acesso por perfil (RBAC).
+Aplicação web integrada a um banco de dados relacional PostgreSQL (Supabase) ou provedor local resiliente com integridade referencial, estruturada com Design System minimalista e sofisticado. A solução oferece rotinas de cadastro, execução de checklists de inspeção, anexação de evidências, histórico de reparos e painéis de indicadores em tempo real, com controle de acesso por perfil (RBAC).
 
 ### Principais funcionalidades
 - Gestão e cadastro de fones de ouvido, lotes, inspetores, técnicos e gerentes.
@@ -98,7 +100,7 @@ O sistema possui controle de acesso refinado baseado nos perfis operacionais e a
 ## 📋 Requisitos do Sistema
 **Funcionais (RF01–RF16):** cadastrar/editar/excluir produtos, lotes, inspetores e critérios; criar checklists; registrar inspeções, não conformidades e fotos; pesquisar registros; visualizar histórico; gerar relatórios; visualizar dashboard; autenticação; gerenciar permissões.
 
-**Não Funcionais (RNF01–RNF10):** resposta ≤ 3s; disponibilidade ≥ 99%; senhas criptografadas; suporte a Chrome/Edge/Firefox; acesso restrito a autenticados; responsividade (desktop/tablet/smartphone); MySQL; rastreabilidade inalterável; uploads em JPG/JPEG/PNG; versionamento via Git/GitHub.
+**Não Funcionais (RNF01–RNF10):** resposta ≤ 3s; disponibilidade ≥ 99%; senhas criptografadas; suporte a Chrome/Edge/Firefox; acesso restrito a autenticados; responsividade (desktop/tablet/smartphone); PostgreSQL / Supabase com fallback local resiliente; rastreabilidade inalterável; evidências fotográficas seguras com validação; versionamento via Git/GitHub.
 
 ---
 
@@ -137,8 +139,10 @@ O sistema possui arquitetura resiliente com **zero-configuração inicial obriga
 3. Execute o script DDL localizado em [`backend/database.sql`](file:///c:/Users/Aluno/Documents/SoundX-Quality/backend/database.sql).
 
 ### 3. Acessar a Aplicação
-Abra seu navegador e acesse:
-👉 **[http://localhost:3001](http://localhost:3001)**
+- 🌐 **Frontend Oficial (Netlify):** [https://soundxquality.netlify.app/](https://soundxquality.netlify.app/)
+- 🚀 **Backend / API (Vercel):** [https://sound-x-quality.vercel.app](https://sound-x-quality.vercel.app)
+- 💻 **Ambiente Local:** [http://localhost:3001](http://localhost:3001)
+- 📊 **Apresentação em Slides:** [http://localhost:3001/documentacao.html#apresentacao](http://localhost:3001/documentacao.html#apresentacao) ou no Netlify em `/documentacao.html#apresentacao`
 
 > *Credenciais de Teste:*
 > - **Inspetor:** `lucas@email.com` | Senha: `1234`

@@ -9,24 +9,24 @@ function normalizarCargo(cargo) {
 
 const checkRole = (...cargosPermitidos) => {
   return (req, res, next) => {
-    const cargoUsuario = normalizarCargo(req.usuario?.cargo);
+    if (!req.usuario || !req.usuario.cargo) {
+      return res.status(401).json({ mensagem: 'Acesso negado: Usuário não autenticado.' });
+    }
 
-    // Permite acesso irrestrito para Admin/Gerente
-    if (cargoUsuario === 'admin' || cargoUsuario === 'gerente') {
+    const cargoUsuario = normalizarCargo(req.usuario.cargo);
+    const permitidosNormalizados = new Set(cargosPermitidos.map(normalizarCargo));
+
+    // Admin possui acesso geral operacional e administrativo
+    if (cargoUsuario === 'admin') {
       return next();
     }
 
-    const permitidosNormalizados = cargosPermitidos.map(normalizarCargo);
-
-    const temPermissao = permitidosNormalizados.some((permitido) =>
-      cargoUsuario === permitido || cargoUsuario.includes(permitido)
-    );
-
-    if (!req.usuario || !temPermissao) {
-      return res.status(403).json({ mensagem: 'Acesso negado: Perfil sem permissão para esta operação.' });
+    // Validação estrita por igualdade (sem correspondência por substring)
+    if (permitidosNormalizados.has(cargoUsuario)) {
+      return next();
     }
 
-    next();
+    return res.status(403).json({ mensagem: 'Acesso negado: Perfil sem permissão para esta operação.' });
   };
 };
 
