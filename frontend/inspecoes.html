@@ -63,18 +63,27 @@
       </div>
       <form id="form-editar-inspecao" class="form">
         <div class="form__grupo">
-          <label class="form__label">Fone</label>
+          <label class="form__label">
+            Fone
+            <span class="tooltip-hint" data-tooltip="Identificação do fone inspecionado neste laudo." title="Fone inspecionado." tabindex="0">!</span>
+          </label>
           <input class="form__controle" type="text" id="edit-inspecao-fone" disabled style="opacity: 0.75;">
         </div>
         <div class="form__grupo">
-          <label class="form__label" for="edit-inspecao-resultado">Resultado Final</label>
+          <label class="form__label" for="edit-inspecao-resultado">
+            Resultado Final
+            <span class="tooltip-hint" data-tooltip="Classificação de conformidade: Aprovado libera o dispositivo; Reprovado encaminha para a fila técnica." title="Classificação do laudo." tabindex="0">!</span>
+          </label>
           <select class="form__controle" id="edit-inspecao-resultado" required>
             <option value="Aprovado">Aprovado</option>
             <option value="Reprovado / Manutenção">Reprovado / Manutenção</option>
           </select>
         </div>
         <div class="form__grupo">
-          <label class="form__label" for="edit-inspecao-obs">Observações / Parecer</label>
+          <label class="form__label" for="edit-inspecao-obs">
+            Observações / Parecer
+            <span class="tooltip-hint" data-tooltip="Justificativas e notas técnicas registradas pelo inspetor de qualidade." title="Observações técnicas." tabindex="0">!</span>
+          </label>
           <textarea class="form__controle" id="edit-inspecao-obs" rows="3" placeholder="Detalhes ou motivos da reprovação..."></textarea>
         </div>
         <div id="alerta-modal-inspecao" class="alerta alerta--erro hidden" role="alert"></div>

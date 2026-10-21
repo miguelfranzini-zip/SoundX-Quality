@@ -39,27 +39,42 @@
             <form class="form" id="form-fone" novalidate>
               <div class="form__grid">
                 <div class="form__grupo">
-                  <label class="form__label" for="numero_serie">Número de série *</label>
+                  <label class="form__label" for="numero_serie">
+                    Número de série *
+                    <span class="tooltip-hint" data-tooltip="Identificador alfanumérico único gravado no fone ou código de barras da embalagem (ex: SX-2026-0001)." title="Código serial único do dispositivo." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="text" id="numero_serie" name="numero_serie" placeholder="Ex.: SX-2026-0001" required>
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="modelo">Modelo *</label>
+                  <label class="form__label" for="modelo">
+                    Modelo *
+                    <span class="tooltip-hint" data-tooltip="Nome comercial da linha SoundX (ex: SoundX Pro, SoundX Studio, Bass Max)." title="Modelo comercial do fone." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="text" id="modelo" name="modelo" placeholder="Ex.: SoundX Pro" required>
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="marca">Marca</label>
+                  <label class="form__label" for="marca">
+                    Marca
+                    <span class="tooltip-hint" data-tooltip="Fabricante oficial do equipamento (padrão: SoundX)." title="Fabricante do fone." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="text" id="marca" name="marca" placeholder="SoundX">
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="lote">Lote de produção *</label>
+                  <label class="form__label" for="lote">
+                    Lote de produção *
+                    <span class="tooltip-hint" data-tooltip="Código da remessa fabril para rastreabilidade de qualidade e auditoria (ex: LT-2026-A)." title="Lote de produção para rastreabilidade." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="text" id="lote" name="lote" placeholder="Ex.: LT-2026-A" value="LT-2026-A" required>
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="tipo_conexao">Tipo de conexão</label>
+                  <label class="form__label" for="tipo_conexao">
+                    Tipo de conexão
+                    <span class="tooltip-hint" data-tooltip="Interface física ou protocolo sem fio de conexão do fone." title="Tipo de conexão do fone." tabindex="0">!</span>
+                  </label>
                   <select class="form__controle" id="tipo_conexao" name="tipo_conexao">
                     <option value="Bluetooth">Bluetooth</option>
                     <option value="USB-C">USB-C</option>
@@ -69,12 +84,18 @@
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="data_fabricacao">Data de fabricação</label>
+                  <label class="form__label" for="data_fabricacao">
+                    Data de fabricação
+                    <span class="tooltip-hint" data-tooltip="Data em que o fone concluiu a montagem na fábrica." title="Data de montagem do fone." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="date" id="data_fabricacao" name="data_fabricacao">
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="status">Status inicial</label>
+                  <label class="form__label" for="status">
+                    Status inicial
+                    <span class="tooltip-hint" data-tooltip="Situação de entrada na esteira. Por padrão, unidades recém-fabricadas entram como 'Aguardando inspeção'." title="Situação de entrada na fábrica." tabindex="0">!</span>
+                  </label>
                   <select class="form__controle" id="status" name="status">
                     <option value="Aguardando inspeção">Aguardando inspeção</option>
                     <option value="Em inspeção">Em inspeção</option>

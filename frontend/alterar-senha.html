@@ -39,17 +39,26 @@
             <form class="form" id="form-alterar-senha" novalidate>
               <div class="form__grid">
                 <div class="form__grupo" style="grid-column: 1 / -1;">
-                  <label class="form__label" for="currentPassword">Senha atual *</label>
+                  <label class="form__label" for="currentPassword">
+                    Senha atual *
+                    <span class="tooltip-hint" data-tooltip="A senha atual que você utilizou para fazer login nesta sessão." title="A senha atual da sua conta." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="password" id="currentPassword" name="currentPassword" placeholder="Digite sua senha atual" required autocomplete="current-password">
                 </div>
 
                 <div class="form__grupo" style="grid-column: 1 / -1;">
-                  <label class="form__label" for="newPassword">Nova senha *</label>
+                  <label class="form__label" for="newPassword">
+                    Nova senha *
+                    <span class="tooltip-hint" data-tooltip="A nova senha de acesso desejada, com no mínimo 6 caracteres." title="A nova senha desejada (mínimo 6 caracteres)." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="password" id="newPassword" name="newPassword" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
                 </div>
 
                 <div class="form__grupo" style="grid-column: 1 / -1;">
-                  <label class="form__label" for="confirmPassword">Confirmar nova senha *</label>
+                  <label class="form__label" for="confirmPassword">
+                    Confirmar nova senha *
+                    <span class="tooltip-hint" data-tooltip="Repita exatamente a mesma senha digitada no campo anterior para confirmação." title="Repita a nova senha para confirmação." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="password" id="confirmPassword" name="confirmPassword" placeholder="Repita a nova senha" required autocomplete="new-password">
                 </div>
               </div>

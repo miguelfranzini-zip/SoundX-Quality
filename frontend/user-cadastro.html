@@ -39,25 +39,37 @@
             <form class="form" id="form-user" novalidate>
               <div class="form__grid">
                 <div class="form__grupo">
-                  <label class="form__label" for="nome">Nome completo *</label>
+                  <label class="form__label" for="nome">
+                    Nome completo *
+                    <span class="tooltip-hint" data-tooltip="Digite o nome completo do funcionário para identificação nos laudos de qualidade." title="Digite o nome completo do funcionário." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="text" id="nome" name="nome"
                     placeholder="Ex: João da Silva" required autocomplete="name">
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="email">E-mail *</label>
+                  <label class="form__label" for="email">
+                    E-mail *
+                    <span class="tooltip-hint" data-tooltip="E-mail de acesso corporativo ou pessoal que será usado para login no sistema." title="E-mail de acesso ao sistema." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="email" id="email" name="email"
                     placeholder="email@empresa.com" required autocomplete="email">
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="senha">Senha *</label>
+                  <label class="form__label" for="senha">
+                    Senha *
+                    <span class="tooltip-hint" data-tooltip="Senha inicial com no mínimo 6 caracteres. O usuário poderá alterá-la futuramente na tela de perfil." title="Senha inicial (mínimo 6 caracteres)." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="password" id="senha" name="senha"
                     placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="cargo">Cargo / Perfil *</label>
+                  <label class="form__label" for="cargo">
+                    Cargo / Perfil *
+                    <span class="tooltip-hint" data-tooltip="Perfil operacional: Inspetor (laudos e testes), Técnico (manutenção e reparo), Gerente (auditoria e relatórios) ou Admin (gestão total)." title="Selecione o perfil de acesso do usuário." tabindex="0">!</span>
+                  </label>
                   <select class="form__controle" id="cargo" name="cargo" required>
                     <option value="" disabled selected>Selecione um cargo</option>
                     <option value="Inspetor">Inspetor de Qualidade</option>
@@ -68,7 +80,10 @@
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="cpf">CPF <span style="font-weight:400;color:var(--text-secundario)">(opcional)</span></label>
+                  <label class="form__label" for="cpf">
+                    CPF <span style="font-weight:400;color:var(--text-secundario)">(opcional)</span>
+                    <span class="tooltip-hint" data-tooltip="Cadastro de Pessoa Física para registro oficial do operador (formato: 000.000.000-00)." title="CPF do colaborador (opcional)." tabindex="0">!</span>
+                  </label>
                   <input class="form__controle" type="text" id="cpf" name="cpf"
                     placeholder="000.000.000-00" maxlength="14" autocomplete="off">
                 </div>

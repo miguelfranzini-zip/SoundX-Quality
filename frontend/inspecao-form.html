@@ -39,14 +39,20 @@
             <form class="form" id="form-inspecao" novalidate>
               <div class="form__grid">
                 <div class="form__grupo">
-                  <label class="form__label" for="id_fone">Fone *</label>
+                  <label class="form__label" for="id_fone">
+                    Fone *
+                    <span class="tooltip-hint" data-tooltip="Selecione o fone cadastrado a ser inspecionado (identificado por número de série e modelo)." title="Selecione o fone de ouvido para inspeção." tabindex="0">!</span>
+                  </label>
                   <select class="form__controle" id="id_fone" name="id_fone" required>
                     <option value="">Carregando fones...</option>
                   </select>
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="resultado_final">Resultado final *</label>
+                  <label class="form__label" for="resultado_final">
+                    Resultado final *
+                    <span class="tooltip-hint" data-tooltip="'Aprovado' libera o fone para expedição. 'Reprovado / Manutenção' abre automaticamente uma Ordem de Serviço na fila dos técnicos." title="Parecer final da inspeção de qualidade." tabindex="0">!</span>
+                  </label>
                   <select class="form__controle" id="resultado_final" name="resultado_final" required>
                     <option value="Aprovado">Aprovado</option>
                     <option value="Reprovado / Manutenção">Reprovado / Manutenção</option>
@@ -55,7 +61,10 @@
               </div>
 
               <div class="form__grupo">
-                <label class="form__label" for="foto_url">Link da Foto / Evidência (opcional)</label>
+                <label class="form__label" for="foto_url">
+                  Link da Foto / Evidência (opcional)
+                  <span class="tooltip-hint" data-tooltip="URL direta de uma imagem (HTTP/HTTPS) documentando o teste ou a avaria identificada." title="Link de imagem da evidência do teste." tabindex="0">!</span>
+                </label>
                 <input
                   class="form__controle"
                   type="url"
@@ -74,7 +83,10 @@
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-3); margin-top: var(--space-3);">
                   <div class="form__grupo">
-                    <label class="form__label" for="chk_audio">1. Áudio L/R (Frequência)</label>
+                    <label class="form__label" for="chk_audio">
+                      1. Áudio L/R (Frequência)
+                      <span class="tooltip-hint" data-tooltip="Verifique equilíbrio de canais esquerdo/direito, ausência de chiados e resposta sonora clara." title="Avaliação dos alto-falantes e estéreo." tabindex="0">!</span>
+                    </label>
                     <select class="form__controle" id="chk_audio">
                       <option value="Passou">Passou (Sem ruído/distorção)</option>
                       <option value="Não passou">Não passou (Falha/Mudo)</option>
@@ -82,7 +94,10 @@
                   </div>
 
                   <div class="form__grupo">
-                    <label class="form__label" for="chk_mic">2. Microfone & Ruído</label>
+                    <label class="form__label" for="chk_mic">
+                      2. Microfone & Ruído
+                      <span class="tooltip-hint" data-tooltip="Avalie clareza na captação de voz e redução de interferências sonoras externas." title="Avaliação do microfone embutido." tabindex="0">!</span>
+                    </label>
                     <select class="form__controle" id="chk_mic">
                       <option value="Passou">Passou (Captação nítida)</option>
                       <option value="Não passou">Não passou (Ruído/Chiado)</option>
@@ -90,7 +105,10 @@
                   </div>
 
                   <div class="form__grupo">
-                    <label class="form__label" for="chk_conexao">3. Conectividade / Pareamento</label>
+                    <label class="form__label" for="chk_conexao">
+                      3. Conectividade / Pareamento
+                      <span class="tooltip-hint" data-tooltip="Avalie estabilidade do pareamento Bluetooth sem cortes ou integridade do conector físico." title="Avaliação do sinal Bluetooth ou conector." tabindex="0">!</span>
+                    </label>
                     <select class="form__controle" id="chk_conexao">
                       <option value="Passou">Passou (Estável)</option>
                       <option value="Não passou">Não passou (Queda/Intermitente)</option>
@@ -98,7 +116,10 @@
                   </div>
 
                   <div class="form__grupo">
-                    <label class="form__label" for="chk_bateria">4. Bateria & Consumo</label>
+                    <label class="form__label" for="chk_bateria">
+                      4. Bateria & Consumo
+                      <span class="tooltip-hint" data-tooltip="Avalie retenção de energia, resposta do circuito de carga e temperatura do aparelho." title="Avaliação da bateria e circuito de alimentação." tabindex="0">!</span>
+                    </label>
                     <select class="form__controle" id="chk_bateria">
                       <option value="Passou">Passou (Tensão normal)</option>
                       <option value="Não passou">Não passou (Perda de carga)</option>
@@ -108,7 +129,10 @@
               </div>
 
               <div class="form__grupo mt-4">
-                <label class="form__label" for="observacao">Observação Técnica</label>
+                <label class="form__label" for="observacao">
+                  Observação Técnica
+                  <span class="tooltip-hint" data-tooltip="Anotações complementares do laudo de qualidade, detalhes de falhas acústicas ou notas de reteste." title="Observações complementares do inspetor." tabindex="0">!</span>
+                </label>
                 <textarea
                   class="form__controle"
                   id="observacao"

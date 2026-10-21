@@ -1184,3 +1184,112 @@ textarea.form__controle { min-height: 96px; resize: vertical; }
 .topbar__dropdown-item--danger:hover svg {
   color: var(--erro);
 }
+
+/* =========================================================
+   TOOLTIPS DE AJUDA INFORMATIVOS ( ! )
+   ========================================================= */
+.tooltip-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: rgba(255, 152, 0, 0.14);
+  color: #c46200;
+  border: 1px solid rgba(255, 152, 0, 0.45);
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-family: var(--font-display, sans-serif);
+  line-height: 1;
+  margin-left: 6px;
+  cursor: help;
+  position: relative;
+  vertical-align: middle;
+  transition: all var(--transition-fast, 0.2s ease);
+  user-select: none;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.tooltip-hint:hover,
+.tooltip-hint:focus {
+  background: var(--laranja);
+  color: #ffffff;
+  border-color: var(--laranja);
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4);
+  outline: none;
+}
+
+.tooltip-hint::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: #1F150D;
+  color: #FFF6E3;
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  padding: 7px 11px;
+  border-radius: 6px;
+  white-space: normal;
+  width: max-content;
+  max-width: 260px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 189, 43, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  z-index: 10000;
+}
+
+.tooltip-hint::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  border-width: 6px 6px 0 6px;
+  border-style: solid;
+  border-color: #1F150D transparent transparent transparent;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  z-index: 10000;
+}
+
+.tooltip-hint:hover::after,
+.tooltip-hint:hover::before,
+.tooltip-hint:focus::after,
+.tooltip-hint:focus::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-hint--bottom::after {
+  bottom: auto;
+  top: calc(100% + 9px);
+  transform: translateX(-50%) translateY(-5px);
+}
+
+.tooltip-hint--bottom::before {
+  bottom: auto;
+  top: calc(100% + 3px);
+  border-width: 0 6px 6px 6px;
+  border-color: transparent transparent #1F150D transparent;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+.tooltip-hint--bottom:hover::after,
+.tooltip-hint--bottom:hover::before,
+.tooltip-hint--bottom:focus::after,
+.tooltip-hint--bottom:focus::before {
+  transform: translateX(-50%) translateY(0);
+}

@@ -74,3 +74,45 @@ exports.listUsers = async (req, res) => {
     res.status(500).json({ mensagem: 'Erro ao listar usuários.' });
   }
 };
+
+// Excluir usuário (apenas Admin)
+exports.deleteUser = async (req, res) => {
+  const id = Number(req.params.id);
+
+  // Impede que o usuário autenticado exclua a si mesmo
+  if (req.usuario && Number(req.usuario.id) === id) {
+    return res.status(400).json({ mensagem: 'Você não pode excluir a sua própria conta de usuário.' });
+  }
+
+  try {
+    // Verifica se o usuário existe
+    const [usuarios] = await db.query(
+      'SELECT id_funcionario, nome, cargo FROM funcionario WHERE id_funcionario = ?',
+      [id]
+    );
+
+    if (!usuarios || usuarios.length === 0) {
+      return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+    }
+
+    const usuarioParaExcluir = usuarios[0];
+
+    // Se for um administrador, impede a exclusão se for o único administrador cadastrado no sistema
+    if ((usuarioParaExcluir.cargo || '').toLowerCase() === 'admin') {
+      const [admins] = await db.query(
+        "SELECT id_funcionario FROM funcionario WHERE LOWER(cargo) = 'admin'"
+      );
+      if (admins && admins.length <= 1) {
+        return res.status(400).json({ mensagem: 'Não é possível excluir o único Administrador cadastrado no sistema.' });
+      }
+    }
+
+    // Executa a exclusão
+    await db.query('DELETE FROM funcionario WHERE id_funcionario = ?', [id]);
+
+    res.json({ mensagem: `Usuário "${usuarioParaExcluir.nome}" excluído com sucesso!` });
+  } catch (error) {
+    console.error('Erro ao excluir usuário:', error);
+    res.status(500).json({ mensagem: 'Erro interno ao excluir usuário.' });
+  }
+};

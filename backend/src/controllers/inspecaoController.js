@@ -145,27 +145,54 @@ exports.obterDashboard = async (req, res) => {
 // 3. Listar todo o histórico de inspeções
 exports.listarInspecoes = async (req, res) => {
   try {
-    const query = `
-      SELECT 
-        i.id_inspecao,
-        i.id_fone,
-        i.data_inspecao,
-        i.resultado_final,
-        i.observacao,
-        i.foto_url,
-        f.modelo AS fone_modelo,
-        f.numero_serie AS fone_serie,
-        func.nome AS inspetor
-      FROM inspecao i
-      JOIN fone f ON i.id_fone = f.id_fone
-      LEFT JOIN funcionario func ON i.id_funcionario = func.id_funcionario
-      ORDER BY i.data_inspecao DESC
-    `;
-    const [inspecoes] = await db.query(query);
-    res.json(inspecoes);
+    let rows;
+    try {
+      const query = `
+        SELECT 
+          i.id_inspecao,
+          i.id_fone,
+          i.data_inspecao,
+          i.resultado_final,
+          i.observacao,
+          COALESCE(i.foto_url, '') AS foto_url,
+          f.modelo AS fone_modelo,
+          f.numero_serie AS fone_serie,
+          func.nome AS inspetor
+        FROM inspecao i
+        LEFT JOIN fone f ON i.id_fone = f.id_fone
+        LEFT JOIN funcionario func ON i.id_funcionario = func.id_funcionario
+        ORDER BY i.data_inspecao DESC
+      `;
+      const [resRows] = await db.query(query);
+      rows = resRows;
+    } catch (colErr) {
+      if (colErr.code === '42703' || colErr.message?.includes('foto_url')) {
+        const querySemFoto = `
+          SELECT 
+            i.id_inspecao,
+            i.id_fone,
+            i.data_inspecao,
+            i.resultado_final,
+            i.observacao,
+            '' AS foto_url,
+            f.modelo AS fone_modelo,
+            f.numero_serie AS fone_serie,
+            func.nome AS inspetor
+          FROM inspecao i
+          LEFT JOIN fone f ON i.id_fone = f.id_fone
+          LEFT JOIN funcionario func ON i.id_funcionario = func.id_funcionario
+          ORDER BY i.data_inspecao DESC
+        `;
+        const [resSemFoto] = await db.query(querySemFoto);
+        rows = resSemFoto;
+      } else {
+        throw colErr;
+      }
+    }
+    res.json(rows || []);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensagem: 'Erro ao buscar inspeções.' });
+    console.error('Erro ao listar inspeções:', error);
+    res.status(500).json({ mensagem: 'Erro ao buscar inspeções.', detalhe: error.message });
   }
 };
 

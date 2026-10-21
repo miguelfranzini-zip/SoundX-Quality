@@ -158,6 +158,38 @@ async function run() {
     const dadosSemSenha = resReset.body?.dados?.every(u => !u.senha);
     assert(resReset.status === 200 && dadosSemSenha, 'Endpoint de reset seguro: senhas não são expostas na resposta JSON');
 
+    // 16. Gerenciamento de Usuários: Cadastrar usuário temporário
+    const resNovoUser = await request(server, 'POST', '/api/users', {
+      nome: 'Usuário Temporário Teste',
+      email: `temp_${Date.now()}@soundx.com`,
+      senha: 'password123',
+      cargo: 'Inspetor'
+    }, adminToken);
+    assert(resNovoUser.status === 201 && Boolean(resNovoUser.body.id_funcionario), 'Admin cadastra novo usuário com sucesso');
+    const idTempUser = resNovoUser.body.id_funcionario;
+
+    // 17. Gerenciamento de Usuários: Impedir autoexclusão do usuário logado
+    // Carlos Souza tem id 3 no banco inicial
+    const resSelfDelete = await request(server, 'DELETE', '/api/users/3', null, adminToken);
+    assert(resSelfDelete.status === 400 && resSelfDelete.body.mensagem.includes('própria conta'), 'Impedida autoexclusão do usuário administrador logado');
+
+    // 18. Gerenciamento de Usuários: RBAC impede Inspetor de excluir usuário
+    const resDeleteForbiddenUser = await request(server, 'DELETE', `/api/users/${idTempUser}`, null, inspetorToken);
+    assert(resDeleteForbiddenUser.status === 403, 'RBAC atuando: Inspetor proibido de excluir usuários (exclusivo Admin)');
+
+    // 19. Gerenciamento de Usuários: Exclusão bem-sucedida pelo Admin
+    const resDeleteUserOk = await request(server, 'DELETE', `/api/users/${idTempUser}`, null, adminToken);
+    assert(resDeleteUserOk.status === 200 && resDeleteUserOk.body.mensagem.includes('excluído com sucesso'), 'Admin exclui usuário com sucesso');
+
+    // 20. Gerenciamento de Usuários: Impedir exclusão do único Administrador
+    // Se tentarmos excluir Carlos Souza fingindo ser outro admin logado (ou testando a validação)
+    // Carlos é o único Admin cadastrado
+    // Vamos criar um token fictício para outro id e tentar excluir o id 3
+    const jwt = require('jsonwebtoken');
+    const fakeAdminToken = jwt.sign({ id: 9999, cargo: 'Admin' }, process.env.JWT_SECRET || 'chave-secreta-padrao-soundx-2026-fallback-seguro');
+    const resDeleteSoleAdmin = await request(server, 'DELETE', '/api/users/3', null, fakeAdminToken);
+    assert(resDeleteSoleAdmin.status === 400 && resDeleteSoleAdmin.body.mensagem.includes('único Administrador'), 'Sistema impede exclusão do único Administrador ativo');
+
     console.log(`\n🏁 Resultado: ${passed}/${total} testes aprovados com sucesso!\n`);
   } catch (err) {
     console.error('Erro durante execução dos testes:', err);

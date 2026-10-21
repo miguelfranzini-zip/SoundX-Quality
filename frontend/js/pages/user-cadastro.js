@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { toast, initShell, emptyState, escapeHtml } from '../ui.js?v=2';
+import { toast, initShell, emptyState, escapeHtml, confirmarAcao } from '../ui.js?v=2';
 import { guardPagina } from '../auth.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -31,12 +31,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       let tbodyHtml = '';
       usuarios.forEach(u => {
+        const isSelf = Number(u.id_funcionario) === Number(usuario.id);
         tbodyHtml += `
           <tr>
-            <td><strong>${escapeHtml(u.nome)}</strong></td>
+            <td>
+              <strong>${escapeHtml(u.nome)}</strong>
+              ${isSelf ? '<span class="badge" style="font-size:0.7rem;margin-left:6px;background:rgba(255,152,0,0.15);color:var(--laranja-escuro);">Você</span>' : ''}
+            </td>
             <td>${escapeHtml(u.email)}</td>
             <td>${escapeHtml(u.cargo)}</td>
             <td style="color:var(--text-secundario)">${escapeHtml(u.cpf || '—')}</td>
+            <td style="text-align: right;">
+              <button 
+                type="button" 
+                class="btn btn--pequeno btn--ghost btn-deletar-user" 
+                data-id="${u.id_funcionario}" 
+                data-nome="${escapeHtml(u.nome)}"
+                ${isSelf ? 'disabled title="Você não pode excluir a sua própria conta."' : 'style="color:var(--erro);font-weight:700;" title="Excluir este usuário"'}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:middle">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Excluir
+              </button>
+            </td>
           </tr>
         `;
       });
@@ -50,6 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <th>E-mail</th>
                 <th>Cargo / Perfil</th>
                 <th>CPF</th>
+                <th style="text-align: right;">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -58,6 +78,32 @@ document.addEventListener('DOMContentLoaded', async () => {
           </table>
         </div>
       `;
+
+      // Adiciona eventos aos botões de exclusão
+      tabelaWrapper.querySelectorAll('.btn-deletar-user').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (btn.disabled) return;
+          const id = btn.getAttribute('data-id');
+          const nome = btn.getAttribute('data-nome');
+
+          const confirmou = await confirmarAcao({
+            titulo: 'Excluir Usuário',
+            mensagem: `Tem certeza de que deseja excluir o usuário "${nome}"? O acesso desta pessoa ao sistema será revogado imediatamente.`,
+            textoBotao: 'Excluir Usuário',
+            perigoso: true
+          });
+
+          if (confirmou) {
+            try {
+              const res = await api(`/users/${id}`, { method: 'DELETE' });
+              toast(res.mensagem || 'Usuário excluído com sucesso!', 'sucesso');
+              await carregarUsuarios();
+            } catch (err) {
+              toast(err.message || 'Erro ao excluir usuário.', 'erro');
+            }
+          }
+        });
+      });
     } catch (error) {
       tabelaWrapper.innerHTML = `<p class="muted" style="color:var(--erro)">Erro ao carregar usuários: ${escapeHtml(error.message)}</p>`;
     }

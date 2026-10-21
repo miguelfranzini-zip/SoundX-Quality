@@ -39,14 +39,20 @@
             <form class="form" id="form-teste" novalidate>
               <div class="form__grid">
                 <div class="form__grupo">
-                  <label class="form__label" for="id_inspecao">Inspeção *</label>
+                  <label class="form__label" for="id_inspecao">
+                    Inspeção *
+                    <span class="tooltip-hint" data-tooltip="Selecione o laudo de inspeção do fone que receberá este teste técnico individual." title="Selecione o laudo de inspeção." tabindex="0">!</span>
+                  </label>
                   <select class="form__controle" id="id_inspecao" name="id_inspecao" required>
                     <option value="">Carregando inspeções...</option>
                   </select>
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="tipo_teste">Tipo de teste *</label>
+                  <label class="form__label" for="tipo_teste">
+                    Tipo de teste *
+                    <span class="tooltip-hint" data-tooltip="Subssistema avaliado: Áudio L/R (acústica), Bluetooth (sinal), Microfone (gravação) ou Bateria (autonomia)." title="Tipo de teste técnico." tabindex="0">!</span>
+                  </label>
                   <select class="form__controle" id="tipo_teste" name="tipo_teste" required>
                     <option value="">Selecione...</option>
                     <option value="Áudio L/R">Áudio L/R</option>
@@ -57,7 +63,10 @@
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="parametro_medido">Parâmetro medido</label>
+                  <label class="form__label" for="parametro_medido">
+                    Parâmetro medido
+                    <span class="tooltip-hint" data-tooltip="Métrica aferida no bancada (ex: Resposta 20Hz-20kHz, Tensão 3.7V, Ruído < 0.5dB)." title="Métrica medida na bancada." tabindex="0">!</span>
+                  </label>
                   <input
                     class="form__controle"
                     type="text"
@@ -68,7 +77,10 @@
                 </div>
 
                 <div class="form__grupo">
-                  <label class="form__label" for="resultado">Resultado *</label>
+                  <label class="form__label" for="resultado">
+                    Resultado *
+                    <span class="tooltip-hint" data-tooltip="'Passou' (conforme especificações) ou 'Não passou' (avaria ou medição fora do padrão)." title="Resultado do teste." tabindex="0">!</span>
+                  </label>
                   <select class="form__controle" id="resultado" name="resultado" required>
                     <option value="Passou">Passou</option>
                     <option value="Não passou">Não passou</option>
@@ -76,7 +88,10 @@
                 </div>
 
                 <div class="form__grupo" style="grid-column: 1 / -1;">
-                  <label class="form__label" for="observacao">Observação</label>
+                  <label class="form__label" for="observacao">
+                    Observação
+                    <span class="tooltip-hint" data-tooltip="Anotações técnicas adicionais sobre o procedimento de teste executado." title="Observações adicionais." tabindex="0">!</span>
+                  </label>
                   <input
                     class="form__controle"
                     type="text"
@@ -115,7 +130,10 @@
       </div>
       <form id="form-editar-teste" class="form">
         <div class="form__grupo">
-          <label class="form__label" for="edit-tipo_teste">Tipo de teste *</label>
+          <label class="form__label" for="edit-tipo_teste">
+            Tipo de teste *
+            <span class="tooltip-hint" data-tooltip="Subssistema testado (Áudio, Bluetooth, Microfone ou Bateria)." title="Tipo de teste técnico." tabindex="0">!</span>
+          </label>
           <select class="form__controle" id="edit-tipo_teste" required>
             <option value="Áudio L/R">Áudio L/R</option>
             <option value="Bluetooth">Bluetooth</option>
@@ -124,18 +142,27 @@
           </select>
         </div>
         <div class="form__grupo">
-          <label class="form__label" for="edit-parametro_medido">Parâmetro medido</label>
+          <label class="form__label" for="edit-parametro_medido">
+            Parâmetro medido
+            <span class="tooltip-hint" data-tooltip="Grandeza física ou técnica aferida no teste." title="Grandeza física aferida." tabindex="0">!</span>
+          </label>
           <input class="form__controle" type="text" id="edit-parametro_medido">
         </div>
         <div class="form__grupo">
-          <label class="form__label" for="edit-resultado">Resultado *</label>
+          <label class="form__label" for="edit-resultado">
+            Resultado *
+            <span class="tooltip-hint" data-tooltip="Parecer do teste técnico individual (Passou ou Não passou)." title="Resultado do teste." tabindex="0">!</span>
+          </label>
           <select class="form__controle" id="edit-resultado" required>
             <option value="Passou">Passou</option>
             <option value="Não passou">Não passou</option>
           </select>
         </div>
         <div class="form__grupo">
-          <label class="form__label" for="edit-observacao">Observação</label>
+          <label class="form__label" for="edit-observacao">
+            Observação
+            <span class="tooltip-hint" data-tooltip="Anotações complementares sobre este ensaio técnico." title="Anotações complementares." tabindex="0">!</span>
+          </label>
           <input class="form__controle" type="text" id="edit-observacao">
         </div>
         <div id="alerta-modal-teste" class="alerta alerta--erro hidden" role="alert"></div>

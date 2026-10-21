@@ -103,6 +103,10 @@ const localProvider = {
         const rows = data.funcionario.filter(f => f.cpf === cpf);
         return [rows, []];
       }
+      if (cleanLower.includes("lower(cargo) = 'admin'") || cleanLower.includes("cargo = 'admin'")) {
+        const rows = data.funcionario.filter(f => (f.cargo || '').toLowerCase() === 'admin');
+        return [rows, []];
+      }
       return [data.funcionario, []];
     }
 
@@ -566,6 +570,24 @@ const localProvider = {
       return [{ affectedRows: func ? 1 : 0 }, []];
     }
 
+    // 35. DELETE FROM funcionario WHERE id_funcionario = ?
+    if (cleanLower.startsWith('delete from funcionario where id_funcionario = ?') || cleanLower.startsWith('delete from funcionario where id_funcionario = $1')) {
+      const id = Number(params[0]);
+      const idx = data.funcionario.findIndex(f => f.id_funcionario === id);
+      if (idx !== -1) {
+        data.funcionario.splice(idx, 1);
+        // Desassocia inspeções realizadas por este funcionário (emulando ON DELETE SET NULL)
+        data.inspecao.forEach(i => {
+          if (i.id_funcionario === id) {
+            i.id_funcionario = null;
+          }
+        });
+        saveLocalData(data);
+        return [{ affectedRows: 1 }, []];
+      }
+      return [{ affectedRows: 0 }, []];
+    }
+
     console.warn('Query SQL não mapeada no provedor local:', sql, params);
     return [[], []];
   }
@@ -580,14 +602,44 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }  // necessário para Supabase
 });
 
+let schemaEnsured = false;
+async function ensureSchema(clientOrPool) {
+  if (schemaEnsured) return;
+  try {
+    await clientOrPool.query('ALTER TABLE fone ADD COLUMN IF NOT EXISTS lote VARCHAR(50) DEFAULT \'LT-2026-A\';');
+    await clientOrPool.query('ALTER TABLE inspecao ADD COLUMN IF NOT EXISTS foto_url TEXT;');
+    await clientOrPool.query('ALTER TABLE funcionario ADD COLUMN IF NOT EXISTS cargo VARCHAR(50) DEFAULT \'Inspetor\';');
+    
+    // Seed fones se a tabela estiver vazia
+    const countRes = await clientOrPool.query('SELECT COUNT(*) FROM fone;');
+    const totalFones = parseInt(countRes.rows?.[0]?.count || countRes.rows?.[0]?.['count(*)'] || 0, 10);
+    if (totalFones === 0) {
+      await clientOrPool.query(`
+        INSERT INTO fone (numero_serie, modelo, marca, tipo_conexao, lote, data_fabricacao, status)
+        VALUES
+          ('FN001', 'SoundX Pro', 'SoundX', 'Bluetooth', 'LT-2026-A', '2026-08-20', 'Reprovado / Manutenção'),
+          ('SX-2026-001', 'SoundX 10', 'SoundX', 'Bluetooth', 'LT-2026-A', '2026-09-01', 'Reprovado / Manutenção'),
+          ('SX-2026-002', 'SoundX Studio Pro', 'SoundX', 'USB-C', 'LT-2026-B', '2026-09-05', 'Aguardando inspeção'),
+          ('SX-2026-003', 'SoundX Bass Max', 'SoundX', 'USB-C', 'LT-2026-B', '2026-09-10', 'Aprovado')
+        ON CONFLICT (numero_serie) DO NOTHING;
+      `);
+      console.log('🌱 Fones de demonstração inseridos no PostgreSQL!');
+    }
+    schemaEnsured = true;
+  } catch (err) {
+    console.warn('Aviso ao sincronizar schema do PostgreSQL:', err.message);
+  }
+}
+
 // Testa conexão na inicialização
-pool.connect((err, client, release) => {
+pool.connect(async (err, client, release) => {
   if (err) {
     useLocalFallback = true;
     console.log('⚡ Nota: Supabase não acessível. Detalhes:', err.message);
     console.log('💾 Provedor de Banco de Dados Local ativado! Dados persistidos em local_data.json.');
   } else {
     console.log('✅ Conectado ao Supabase (PostgreSQL) com sucesso!');
+    await ensureSchema(client);
     release();
   }
 });
@@ -608,6 +660,9 @@ pool.connect((err, client, release) => {
 // Para SELECT o código usa result[0] como array de linhas.
 
 async function pgQuery(sql, params = []) {
+  if (!schemaEnsured) {
+    await ensureSchema(pool);
+  }
   // Converte placeholders MySQL (?) para PostgreSQL ($1, $2, ...)
   let pgSql = sql;
   let i = 0;

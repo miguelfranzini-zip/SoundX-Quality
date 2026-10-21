@@ -73,13 +73,11 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// Front-end (pasta pública do projeto — apenas em modo local)
-if (process.env.NODE_ENV !== 'production') {
-  app.use(express.static(path.resolve(__dirname, '../../frontend')));
-}
+// Front-end (pasta pública do projeto)
+app.use(express.static(path.resolve(__dirname, '../../frontend')));
 
 // Rota raiz e API Info (útil para testar direto no navegador se a API está online)
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.json({
     projeto: 'SoundX Quality API',
     status: 'online',
@@ -90,17 +88,9 @@ app.get('/', (req, res) => {
       fones: '/api/fones',
       inspecoes: '/api/inspecoes',
       manutencao: '/api/manutencao',
-      testes: '/api/testes'
+      testes: '/api/testes',
+      users: '/api/users'
     },
-    timestamp: new Date()
-  });
-});
-
-app.get('/api', (req, res) => {
-  res.json({
-    projeto: 'SoundX Quality API',
-    status: 'online',
-    versao: '1.0.0',
     timestamp: new Date()
   });
 });

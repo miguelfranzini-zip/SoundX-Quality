@@ -60,7 +60,10 @@
 
       <form class="form" id="form-manutencao" novalidate>
         <div class="form__grupo">
-          <label class="form__label" for="manutencao-defeito">Descrição do Defeito *</label>
+          <label class="form__label" for="manutencao-defeito">
+            Descrição do Defeito *
+            <span class="tooltip-hint" data-tooltip="Relato da não conformidade física, acústica ou elétrica diagnosticada na inspeção." title="Descrição da falha diagnosticada." tabindex="0">!</span>
+          </label>
           <textarea
             class="form__controle"
             id="manutencao-defeito"
@@ -71,7 +74,10 @@
         </div>
 
         <div class="form__grupo">
-          <label class="form__label" for="manutencao-status">Status *</label>
+          <label class="form__label" for="manutencao-status">
+            Status *
+            <span class="tooltip-hint" data-tooltip="'Pendente' (aguardando bancada), 'Em Manutenção' (em reparo) ou 'Concluído' (reparo finalizado)." title="Situação da ordem de manutenção." tabindex="0">!</span>
+          </label>
           <select class="form__controle" id="manutencao-status" required>
             <option value="Pendente">Pendente</option>
             <option value="Em Manutencao">Em manutenção</option>
@@ -80,7 +86,10 @@
         </div>
 
         <div class="form__grupo">
-          <label class="form__label" for="acao_corretiva">Ação corretiva</label>
+          <label class="form__label" for="acao_corretiva">
+            Ação corretiva
+            <span class="tooltip-hint" data-tooltip="Procedimento de reparo realizado pelo técnico (ex: troca de driver, ressolda de conector, calibração acústica)." title="Ação corretiva executada pelo técnico." tabindex="0">!</span>
+          </label>
           <textarea
             class="form__controle"
             id="acao_corretiva"
@@ -107,14 +116,20 @@
 
       <form class="form" id="form-nova-manutencao" novalidate>
         <div class="form__grupo">
-          <label class="form__label" for="novo-id_fone">Fone de Ouvido *</label>
+          <label class="form__label" for="novo-id_fone">
+            Fone de Ouvido *
+            <span class="tooltip-hint" data-tooltip="Selecione o fone com falha a ser registrado na fila de manutenção." title="Selecione o fone de ouvido para reparo." tabindex="0">!</span>
+          </label>
           <select class="form__controle" id="novo-id_fone" required>
             <option value="">Selecione um fone...</option>
           </select>
         </div>
 
         <div class="form__grupo">
-          <label class="form__label" for="novo-descricao_defeito">Descrição do Defeito *</label>
+          <label class="form__label" for="novo-descricao_defeito">
+            Descrição do Defeito *
+            <span class="tooltip-hint" data-tooltip="Detalhe o sintoma observado ou a causa de abertura da ordem técnica." title="Descrição da falha identificada." tabindex="0">!</span>
+          </label>
           <textarea
             class="form__controle"
             id="novo-descricao_defeito"
