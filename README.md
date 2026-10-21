@@ -1,8 +1,33 @@
 # SoundX Quality — Sistema de Controle de Qualidade de Fones de Ouvido
 
+[![Status](https://img.shields.io/badge/Status-100%25%20Concluído-brightgreen.svg)](https://github.com/miguelfranzini-zip/SoundX-Quality)
+[![Testes](https://img.shields.io/badge/Testes-100%25%20Aprovados-success.svg)](backend/test-app-completo.js)
+[![Arquitetura](https://img.shields.io/badge/Arquitetura-REST%20%2B%20ACID-orange.svg)](frontend/documentacao.html)
+[![Frontend](https://img.shields.io/badge/Frontend-Netlify-00C7B7.svg)](https://soundxquality.netlify.app/)
+[![Backend](https://img.shields.io/badge/Backend-Vercel-000000.svg)](https://sound-x-quality.vercel.app)
+[![Banco](https://img.shields.io/badge/Database-Supabase%20%2F%20PostgreSQL-3ECF8E.svg)](https://supabase.com/)
+
 > Repositório: [https://github.com/miguelfranzini-zip/SoundX-Quality](https://github.com/miguelfranzini-zip/SoundX-Quality)  
-> 🌐 **Frontend em Produção:** [https://soundxquality.netlify.app/](https://soundxquality.netlify.app/)  
-> 🚀 **API / Backend em Produção:** [https://sound-x-quality.vercel.app](https://sound-x-quality.vercel.app)
+> 🌐 **Frontend Oficial em Produção:** [https://soundxquality.netlify.app/](https://soundxquality.netlify.app/)  
+> 🚀 **API / Backend em Produção:** [https://sound-x-quality.vercel.app](https://sound-x-quality.vercel.app)  
+> 📖 **Manual Técnico & Apresentação (Slides):** [https://soundxquality.netlify.app/documentacao.html](https://soundxquality.netlify.app/documentacao.html)
+
+---
+
+## 🏆 Status do Projeto: 100% Concluído & Homologado
+
+O sistema SoundX Quality encontra-se **100% implementado, testado e pronto para operação industrial**. Todas as rotinas de bancada, fluxo de manutenção, transações com integridade ACID, controle RBAC com exclusão segura, tooltips explicativos contextuais e documentação técnica estão operacionais.
+
+### Resumo Executivo em Números:
+- **14 Páginas Web SPA:** Sem frameworks pesados; navegação fluida em milissegundos.
+- **23 Endpoints REST:** API modularizada em controladores e rotas dedicadas.
+- **5 Tabelas Relacionais:** Modeladas no PostgreSQL (Supabase) com auto-migração resiliente.
+- **4 Testes Técnicos de Bancada:** Áudio L/R, Microfone/Voz, Conexão e Bateria/Carga.
+- **3 Personas RBAC:** Inspetor de Qualidade, Técnico de Oficina e Administrador/Gestor.
+- **2 Provedores de Dados:** PostgreSQL na nuvem (principal) + Provedor Local JSON (contingência offline).
+- **100% dos Testes Automatizados Aprovados:** Suíte ponta a ponta sem qualquer pendência.
+
+---
 
 ## 📌 Escopo do Projeto
 
@@ -81,8 +106,8 @@ O sistema possui controle de acesso refinado baseado nos perfis operacionais e a
 - **Responsabilidades:**
   - Acesso total e irrestrito a todos os módulos, telas e registros.
   - Acompanhamento do **Dashboard de Indicadores** com KPIs em tempo real (total de fones produzidos, volume de inspeções, fones aprovados vs. reprovados e taxa percentual de conformidade).
-  - **Exclusividade em ações destrutivas (DELETE):** Apenas administradores podem excluir fones, laudos de inspeção e ordens de manutenção, salvaguardando a integridade histórica e a rastreabilidade da produção (RNF08).
-  - Poder de edição sobre qualquer registro operacional.
+  - **Exclusividade em ações destrutivas (DELETE):** Apenas administradores podem excluir fones, laudos de inspeção, ordens de manutenção e usuários, salvaguardando a auditoria da fábrica (RNF08).
+  - **Salvaguarda de Exclusão de Usuários:** Bloqueio estrito que impede autoexclusão e exclusão do último administrador remanescente do sistema.
 
 ---
 
@@ -91,26 +116,32 @@ O sistema possui controle de acesso refinado baseado nos perfis operacionais e a
 | Módulo / Entidade | Criar (POST) | Listar / Visualizar (GET) | Editar (PUT) | Excluir (DELETE) |
 | :--- | :--- | :--- | :--- | :--- |
 | **Fones de Ouvido** | Inspetor, Admin | Todos autenticados | Inspetor, Admin | **Admin** *(preserva histórico em cascata)* |
-| **Inspeções** | Inspetor, Admin | Todos autenticados | Inspetor, Admin | **Admin** *(recalcula taxas e dashboards)* |
+| **Inspeções** | Inspetor, Admin | Todos autenticados | Inspetor, Admin | **Admin** *(reconcilia status do fone automaticamente)* |
 | **Testes Técnicos** | Inspetor, Admin | Todos autenticados | Inspetor, Admin | Inspetor, Admin *(remoção de testes duplicados)* |
-| **Manutenção** | Todos autenticados | Técnico, Admin | Técnico, Admin | **Admin** *(impede descarte indevido de O.S.)* |
+| **Manutenção (O.S.)** | Todos autenticados | Técnico, Admin | Técnico, Admin | **Admin** *(impede descarte indevido de O.S.)* |
+| **Usuários** | **Admin** | **Admin** | **Admin** / Próprio (senha) | **Admin** *(bloqueia autoexclusão e último admin)* |
 
 ---
 
 ## 📋 Requisitos do Sistema
-**Funcionais (RF01–RF16):** cadastrar/editar/excluir produtos, lotes, inspetores e critérios; criar checklists; registrar inspeções, não conformidades e fotos; pesquisar registros; visualizar histórico; gerar relatórios; visualizar dashboard; autenticação; gerenciar permissões.
+**Funcionais (RF01–RF16):** cadastrar/editar/excluir produtos, lotes, inspetores e critérios; criar checklists; registrar inspeções, não conformidades e fotos; pesquisar registros; visualizar histórico; gerar relatórios; visualizar dashboard; autenticação; gerenciar e excluir usuários com salvaguardas.
 
-**Não Funcionais (RNF01–RNF10):** resposta ≤ 3s; disponibilidade ≥ 99%; senhas criptografadas; suporte a Chrome/Edge/Firefox; acesso restrito a autenticados; responsividade (desktop/tablet/smartphone); PostgreSQL / Supabase com fallback local resiliente; rastreabilidade inalterável; evidências fotográficas seguras com validação; versionamento via Git/GitHub.
+**Não Funcionais (RNF01–RNF10):** resposta ≤ 3s; disponibilidade ≥ 99%; senhas criptografadas com Bcrypt; suporte a Chrome/Edge/Firefox; acesso restrito a autenticados com JWT; responsividade (desktop/tablet/smartphone); PostgreSQL / Supabase com fallback local resiliente; rastreabilidade inalterável; evidências fotográficas seguras com validação; versionamento via Git/GitHub.
 
 ---
 
-## 📌 Status Atual do Projeto
-- [x] **Identidade Visual e Design System** (Cores oficiais, tipografia Garet/Muli, gradientes e logos)
-- [x] **Personas e Perfis de Acesso** (Inspetor, Técnico e Administrador com RBAC integrado)
-- [x] **Modelagem do Banco de Dados** (DDL e DML inicial com integridade referencial e cascade)
-- [x] **Back-end Completo** (API REST em Node.js/Express, autenticação JWT, validação de IDs e fallback local)
-- [x] **Front-end Completo** (Interface Web moderna, barra lateral retrátil com persistência, cards de KPI, tabelas responsivas, busca em tempo real e modais)
-- [x] **CRUD Completo e Integrado** (Operações de Criação, Leitura, Edição e Exclusão com diálogos de confirmação em todas as 4 entidades)
+## 📌 Checklist do Projeto — 100% Concluído
+
+- [x] **Identidade Visual e Design System Oficial** (Cores oficiais, tipografia Garet/Muli, gradientes, logos e tokens CSS centralizados)
+- [x] **Personas e Perfis de Acesso (RBAC)** (Inspetor, Técnico e Administrador com segregação granular e validação de permissões)
+- [x] **Gestão de Usuários & Exclusão Segura** (CRUD completo de usuários, proteção contra autoexclusão e bloqueio do último admin)
+- [x] **Modelagem & Auto-Migração do Banco de Dados** (PostgreSQL Supabase com criação automática de colunas `foto_url` e `lote`)
+- [x] **Back-end Completo com Transações ACID** (23 endpoints REST, atomicidade tudo-ou-nada via `withTransaction` e reconciliação de status)
+- [x] **Front-end Completo com 14 Páginas SPA** (Interface moderna, feedback imediato com toasts, modais de confirmação e zero build pesado)
+- [x] **Tooltips Informativos Flutuantes Globais `(!)`** (Ajuda contextual em formulários e tabelas sem cortes por `overflow`)
+- [x] **Apresentação Executiva & Modo Imersivo** (11 slides visuais, logo na proporção nativa 16:9, zero emojis, ícones SVG e atalhos <kbd>F</kbd>/<kbd>Esc</kbd>)
+- [x] **Aba 09 · Resumo Geral na Documentação** (Síntese consolidada de todos os tópicos e matriz sinótica da arquitetura)
+- [x] **Suíte de Testes Automatizados Ponta a Ponta** (`test-app-completo.js` validando banco, rotas, login e 17 scripts JS com 100% de sucesso)
 
 ---
 
@@ -129,22 +160,29 @@ O sistema possui arquitetura resiliente com **zero-configuração inicial obriga
    - Back-end API: `http://localhost:3001/api`
    - Front-end SPA: `http://localhost:3001`
 
-### 2. (Opcional) Conectar ao PostgreSQL / Supabase
+### 2. Rodar o Teste Completo do Sistema
+Para rodar a verificação automatizada completa (banco, rotas, login, páginas e sintaxe dos scripts):
+```bash
+node backend/test-app-completo.js
+```
+
+### 3. (Opcional) Conectar ao PostgreSQL / Supabase
 1. Crie um arquivo `backend/.env` baseado no `backend/.env.example`.
 2. Configure sua string de conexão:
    ```env
-   DATABASE_URL=postgresql://postgres:senha@host.supabase.co:5432/postgres?sslmode=require
+   DATABASE_URL=postgresql://postgres:senha@aws-0-sa-east-1.pooler.supabase.com:6543/postgres
    JWT_SECRET=soundx_secret_key_2026
    ```
-3. Execute o script DDL localizado em [`backend/database.sql`](file:///c:/Users/Aluno/Documents/SoundX-Quality/backend/database.sql).
+3. O sistema aplica auto-migração das colunas necessárias automaticamente na inicialização.
 
-### 3. Acessar a Aplicação
+### 4. Acessar a Aplicação
 - 🌐 **Frontend Oficial (Netlify):** [https://soundxquality.netlify.app/](https://soundxquality.netlify.app/)
 - 🚀 **Backend / API (Vercel):** [https://sound-x-quality.vercel.app](https://sound-x-quality.vercel.app)
 - 💻 **Ambiente Local:** [http://localhost:3001](http://localhost:3001)
-- 📊 **Apresentação em Slides:** [http://localhost:3001/documentacao.html#apresentacao](http://localhost:3001/documentacao.html#apresentacao) ou no Netlify em `/documentacao.html#apresentacao`
+- 📊 **Apresentação em Slides:** [http://localhost:3001/documentacao.html#apresentacao](http://localhost:3001/documentacao.html#apresentacao)
+- 📖 **Resumo Executivo de Todos os Tópicos:** [http://localhost:3001/documentacao.html#resumo](http://localhost:3001/documentacao.html#resumo)
 
-> *Credenciais de Teste:*
+> *Credenciais de Teste Homologadas:*
 > - **Inspetor:** `lucas@email.com` | Senha: `1234`
 > - **Técnico:** `tecnico@soundx.com` | Senha: `1234`
 > - **Admin:** `admin@soundx.com` | Senha: `1234`

@@ -38,6 +38,7 @@ API REST para controle de qualidade, registro de testes técnicos e gestão de m
 | POST   | /api/user-auth/change-password | Sim | Todos autenticados    | Alteração de senha do usuário conectado     |
 | GET    | /api/users               | Sim       | Admin                 | Lista todos os usuários cadastrados         |
 | POST   | /api/users               | Sim       | Admin                 | Cadastra novo usuário/funcionário           |
+| DELETE | /api/users/:id           | Sim       | Admin                 | Exclui usuário (com salvaguardas RNF08)     |
 | GET    | /api/fones               | Sim       | Todos autenticados    | Lista todos os fones cadastrados            |
 | POST   | /api/fones               | Sim       | Admin, Inspetor       | Cadastra um novo fone (com número e lote)   |
 | PUT    | /api/fones/:id           | Sim       | Admin, Inspetor       | Atualiza dados de um fone                   |
