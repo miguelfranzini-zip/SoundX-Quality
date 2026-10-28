@@ -58,6 +58,13 @@ function renderizar(lista) {
               title="Ver histórico do fone"
             >Histórico</button>
 
+            <a
+              class="btn btn--pequeno"
+              style="background: rgba(255, 152, 0, 0.12); color: var(--marrom); border: 1px solid rgba(255, 152, 0, 0.35); text-decoration: none; display: inline-flex; align-items: center;"
+              href="manutencao-solicitar.html?id_fone=${fone.id_fone}"
+              title="Solicitar manutenção técnica para este fone"
+            >Reparo</a>
+
             ${podeEditar ? `
               <button
                 class="btn btn--secundario btn--pequeno"

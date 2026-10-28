@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual do Usuário — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css?v=2">
+  <link rel="stylesheet" href="css/components.css?v=3">
+  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+  <style>
+    .manual-container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .manual-secao {
+      background: #FFFFFF;
+      border: 1px solid rgba(96, 33, 0, 0.08);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-bottom: var(--space-5);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .manual-secao h2 {
+      color: var(--marrom);
+      border-bottom: 2px solid rgba(255, 152, 0, 0.2);
+      padding-bottom: var(--space-2);
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .manual-passo {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+    .passo-numero {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--laranja);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .passo-conteudo h4 {
+      margin: 0 0 var(--space-1) 0;
+      color: var(--marrom);
+    }
+    .passo-conteudo p {
+      margin: 0;
+      font-size: 0.92rem;
+      color: var(--text-suave);
+      line-height: 1.5;
+    }
+    .destaque-box {
+      background: rgba(255, 152, 0, 0.08);
+      border-left: 4px solid var(--laranja);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-sm);
+      margin: var(--space-3) 0;
+      font-size: 0.9rem;
+    }
+    .glossario-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+    }
+    .glossario-card {
+      background: rgba(0,0,0,0.02);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+    }
+    .glossario-card strong {
+      color: var(--marrom);
+      display: block;
+      margin-bottom: 4px;
+    }
+    @media print {
+      body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+      }
+      .sidebar, .topbar, .overlay, #btn-imprimir, #btn-voltar-topo, .app-main header {
+        display: none !important;
+      }
+      .app-shell, .app-main, .content {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .manual-secao {
+        border: 1px solid #CCC !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        margin-bottom: 20px !important;
+      }
+      .manual-container {
+        max-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner manual-container">
+          <div class="page-header">
+            <div>
+              <h1>Manual Operacional do Usuário</h1>
+              <p>Guia definitivo de procedimentos para Inspetores, Técnicos e Administradores.</p>
+            </div>
+            <div style="display: flex; gap: var(--space-2);">
+              <button class="btn btn--primario" id="btn-imprimir" title="Imprimir ou salvar manual em PDF">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                Imprimir / PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- Índice Rápido -->
+          <div class="card" style="margin-bottom: var(--space-5);">
+            <div style="font-weight: 700; color: var(--marrom); margin-bottom: var(--space-2);">Índice de Navegação Rápida</div>
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+              <a href="#persona-inspetor" class="btn btn--ghost btn--pequeno">1. Guia do Inspetor</a>
+              <a href="#persona-tecnico" class="btn btn--ghost btn--pequeno">2. Guia do Técnico</a>
+              <a href="#persona-gerente" class="btn btn--ghost btn--pequeno">3. Guia do Gerente & Admin</a>
+              <a href="#secao-glossario" class="btn btn--ghost btn--pequeno">4. Glossário de Indicadores</a>
+            </div>
+          </div>
+
+          <!-- 1. GUIA DO INSPETOR DA QUALIDADE -->
+          <section class="manual-secao" id="persona-inspetor">
+            <h2>
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--laranja);"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+              1. Guia do Inspetor da Qualidade
+            </h2>
+            <p class="muted">
+              Responsável pelo controle de conformidade fabril, execução do checklist de testes e triagem de não conformidades.
+            </p>
+
+            <div class="manual-passo">
+              <div class="passo-numero">1</div>
+              <div class="passo-conteudo">
+                <h4>Cadastrar Novo Dispositivo Fabril</h4>
+                <p>Acesse o menu <strong>Fones</strong> e clique em <em>Novo Fone</em>. Preencha o número de série único gravado na peça, o modelo comercial, a marca, o tipo de conexão e o lote de produção para rastreabilidade (ex: <code>LT-2026-A</code>).</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">2</div>
+              <div class="passo-conteudo">
+                <h4>Executar Inspeção & Checklist Técnico</h4>
+                <p>No menu <strong>Inspeções</strong>, selecione <em>Nova Inspeção</em>. Selecione o fone a ser testado e avalie os ensaios técnicos: Resposta em Frequência, Impedância Acústica, Isolamento e Inspeção Visual da Carcaça.</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">3</div>
+              <div class="passo-conteudo">
+                <h4>Evidência Fotográfica Segura</h4>
+                <p>Em caso de avarias físicas visuais, insira a URL da foto de evidência (protocolos seguros obrigatórios: <code>http://</code> ou <code>https://</code>).</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">4</div>
+              <div class="passo-conteudo">
+                <h4>Regra de Coerência & Parecer</h4>
+                <p>O sistema possui barreira automática: se algum ensaio do checklist for marcado como reprovado, o fone <strong>não pode</strong> receber parecer "Aprovado". Caso reprovado, o sistema abre automaticamente a Ordem de Serviço na manutenção.</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">5</div>
+              <div class="passo-conteudo">
+                <h4>Solicitação Manual de Manutenção</h4>
+                <p>Se identificar uma falha durante o manuseio, você pode acessar o atalho <em>Solicitar Reparo</em> diretamente na listagem de fones ou no menu de manutenção, definindo a prioridade (Baixa, Média, Alta ou Crítica).</p>
+              </div>
+            </div>
+
+            <div class="destaque-box">
+              💡 <strong>Dica do Inspetor:</strong> Sempre consulte o <em>Laudo do Fone</em> para verificar se o dispositivo já foi reprovado anteriormente ou se passou por retrabalho na bancada técnica.
+            </div>
+          </section>
+
+          <!-- 2. GUIA DO TÉCNICO DE MANUTENÇÃO -->
+          <section class="manual-secao" id="persona-tecnico">
+            <h2>
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--dourado);"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              2. Guia do Técnico de Manutenção
+            </h2>
+            <p class="muted">
+              Responsável pelo diagnóstico de hardware, correção de falhas e reabilitação de dispositivos para reteste.
+            </p>
+
+            <div class="manual-passo">
+              <div class="passo-numero">1</div>
+              <div class="passo-conteudo">
+                <h4>Visualizar a Fila de Solicitações</h4>
+                <p>Acesse o menu <strong>Manutenção</strong>. Na primeira aba, <em>📥 Solicitações</em>, você visualiza todas as ordens abertas pelos inspetores e gerentes aguardando triagem.</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">2</div>
+              <div class="passo-conteudo">
+                <h4>Assumir a Ordem de Serviço (O.S.)</h4>
+                <p>Clique no botão <strong>Assumir</strong> na linha correspondente ao fone que você colocou em bancada. A O.S. passa para o status <em>Em Manutenção</em> e vincula seu usuário automaticamente como responsável técnico.</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">3</div>
+              <div class="passo-conteudo">
+                <h4>Registrar a Ação Corretiva Executada</h4>
+                <p>Clique em <strong>Atualizar</strong>. Descreva detalhadamente o reparo efetuado (ex.: "Substituição do transdutor dinâmico de 40mm, ressolda do terra e teste de impedância a 32 ohms").</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">4</div>
+              <div class="passo-conteudo">
+                <h4>Concluir e Liberar para Reteste</h4>
+                <p>Ao selecionar o status <strong>Concluído</strong> e salvar, o sistema calcula automaticamente o tempo de atendimento (MTTR), registra a data de encerramento e altera o fone no estoque para <em>Em Análise</em>, permitindo nova inspeção na linha.</p>
+              </div>
+            </div>
+
+            <div class="destaque-box">
+              ⚙️ <strong>Invariante da Linha:</strong> O sistema garante que cada fone possui no máximo uma única ordem aberta simultaneamente, evitando duplicidade de atendimento.
+            </div>
+          </section>
+
+          <!-- 3. GUIA DO GERENTE & ADMIN -->
+          <section class="manual-secao" id="persona-gerente">
+            <h2>
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--marrom);"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
+              3. Guia do Gerente da Qualidade & Administrador
+            </h2>
+            <p class="muted">
+              Governança fabril, leitura do dashboard analítico, auditoria e controle de acessos (RBAC).
+            </p>
+
+            <div class="manual-passo">
+              <div class="passo-numero">1</div>
+              <div class="passo-conteudo">
+                <h4>Dashboard Analítico em Tempo Real</h4>
+                <p>Acompanhe os 6 gráficos analíticos integrados: volume diário de inspeções, distribuição de status do estoque, modelos mais reprovados, testes do checklist que mais falham, manutenções pendentes vs concluídas e produtividade por técnico.</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">2</div>
+              <div class="passo-conteudo">
+                <h4>Central de Históricos & Auditoria</h4>
+                <p>No menu <strong>Histórico</strong>, filtre registros por período (data início/fim), parecer, status, prioridade e lote. Você pode auditar todo o ciclo de vida e exportar dados filtrados em CSV com formatação brasileira (ponto e vírgula e BOM UTF-8).</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">3</div>
+              <div class="passo-conteudo">
+                <h4>Gestão de Usuários com Soft Delete</h4>
+                <p>No menu <strong>Cadastrar Usuário</strong> (exclusivo Admin), você pode adicionar novos colaboradores com perfis RBAC (Inspetor, Técnico, Gerente ou Admin). Ao excluir um usuário, o sistema utiliza <em>Exclusão Lógica</em> (Soft Delete): o login é revogado imediatamente, mas todo o histórico de inspeções e laudos assinado por ele é 100% preservado.</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">4</div>
+              <div class="passo-conteudo">
+                <h4>Restauração de Contas Inativas</h4>
+                <p>Na aba <em>Excluídos (Histórico)</em>, você pode visualizar a data em que o colaborador foi inativado e restaurar o acesso com um clique, reativando suas credenciais sem perder qualquer rastreabilidade.</p>
+              </div>
+            </div>
+
+            <div class="destaque-box">
+              🔒 <strong>Segurança Institucional:</strong> A autoexclusão do administrador logado e a exclusão do último administrador ativo são terminantemente bloqueadas pelo sistema para impedir bloqueios acidentais.
+            </div>
+          </section>
+
+          <!-- 4. GLOSSÁRIO DE INDICADORES -->
+          <section class="manual-secao" id="secao-glossario">
+            <h2>
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--sucesso);"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              4. Glossário Técnico & Dicionário de Indicadores
+            </h2>
+            <p class="muted">Terminologias de qualidade e engenharia utilizadas nos painéis da SoundX.</p>
+
+            <div class="glossario-grid">
+              <div class="glossario-card">
+                <strong>First Pass Yield (FPY) / Taxa de Aprovação</strong>
+                <span>Percentual de fones aprovados logo na primeira bateria de testes sem necessidade de retrabalho ou ajuste mecânico.</span>
+              </div>
+
+              <div class="glossario-card">
+                <strong>Mean Time to Repair (MTTR)</strong>
+                <span>Tempo médio (em dias) decorrido entre a entrada do fone na manutenção e a conclusão do conserto pelo técnico responsável.</span>
+              </div>
+
+              <div class="glossario-card">
+                <strong>Taxa de Retrabalho</strong>
+                <span>Percentual de produtos do catálogo que precisaram passar por mais de uma rodada de inspeção devido a reparações na bancada.</span>
+              </div>
+
+              <div class="glossario-card">
+                <strong>Soft Delete (Exclusão Lógica)</strong>
+                <span>Mecanismo que desativa usuários sem apagar seus registros no banco de dados, garantindo a validade jurídica dos laudos assinados.</span>
+              </div>
+
+              <div class="glossario-card">
+                <strong>RBAC (Role-Based Access Control)</strong>
+                <span>Controle de acessos baseado em perfis (Admin, Gerente, Inspetor, Técnico) garantindo separação de responsabilidades na fábrica.</span>
+              </div>
+
+              <div class="glossario-card">
+                <strong>Lote de Produção</strong>
+                <span>Identificador da remessa de fabricação (ex: <code>LT-2026-A</code>) que permite auditoria de componentes e isolamento de falhas em série.</span>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="js/env-config.js"></script>
+  <script type="module">
+    import { getUsuario } from './js/auth.js';
+    import { initShell } from './js/ui.js?v=3';
+
+    const usuario = getUsuario();
+    if (usuario) {
+      initShell('manual', usuario);
+    }
+
+    document.getElementById('btn-imprimir')?.addEventListener('click', () => {
+      window.print();
+    });
+  </script>
+</body>
+</html>

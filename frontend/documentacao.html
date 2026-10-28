@@ -2504,8 +2504,11 @@ module.exports = (...cargosPermitidos) =&gt; (req, res, next) =&gt; {
                     <tr><td><code>inspecoes.html</code></td><td><code>inspecoes.js</code></td><td>Admin, Gerente, Inspetor</td><td>Lista com filtro, foto, testes, edição, exclusão e CSV.</td></tr>
                     <tr><td><code>inspecao-form.html</code></td><td><code>inspecao-form.js</code></td><td>Admin, Gerente, Inspetor</td><td>Laudo + foto por URL + checklist de quatro itens no mesmo POST.</td></tr>
                     <tr><td><code>testes.html</code></td><td><code>testes.js</code></td><td>Admin, Gerente, Inspetor</td><td>Escolhe uma inspeção e faz CRUD dos testes técnicos.</td></tr>
-                    <tr><td><code>manutencao.html</code></td><td><code>manutencao.js</code></td><td>Admin, Gerente, Técnico</td><td>Fila de OS, atualização de diagnóstico/status e exclusão.</td></tr>
-                    <tr><td><code>user-cadastro.html</code></td><td><code>user-cadastro.js</code></td><td>Admin (Gerente passa*)</td><td>Cadastro de funcionário e tabela de usuários.</td></tr>
+                    <tr><td><code>manutencao.html</code></td><td><code>manutencao.js</code></td><td>Admin, Gerente, Técnico</td><td>Painel com 4 abas (solicitações, em reparo, concluídas, todas), assumir O.S., prioridades e ações.</td></tr>
+                    <tr><td><code>manutencao-solicitar.html</code></td><td><code>manutencao-solicitar.js</code></td><td>Inspetor, Gerente, Admin, Técnico</td><td>Abertura de solicitações de reparo com fone, prioridade e sintomas.</td></tr>
+                    <tr><td><code>historico.html</code></td><td><code>historico.js</code></td><td>Admin, Gerente</td><td>Central de auditoria: histórico de inspeções, manutenções, visão por lote e exportação CSV.</td></tr>
+                    <tr><td><code>manual.html</code></td><td>—</td><td>Pública (com RBAC contextual)</td><td>Manual operacional do usuário por persona (Inspetor, Técnico, Gerente) e PDF.</td></tr>
+                    <tr><td><code>user-cadastro.html</code></td><td><code>user-cadastro.js</code></td><td>Admin (Gerente passa*)</td><td>Cadastro de funcionário, soft delete e restauração de contas.</td></tr>
                     <tr><td><code>alterar-senha.html</code></td><td><code>alterar-senha.js</code></td><td>Qualquer autenticado</td><td>Troca a própria senha via <span class="docs-inline">fetch</span> direto.</td></tr>
                     <tr><td><code>acesso-negado.html</code></td><td>—</td><td>Pública</td><td>Página estática de bloqueio.</td></tr>
                     <tr><td><code>documentacao.html</code></td><td><code>docs.js</code></td><td>Pública</td><td>Esta página: não importa auth, API, ui.js nem env-config.</td></tr>

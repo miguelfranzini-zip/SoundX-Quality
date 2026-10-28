@@ -8,10 +8,13 @@ const { validarIDParam } = require('../middlewares/validarIdMiddleware');
 // Criar novo usuário (apenas Admin)
 router.post('/', authMiddleware, roleMiddleware('admin'), userController.createUser);
 
-// Listar usuários (apenas Admin)
+// Listar usuários ativos (apenas Admin). ?excluidos=1 lista os excluídos (histórico preservado).
 router.get('/', authMiddleware, roleMiddleware('admin'), userController.listUsers);
 
-// Excluir usuário (apenas Admin)
+// Exclusão lógica (soft delete) — apenas Admin. Preserva histórico.
 router.delete('/:id', authMiddleware, roleMiddleware('admin'), validarIDParam, userController.deleteUser);
+
+// Restaurar um usuário excluído (reativação) — apenas Admin
+router.post('/:id/restaurar', authMiddleware, roleMiddleware('admin'), validarIDParam, userController.restoreUser);
 
 module.exports = router;

@@ -9,7 +9,8 @@ const { validarIDParam } = require('../middlewares/validarIdMiddleware');
 // Protege todas as rotas de inspeção com o JWT
 router.use(authMiddleware);
 
-// Rota do Dashboard (métrica geral)
+// Rotas do Dashboard (métrica geral e analítica detalhada)
+router.get('/dashboard/estatisticas', inspecaoController.obterEstatisticasDashboard);
 router.get('/dashboard', inspecaoController.obterDashboard);
 
 // Rotas de listagem, criação, edição e exclusão de inspeções

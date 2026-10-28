@@ -25,19 +25,67 @@
         <div class="content__inner">
           <div class="page-header">
             <div>
-              <h1>Fila de Manutenção</h1>
-              <p>Fones aguardando reparo na linha de produção.</p>
+              <h1>Gestão de Manutenção</h1>
+              <p>Fila técnica, solicitações da qualidade e histórico de reparos da bancada.</p>
             </div>
-            <button class="btn btn--primario" id="btn-nova-manutencao">Nova Ordem</button>
+            <div style="display: flex; gap: var(--space-2);">
+              <a href="manutencao-solicitar.html" class="btn btn--primario" id="btn-solicitar-manutencao">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M12 5v14M5 12h14"></path></svg>
+                Nova Solicitação
+              </a>
+            </div>
+          </div>
+
+          <!-- Abas de navegação da Manutenção -->
+          <div class="tabs" role="tablist">
+            <button class="tab tab--ativa" id="tab-solicitacoes" data-aba="solicitacoes" role="tab" aria-selected="true">
+              📥 Solicitações <span class="badge badge--alerta" id="cnt-solicitacoes" style="margin-left: 6px;">0</span>
+            </button>
+            <button class="tab" id="tab-em-aberto" data-aba="em-aberto" role="tab" aria-selected="false">
+              ⚙️ Em Reparo / A Fazer <span class="badge badge--info" id="cnt-em-aberto" style="margin-left: 6px;">0</span>
+            </button>
+            <button class="tab" id="tab-concluidas" data-aba="concluidas" role="tab" aria-selected="false">
+              ✅ Concluídas <span class="badge badge--sucesso" id="cnt-concluidas" style="margin-left: 6px;">0</span>
+            </button>
+            <button class="tab" id="tab-todas" data-aba="todas" role="tab" aria-selected="false">
+              📋 Todas <span class="badge" id="cnt-todas" style="margin-left: 6px;">0</span>
+            </button>
+          </div>
+
+          <!-- Barra de filtros rápidos -->
+          <div class="card" style="margin-bottom: var(--space-4); padding: var(--space-3) var(--space-4);">
+            <div style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center; justify-content: space-between;">
+              <div style="display: flex; gap: var(--space-3); flex: 1; min-width: 280px;">
+                <input
+                  type="text"
+                  class="form__controle"
+                  id="filtro-busca"
+                  placeholder="Buscar por número de série, modelo ou defeito..."
+                  style="max-width: 380px;"
+                >
+                <select class="form__controle" id="filtro-prioridade" style="max-width: 180px;">
+                  <option value="">Todas as prioridades</option>
+                  <option value="Critica">🔴 Crítica</option>
+                  <option value="Alta">🟠 Alta</option>
+                  <option value="Media">🟡 Média</option>
+                  <option value="Baixa">🟢 Baixa</option>
+                </select>
+              </div>
+              <div style="font-size: 0.85rem; color: var(--text-suave);" id="info-total-exibido">
+                Carregando registros...
+              </div>
+            </div>
           </div>
 
           <div class="tabela-wrapper">
             <table class="tabela">
               <thead>
                 <tr>
-                  <th>Fone</th>
+                  <th>Fone / Série</th>
                   <th>Modelo</th>
-                  <th>Defeito</th>
+                  <th>Defeito Diagnosticado</th>
+                  <th>Prioridade</th>
+                  <th>Responsáveis</th>
                   <th>Entrada</th>
                   <th>Status</th>
                   <th>Ações</th>
@@ -51,10 +99,11 @@
     </div>
   </div>
 
+  <!-- Modal Atualizar Manutenção -->
   <div class="modal-overlay" id="modal-atualizar">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
       <div class="modal__header">
-        <h3 id="modal-titulo">Atualizar manutenção</h3>
+        <h3 id="modal-titulo">Atualizar Manutenção</h3>
         <button class="modal__fechar" id="btn-fechar-modal" aria-label="Fechar">×</button>
       </div>
 
@@ -62,7 +111,7 @@
         <div class="form__grupo">
           <label class="form__label" for="manutencao-defeito">
             Descrição do Defeito *
-            <span class="tooltip-hint" data-tooltip="Relato da não conformidade física, acústica ou elétrica diagnosticada na inspeção." title="Descrição da falha diagnosticada." tabindex="0">!</span>
+            <span class="tooltip-hint" data-tooltip="Relato da não conformidade diagnosticada." title="Descrição da falha." tabindex="0">!</span>
           </label>
           <textarea
             class="form__controle"
@@ -73,85 +122,56 @@
           ></textarea>
         </div>
 
-        <div class="form__grupo">
-          <label class="form__label" for="manutencao-status">
-            Status *
-            <span class="tooltip-hint" data-tooltip="'Pendente' (aguardando bancada), 'Em Manutenção' (em reparo) ou 'Concluído' (reparo finalizado)." title="Situação da ordem de manutenção." tabindex="0">!</span>
-          </label>
-          <select class="form__controle" id="manutencao-status" required>
-            <option value="Pendente">Pendente</option>
-            <option value="Em Manutencao">Em manutenção</option>
-            <option value="Concluido">Concluído</option>
-          </select>
+        <div class="form__grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="form__grupo">
+            <label class="form__label" for="manutencao-status">
+              Status Operacional *
+            </label>
+            <select class="form__controle" id="manutencao-status" required>
+              <option value="Solicitada">Solicitada (Aguardando bancada)</option>
+              <option value="Pendente">Pendente (Na fila)</option>
+              <option value="Em Manutencao">Em Manutenção (Em reparo ativo)</option>
+              <option value="Concluido">Concluído (Liberado para reteste)</option>
+            </select>
+          </div>
+
+          <div class="form__grupo">
+            <label class="form__label" for="manutencao-prioridade">
+              Prioridade *
+            </label>
+            <select class="form__controle" id="manutencao-prioridade" required>
+              <option value="Baixa">🟢 Baixa</option>
+              <option value="Media">🟡 Média</option>
+              <option value="Alta">🟠 Alta</option>
+              <option value="Critica">🔴 Crítica</option>
+            </select>
+          </div>
         </div>
 
         <div class="form__grupo">
           <label class="form__label" for="acao_corretiva">
-            Ação corretiva
-            <span class="tooltip-hint" data-tooltip="Procedimento de reparo realizado pelo técnico (ex: troca de driver, ressolda de conector, calibração acústica)." title="Ação corretiva executada pelo técnico." tabindex="0">!</span>
+            Ação Corretiva Realizada pelo Técnico
+            <span class="tooltip-hint" data-tooltip="Procedimento de reparo efetuado (troca de transdutor, reparo de solda, substituição de fiação, calibração acústica)." title="Ação corretiva." tabindex="0">!</span>
           </label>
           <textarea
             class="form__controle"
             id="acao_corretiva"
-            placeholder="Descreva o reparo realizado..."
+            rows="3"
+            placeholder="Descreva o procedimento técnico de reparo executado na bancada..."
           ></textarea>
         </div>
 
         <div id="alerta-manutencao" class="alerta alerta--erro hidden" role="alert"></div>
 
-        <div class="toolbar">
-          <button type="submit" class="btn btn--primario" id="btn-salvar-manutencao">Salvar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Nova Manutenção -->
-  <div class="modal-overlay" id="modal-nova-manutencao">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-nova-titulo">
-      <div class="modal__header">
-        <h3 id="modal-nova-titulo">Abrir Ordem de Manutenção</h3>
-        <button class="modal__fechar" id="btn-fechar-modal-nova" aria-label="Fechar">×</button>
-      </div>
-
-      <form class="form" id="form-nova-manutencao" novalidate>
-        <div class="form__grupo">
-          <label class="form__label" for="novo-id_fone">
-            Fone de Ouvido *
-            <span class="tooltip-hint" data-tooltip="Selecione o fone com falha a ser registrado na fila de manutenção." title="Selecione o fone de ouvido para reparo." tabindex="0">!</span>
-          </label>
-          <select class="form__controle" id="novo-id_fone" required>
-            <option value="">Selecione um fone...</option>
-          </select>
-        </div>
-
-        <div class="form__grupo">
-          <label class="form__label" for="novo-descricao_defeito">
-            Descrição do Defeito *
-            <span class="tooltip-hint" data-tooltip="Detalhe o sintoma observado ou a causa de abertura da ordem técnica." title="Descrição da falha identificada." tabindex="0">!</span>
-          </label>
-          <textarea
-            class="form__controle"
-            id="novo-descricao_defeito"
-            rows="3"
-            placeholder="Descreva a falha ou motivo da manutenção..."
-            required
-          ></textarea>
-        </div>
-
-        <div id="alerta-nova-manutencao" class="alerta alerta--erro hidden" role="alert"></div>
-
-        <div style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4);">
-          <button type="button" class="btn btn--secundario" id="btn-cancelar-modal-nova">Cancelar</button>
-          <button type="submit" class="btn btn--primario" id="btn-salvar-nova-manutencao">Abrir Ordem</button>
+        <div class="toolbar" style="display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-4);">
+          <button type="button" class="btn btn--secundario" id="btn-cancelar-modal">Cancelar</button>
+          <button type="submit" class="btn btn--primario" id="btn-salvar-manutencao">Salvar Alterações</button>
         </div>
       </form>
     </div>
   </div>
 
   <div id="toast-container" class="toast-container"></div>
-
-  <!-- Configuração de ambiente (gerado no build do Netlify) -->
   <script src="js/env-config.js"></script>
   <script type="module" src="js/pages/manutencao.js"></script>
 </body>

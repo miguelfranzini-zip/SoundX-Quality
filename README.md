@@ -19,11 +19,14 @@
 O sistema SoundX Quality encontra-se **100% implementado, testado e pronto para operação industrial**. Todas as rotinas de bancada, fluxo de manutenção, transações com integridade ACID, controle RBAC com exclusão segura, tooltips explicativos contextuais e documentação técnica estão operacionais.
 
 ### Resumo Executivo em Números:
-- **14 Páginas Web SPA:** Sem frameworks pesados; navegação fluida em milissegundos.
-- **23 Endpoints REST:** API modularizada em controladores e rotas dedicadas.
-- **5 Tabelas Relacionais:** Modeladas no PostgreSQL (Supabase) com auto-migração resiliente.
-- **4 Testes Técnicos de Bancada:** Áudio L/R, Microfone/Voz, Conexão e Bateria/Carga.
-- **3 Personas RBAC:** Inspetor de Qualidade, Técnico de Oficina e Administrador/Gestor.
+- **17 Páginas Web SPA:** Sem frameworks pesados; navegação fluida em milissegundos.
+- **26 Endpoints REST:** API modularizada em controladores e rotas dedicadas.
+- **5 Tabelas Relacionais com Índices:** Modeladas no PostgreSQL (Supabase) com auto-migração resiliente.
+- **6 Gráficos Analíticos Integrados:** Volume diário, status do estoque, modelos reprovados, testes falhos, manutenções e produtividade técnica.
+- **Ciclo Completo de Manutenção:** Solicitações da qualidade, fila em reparo, conclusão técnica e reteste automático.
+- **Central de Auditoria & Históricos:** Rastreabilidade por data, resultado, parecer, status e lote fabril.
+- **Manual Operacional por Persona:** Guia dedicado para Inspetores, Técnicos e Gerentes com impressão PDF.
+- **Soft Delete de Usuários:** Exclusão lógica com bloqueio de acesso e preservação inalterável do histórico de laudos.
 - **2 Provedores de Dados:** PostgreSQL na nuvem (principal) + Provedor Local JSON (contingência offline).
 - **100% dos Testes Automatizados Aprovados:** Suíte ponta a ponta sem qualquer pendência.
 
@@ -179,6 +182,10 @@ node backend/test-app-completo.js
 - 🌐 **Frontend Oficial (Netlify):** [https://soundxquality.netlify.app/](https://soundxquality.netlify.app/)
 - 🚀 **Backend / API (Vercel):** [https://sound-x-quality.vercel.app](https://sound-x-quality.vercel.app)
 - 💻 **Ambiente Local:** [http://localhost:3001](http://localhost:3001)
+- 📊 **Dashboard Analítico:** [http://localhost:3001/dashboard.html](http://localhost:3001/dashboard.html)
+- 🔍 **Central de Históricos:** [http://localhost:3001/historico.html](http://localhost:3001/historico.html)
+- 🛠️ **Gestão de Manutenção:** [http://localhost:3001/manutencao.html](http://localhost:3001/manutencao.html)
+- 📖 **Manual Operacional do Usuário:** [http://localhost:3001/manual.html](http://localhost:3001/manual.html)
 - 📊 **Apresentação em Slides:** [http://localhost:3001/documentacao.html#apresentacao](http://localhost:3001/documentacao.html#apresentacao)
 - 📖 **Resumo Executivo de Todos os Tópicos:** [http://localhost:3001/documentacao.html#resumo](http://localhost:3001/documentacao.html#resumo)
 

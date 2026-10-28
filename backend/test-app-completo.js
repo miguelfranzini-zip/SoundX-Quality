@@ -104,10 +104,19 @@ async function runDiagnostic() {
     const dash = JSON.parse(resDash.body);
     console.log(`[GET /api/inspecoes/dashboard] ✅ Status: ${resDash.status} | Fones Cadastrados: ${dash.total_fones_cadastrados} | Aprovados: ${dash.fones_aprovados} | Taxa: ${dash.taxa_aprovacao}`);
 
-    // Manutenção
+    // Dashboard Estatísticas Detalhadas
+    const resStats = await fetchHttp(server, 'GET', '/api/inspecoes/dashboard/estatisticas', tokenAdmin);
+    const stats = JSON.parse(resStats.body);
+    console.log(`[GET /api/inspecoes/dashboard/estatisticas] ✅ Status: ${resStats.status} | Séries temporais: ${stats.serie_inspecoes?.length || 0} dias | MTTR: ${stats.mttr_medio_dias} d`);
+
+    // Manutenção Fila & Listagem Completa
     const resFila = await fetchHttp(server, 'GET', '/api/manutencao/fila', tokenAdmin);
     const fila = JSON.parse(resFila.body);
     console.log(`[GET /api/manutencao/fila] ✅ Status: ${resFila.status} | Fones na Fila de Reparo: ${fila.length}`);
+
+    const resManut = await fetchHttp(server, 'GET', '/api/manutencao', tokenAdmin);
+    const manuts = JSON.parse(resManut.body);
+    console.log(`[GET /api/manutencao] ✅ Status: ${resManut.status} | Total de Manutenções Registradas: ${Array.isArray(manuts) ? manuts.length : (manuts.dados?.length || 0)}`);
 
     // Usuários
     const resUsers = await fetchHttp(server, 'GET', '/api/users', tokenAdmin);
@@ -128,6 +137,9 @@ async function runDiagnostic() {
       { url: '/inspecoes.html', desc: 'Histórico Geral de Inspeções' },
       { url: '/inspecao-form.html', desc: 'Formulário de Nova Inspeção' },
       { url: '/manutencao.html', desc: 'Fila de Manutenção' },
+      { url: '/manutencao-solicitar.html', desc: 'Solicitar Manutenção (O.S.)' },
+      { url: '/historico.html', desc: 'Central de Históricos e Auditoria' },
+      { url: '/manual.html', desc: 'Manual Operacional do Usuário' },
       { url: '/testes.html', desc: 'Bancada de Testes Técnicos' },
       { url: '/user-cadastro.html', desc: 'Cadastro de Usuários' },
       { url: '/alterar-senha.html', desc: 'Alteração de Senha' },

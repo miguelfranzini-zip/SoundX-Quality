@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitar Manutenção — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css?v=3">
+  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Solicitar Manutenção Técnica</h1>
+              <p>Abra uma solicitação de reparo para envio à bancada técnica.</p>
+            </div>
+            <button class="btn btn--ghost" id="btn-voltar">Voltar</button>
+          </div>
+
+          <div class="card" style="max-width: 800px; margin: 0 auto;">
+            <div class="card__title">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--laranja);">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+              </svg>
+              <h2>Nova Ordem de Serviço</h2>
+            </div>
+            <p class="muted" style="margin-bottom: var(--space-4);">
+              Preencha os dados da falha identificada. A ordem entrará como <strong>Solicitada</strong> para atendimento prioritário pelos técnicos.
+            </p>
+
+            <form class="form" id="form-solicitar-manutencao" novalidate>
+              <div class="form__grupo">
+                <label class="form__label" for="select-fone">
+                  Fone com Não Conformidade *
+                  <span class="tooltip-hint" data-tooltip="Selecione o fone reprovado na inspeção ou com falha operacional identificada." title="Fone a ser reparado." tabindex="0">!</span>
+                </label>
+                <select class="form__controle" id="select-fone" required>
+                  <option value="">Carregando fones cadastrados...</option>
+                </select>
+                <span class="form__hint" id="fone-info-detalhe"></span>
+              </div>
+
+              <div class="form__grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form__grupo">
+                  <label class="form__label" for="select-prioridade">
+                    Prioridade de Atendimento *
+                    <span class="tooltip-hint" data-tooltip="Defina a urgência para a bancada técnica: Baixa, Média, Alta ou Crítica." title="Nível de prioridade." tabindex="0">!</span>
+                  </label>
+                  <select class="form__controle" id="select-prioridade" required>
+                    <option value="Baixa">🟢 Baixa (Ajustes estéticos / calibração leve)</option>
+                    <option value="Media" selected>🟡 Média (Padrão para falhas funcionais)</option>
+                    <option value="Alta">🟠 Alta (Lote com defeito crítico)</option>
+                    <option value="Critica">🔴 Crítica (Parada de linha / risco acústico)</option>
+                  </select>
+                </div>
+
+                <div class="form__grupo">
+                  <label class="form__label">
+                    Solicitante
+                  </label>
+                  <input class="form__controle" type="text" id="campo-solicitante" readonly disabled style="opacity: 0.8; background-color: rgba(0,0,0,0.03);">
+                </div>
+              </div>
+
+              <div class="form__grupo">
+                <label class="form__label" for="descricao_defeito">
+                  Descrição Detalhada do Defeito *
+                  <span class="tooltip-hint" data-tooltip="Descreva detalhadamente o sintoma apresentado (ex.: chiado no driver esquerdo acima de 80dB, botão de pareamento travado)." title="Descrição do defeito." tabindex="0">!</span>
+                </label>
+                <textarea
+                  class="form__controle"
+                  id="descricao_defeito"
+                  name="descricao_defeito"
+                  rows="4"
+                  placeholder="Ex.: Durante o teste de resposta em frequência, foi observado corte súbito de graves e aquecimento excessivo na carcaça esquerda..."
+                  required
+                ></textarea>
+              </div>
+
+              <div id="alerta-solicitacao" class="alerta alerta--erro hidden" role="alert"></div>
+
+              <div class="toolbar" style="margin-top: var(--space-4); display: flex; justify-content: flex-end; gap: var(--space-3);">
+                <button type="button" class="btn btn--secundario" id="btn-cancelar">Cancelar</button>
+                <button type="submit" class="btn btn--primario" id="btn-enviar-solicitacao">
+                  Enviar Solicitação
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="js/env-config.js"></script>
+  <script type="module" src="js/pages/manutencao-solicitar.js"></script>
+</body>
+</html>

@@ -100,8 +100,14 @@
           <!-- Tabela de usuários cadastrados -->
           <div class="card" style="margin-top: var(--space-6);">
             <div class="card__title">
-              <h2>Usuários Cadastrados</h2>
+              <h2>Usuários</h2>
             </div>
+
+            <div class="tabs" id="tabs-usuarios">
+              <button class="tab tab--ativa" data-aba="ativos">Ativos</button>
+              <button class="tab" data-aba="excluidos">Excluídos (histórico)</button>
+            </div>
+
             <div id="tabela-usuarios-wrapper">
               <p class="muted">Carregando...</p>
             </div>

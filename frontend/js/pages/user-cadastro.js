@@ -14,24 +14,59 @@ document.addEventListener('DOMContentLoaded', async () => {
   const alertaForm = document.getElementById('alerta-form');
   const btnVoltar = document.getElementById('btn-voltar');
   const tabelaWrapper = document.getElementById('tabela-usuarios-wrapper');
+  const tabsContainer = document.getElementById('tabs-usuarios');
+
+  let abaAtiva = 'ativos';
 
   btnVoltar.addEventListener('click', () => {
     window.history.back();
   });
 
-  // Carrega lista de usuários
+  function dataBR(valor) {
+    if (!valor) return '—';
+    const d = new Date(valor);
+    if (Number.isNaN(d.getTime())) return String(valor);
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  // Carrega lista de usuários conforme a aba (ativos ou excluídos)
   async function carregarUsuarios() {
     try {
-      const usuarios = await api('/users');
-      
+      const query = abaAtiva === 'excluidos' ? '/users?excluidos=1' : '/users';
+      const usuarios = await api(query);
+
       if (usuarios.length === 0) {
-        emptyState(tabelaWrapper, 'Nenhum usuário', 'Nenhum usuário foi cadastrado ainda.');
+        emptyState(
+          tabelaWrapper,
+          abaAtiva === 'excluidos' ? 'Nenhum usuário excluído' : 'Nenhum usuário',
+          abaAtiva === 'excluidos'
+            ? 'Nenhum usuário foi excluído ainda. Excluídos aparecem aqui com o histórico preservado.'
+            : 'Nenhum usuário foi cadastrado ainda.'
+        );
         return;
       }
 
       let tbodyHtml = '';
-      usuarios.forEach(u => {
+      usuarios.forEach((u) => {
         const isSelf = Number(u.id_funcionario) === Number(usuario.id);
+        const excluido = abaAtiva === 'excluidos';
+
+        const colunaAcoes = excluido
+          ? `<button
+                type="button"
+                class="btn btn--pequeno btn--secundario btn-restaurar-user"
+                data-id="${u.id_funcionario}"
+                data-nome="${escapeHtml(u.nome)}"
+                title="Restaurar este usuário (reativar acesso)"
+             >Restaurar</button>`
+          : `<button
+                type="button"
+                class="btn btn--pequeno btn--ghost btn-deletar-user"
+                data-id="${u.id_funcionario}"
+                data-nome="${escapeHtml(u.nome)}"
+                ${isSelf ? 'disabled title="Você não pode excluir a sua própria conta."' : 'style="color:var(--erro);font-weight:700;" title="Excluir este usuário (acesso revogado, histórico preservado)"'}
+             >Excluir</button>`;
+
         tbodyHtml += `
           <tr>
             <td>
@@ -41,21 +76,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td>${escapeHtml(u.email)}</td>
             <td>${escapeHtml(u.cargo)}</td>
             <td style="color:var(--text-secundario)">${escapeHtml(u.cpf || '—')}</td>
-            <td style="text-align: right;">
-              <button 
-                type="button" 
-                class="btn btn--pequeno btn--ghost btn-deletar-user" 
-                data-id="${u.id_funcionario}" 
-                data-nome="${escapeHtml(u.nome)}"
-                ${isSelf ? 'disabled title="Você não pode excluir a sua própria conta."' : 'style="color:var(--erro);font-weight:700;" title="Excluir este usuário"'}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:middle">
-                  <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-                Excluir
-              </button>
-            </td>
+            <td>${excluido ? dataBR(u.excluido_em) : '—'}</td>
+            <td style="text-align: right;">${colunaAcoes}</td>
           </tr>
         `;
       });
@@ -69,18 +91,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <th>E-mail</th>
                 <th>Cargo / Perfil</th>
                 <th>CPF</th>
+                <th>Excluído em</th>
                 <th style="text-align: right;">Ações</th>
               </tr>
             </thead>
-            <tbody>
-              ${tbodyHtml}
-            </tbody>
+            <tbody>${tbodyHtml}</tbody>
           </table>
         </div>
       `;
 
-      // Adiciona eventos aos botões de exclusão
-      tabelaWrapper.querySelectorAll('.btn-deletar-user').forEach(btn => {
+      // Ações de exclusão (soft delete)
+      tabelaWrapper.querySelectorAll('.btn-deletar-user').forEach((btn) => {
         btn.addEventListener('click', async () => {
           if (btn.disabled) return;
           const id = btn.getAttribute('data-id');
@@ -88,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           const confirmou = await confirmarAcao({
             titulo: 'Excluir Usuário',
-            mensagem: `Tem certeza de que deseja excluir o usuário "${nome}"? O acesso desta pessoa ao sistema será revogado imediatamente.`,
+            mensagem: `Tem certeza de que deseja excluir o usuário "${nome}"? O acesso desta pessoa ao sistema será revogado imediatamente, mas o histórico de ações (inspeções e manutenções) será preservado.`,
             textoBotao: 'Excluir Usuário',
             perigoso: true
           });
@@ -96,10 +117,35 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (confirmou) {
             try {
               const res = await api(`/users/${id}`, { method: 'DELETE' });
-              toast(res.mensagem || 'Usuário excluído com sucesso!', 'sucesso');
+              toast(res.mensagem || 'Usuário excluído com sucesso! Histórico preservado.', 'sucesso');
               await carregarUsuarios();
             } catch (err) {
               toast(err.message || 'Erro ao excluir usuário.', 'erro');
+            }
+          }
+        });
+      });
+
+      // Ações de restauração (reativação)
+      tabelaWrapper.querySelectorAll('.btn-restaurar-user').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          const nome = btn.getAttribute('data-nome');
+
+          const confirmou = await confirmarAcao({
+            titulo: 'Restaurar Usuário',
+            mensagem: `Deseja restaurar o usuário "${nome}"? O acesso ao sistema será reativado.`,
+            textoBotao: 'Restaurar',
+            perigoso: false
+          });
+
+          if (confirmou) {
+            try {
+              const res = await api(`/users/${id}/restaurar`, { method: 'POST' });
+              toast(res.mensagem || 'Usuário restaurado com sucesso!', 'sucesso');
+              await carregarUsuarios();
+            } catch (err) {
+              toast(err.message || 'Erro ao restaurar usuário.', 'erro');
             }
           }
         });
@@ -109,7 +155,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Submissão do formulário
+  // Troca de abas (ativos / excluídos)
+  if (tabsContainer) {
+    tabsContainer.addEventListener('click', (e) => {
+      const aba = e.target.closest('[data-aba]');
+      if (!aba) return;
+      abaAtiva = aba.dataset.aba;
+      tabsContainer.querySelectorAll('.tab').forEach((t) => t.classList.toggle('tab--ativa', t === aba));
+      carregarUsuarios();
+    });
+  }
+
+  // Submissão do formulário de cadastro
   formUser.addEventListener('submit', async (e) => {
     e.preventDefault();
     alertaForm.classList.add('hidden');

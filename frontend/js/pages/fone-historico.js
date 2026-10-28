@@ -11,7 +11,7 @@ import {
   toast,
 } from '../ui.js';
 
-const usuario = guardPagina(['Admin', 'Gerente', 'Inspetor']);
+const usuario = guardPagina(['Admin', 'Gerente', 'Inspetor', 'Técnico']);
 if (usuario) {
   initShell('fones', usuario);
 }
@@ -89,6 +89,13 @@ function renderizarInspecoes(lista) {
             <div class="timeline__desc">
               Observação: ${escapeHtml(inspecao.observacao || '(sem observação)')}
             </div>
+            ${inspecao.foto_url ? `
+              <div style="margin-top: 6px;">
+                <a href="${escapeHtml(inspecao.foto_url)}" target="_blank" rel="noopener noreferrer" class="btn btn--pequeno btn--ghost" style="padding: 2px 8px; font-size: 0.78rem;">
+                  📷 Ver Evidência Fotográfica
+                </a>
+              </div>
+            ` : ''}
           </div>
         `
         )
@@ -152,6 +159,7 @@ function renderizarManutencoes(lista) {
             <div class="timeline__data">Entrada: ${formatarData(manutencao.data_entrada)}</div>
             <div class="timeline__titulo">
               ${badgeStatus(manutencao.status)}
+              ${manutencao.prioridade ? `<span class="badge badge--info" style="margin-left: 6px;">Prioridade: ${escapeHtml(manutencao.prioridade)}</span>` : ''}
               ${manutencao.data_conclusao ? `<span class="muted"> · Concluída em ${formatarData(manutencao.data_conclusao)}</span>` : ''}
             </div>
             <div class="timeline__desc">

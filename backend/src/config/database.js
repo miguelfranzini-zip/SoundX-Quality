@@ -29,9 +29,9 @@ if (process.env.VERCEL) {
 function getInitialData() {
   return {
     funcionario: [
-      { id_funcionario: 1, nome: 'Lucas Silva',   cpf: '123.456.789-00', cargo: 'Inspetor', email: 'lucas@email.com',    senha: '1234' },
-      { id_funcionario: 2, nome: 'Marcos Santos', cpf: '234.567.890-11', cargo: 'Técnico',  email: 'tecnico@soundx.com', senha: '1234' },
-      { id_funcionario: 3, nome: 'Carlos Souza',  cpf: '345.678.901-22', cargo: 'Admin',    email: 'admin@soundx.com',   senha: '1234' }
+      { id_funcionario: 1, nome: 'Lucas Silva',   cpf: '123.456.789-00', cargo: 'Inspetor', email: 'lucas@email.com',    senha: '1234', ativo: true },
+      { id_funcionario: 2, nome: 'Marcos Santos', cpf: '234.567.890-11', cargo: 'Técnico',  email: 'tecnico@soundx.com', senha: '1234', ativo: true },
+      { id_funcionario: 3, nome: 'Carlos Souza',  cpf: '345.678.901-22', cargo: 'Admin',    email: 'admin@soundx.com',   senha: '1234', ativo: true }
     ],
     fone: [
       { id_fone: 1, numero_serie: 'FN001',       modelo: 'SoundX Pro',        marca: 'SoundX', tipo_conexao: 'Bluetooth', lote: 'LT-2026-A', data_fabricacao: '2026-08-20', status: 'Reprovado / Manutenção' },
@@ -228,16 +228,19 @@ const localProvider = {
       return [{ affectedRows: fone ? 1 : 0 }, []];
     }
 
-    // 11. INSERT INTO manutencao
+    // 11. INSERT INTO manutencao (aceita status/prioridade/solicitado_por)
     if (cleanLower.startsWith('insert into manutencao')) {
       const newId = data.manutencao.reduce((max, m) => Math.max(max, m.id_manutencao || 0), 0) + 1;
-      const [id_fone, descricao_defeito] = params;
+      const [id_fone, descricao_defeito, status, prioridade, solicitado_por] = params;
       const nova = {
         id_manutencao: newId,
         id_fone: Number(id_fone),
         descricao_defeito,
         acao_corretiva: null,
-        status: 'Pendente',
+        status: status || 'Pendente',
+        prioridade: prioridade || 'Media',
+        solicitado_por: solicitado_por != null ? Number(solicitado_por) : null,
+        concluido_por: null,
         data_entrada: new Date().toISOString().replace('T', ' ').slice(0, 19),
         data_conclusao: null
       };
@@ -328,13 +331,14 @@ const localProvider = {
       return [rows, []];
     }
 
-    // 17. UPDATE manutencao SET acao_corretiva = ?
+    // 17. UPDATE manutencao SET acao_corretiva = ? (com concluido_por)
     if (cleanLower.startsWith('update manutencao set acao_corretiva = ?') || cleanLower.startsWith('update manutencao set acao_corretiva = $1')) {
-      const [acao_corretiva, status, data_conclusao, id] = params;
+      const [acao_corretiva, status, data_conclusao, id, concluido_por] = params;
       const item = data.manutencao.find(m => m.id_manutencao === Number(id));
       if (item) {
         item.acao_corretiva = acao_corretiva;
         item.status = status;
+        item.concluido_por = concluido_por != null ? Number(concluido_por) : item.concluido_por;
         item.data_conclusao = data_conclusao ? new Date().toISOString().replace('T', ' ').slice(0, 19) : null;
         saveLocalData(data);
       }
@@ -545,7 +549,9 @@ const localProvider = {
         cpf: cpf || null,
         cargo: cargo,
         email: email.trim().toLowerCase(),
-        senha: senha  // já está hashado pelo controller
+        senha: senha,  // já está hashado pelo controller
+        ativo: true,
+        excluido_em: null
       };
       data.funcionario.push(novo);
       saveLocalData(data);
@@ -570,22 +576,302 @@ const localProvider = {
       return [{ affectedRows: func ? 1 : 0 }, []];
     }
 
-    // 35. DELETE FROM funcionario WHERE id_funcionario = ?
-    if (cleanLower.startsWith('delete from funcionario where id_funcionario = ?') || cleanLower.startsWith('delete from funcionario where id_funcionario = $1')) {
-      const id = Number(params[0]);
-      const idx = data.funcionario.findIndex(f => f.id_funcionario === id);
-      if (idx !== -1) {
-        data.funcionario.splice(idx, 1);
-        // Desassocia inspeções realizadas por este funcionário (emulando ON DELETE SET NULL)
-        data.inspecao.forEach(i => {
-          if (i.id_funcionario === id) {
-            i.id_funcionario = null;
-          }
-        });
+    // 35. Soft delete de funcionario: UPDATE funcionario SET ativo = FALSE, excluido_em = NOW() WHERE id_funcionario = ?
+    if (cleanLower.startsWith('update funcionario set ativo = false') || cleanLower.startsWith('update funcionario set ativo = $1') || cleanLower.startsWith('update funcionario set ativo = ?')) {
+      const id = Number(params[params.length - 1]);
+      const func = data.funcionario.find(f => f.id_funcionario === id);
+      if (func) {
+        func.ativo = false;
+        func.excluido_em = new Date().toISOString().replace('T', ' ').slice(0, 19);
+        // NÃO remove o registro: preserva histórico de inspeções/manutenções
         saveLocalData(data);
         return [{ affectedRows: 1 }, []];
       }
       return [{ affectedRows: 0 }, []];
+    }
+
+    // 35b. Restaurar funcionario (reativação): UPDATE funcionario SET ativo = TRUE WHERE id_funcionario = ?
+    if (cleanLower.startsWith('update funcionario set ativo = true')) {
+      const id = Number(params[params.length - 1]);
+      const func = data.funcionario.find(f => f.id_funcionario === id);
+      if (func) {
+        func.ativo = true;
+        func.excluido_em = null;
+        saveLocalData(data);
+        return [{ affectedRows: 1 }, []];
+      }
+      return [{ affectedRows: 0 }, []];
+    }
+
+    // 36. SELECT * FROM teste ORDER BY ... (todos os testes — usado por estatísticas)
+    if (cleanLower.startsWith('select * from teste order by')) {
+      const rows = [...data.teste].sort((a, b) => b.id_teste - a.id_teste);
+      return [rows, []];
+    }
+
+    // 37. SELECT * FROM manutencao ORDER BY ... (todas as O.S., incluindo concluídas — estatísticas/histórico)
+    if (cleanLower.startsWith('select * from manutencao order by')) {
+      const rows = [...data.manutencao].sort((a, b) => new Date(b.data_entrada || 0) - new Date(a.data_entrada || 0));
+      return [rows, []];
+    }
+
+    // ------------------------------------------------------------------
+    // Padrões de expansão: filtros + paginação (inspeções e manutenções)
+    // ------------------------------------------------------------------
+
+    // 38. Listar inspeções com JOIN + filtros (data, resultado, fone, inspetor) + paginação
+    if (
+      cleanLower.includes('from inspecao i') &&
+      cleanLower.includes('left join fone f') &&
+      cleanLower.includes('left join funcionario func') &&
+      (cleanLower.includes('limit') || cleanLower.includes('where'))
+    ) {
+      const dados = loadLocalData();
+      let rows = dados.inspecao.map((i) => {
+        const fone = dados.fone.find((f) => f.id_fone === i.id_fone) || {};
+        const func = dados.funcionario.find((f) => f.id_funcionario === i.id_funcionario) || {};
+        return {
+          id_inspecao: i.id_inspecao,
+          id_fone: i.id_fone,
+          data_inspecao: i.data_inspecao,
+          resultado_final: i.resultado_final,
+          observacao: i.observacao || '',
+          foto_url: i.foto_url || null,
+          fone_modelo: fone.modelo || '—',
+          fone_serie: fone.numero_serie || '—',
+          inspetor: func.nome || 'Inspetor'
+        };
+      });
+
+      // params esperados: [de, ate, resultado, id_fone, inspetor, limit, offset]
+      const [de, ate, resultado, idFone, inspetor, limit, offset] = params;
+
+      if (de) rows = rows.filter((r) => String(r.data_inspecao || '').slice(0, 10) >= String(de));
+      if (ate) rows = rows.filter((r) => String(r.data_inspecao || '').slice(0, 10) <= String(ate));
+      if (resultado) rows = rows.filter((r) => String(r.resultado_final || '').toLowerCase().includes(String(resultado).toLowerCase()));
+      if (idFone) rows = rows.filter((r) => r.id_fone === Number(idFone));
+      if (inspetor) rows = rows.filter((r) => String(r.inspetor || '').toLowerCase().includes(String(inspetor).toLowerCase()));
+
+      rows.sort((a, b) => new Date(b.data_inspecao || 0) - new Date(a.data_inspecao || 0));
+
+      const total = rows.length;
+      const lim = limit ? Number(limit) : total;
+      const off = offset ? Number(offset) : 0;
+      const pagina = rows.slice(off, off + lim);
+      return [pagina, []];
+    }
+
+    // 39. Contar inspeções com filtros (mesmo WHERE do padrão 38)
+    if (
+      cleanLower.includes('select count(*) as total from inspecao i') &&
+      cleanLower.includes('left join fone f') &&
+      cleanLower.includes('left join funcionario func')
+    ) {
+      const dados = loadLocalData();
+      let rows = dados.inspecao.map((i) => {
+        const fone = dados.fone.find((f) => f.id_fone === i.id_fone) || {};
+        const func = dados.funcionario.find((f) => f.id_funcionario === i.id_funcionario) || {};
+        return {
+          id_inspecao: i.id_inspecao,
+          id_fone: i.id_fone,
+          data_inspecao: i.data_inspecao,
+          resultado_final: i.resultado_final,
+          observacao: i.observacao || '',
+          foto_url: i.foto_url || null,
+          fone_modelo: fone.modelo || '—',
+          fone_serie: fone.numero_serie || '—',
+          inspetor: func.nome || 'Inspetor'
+        };
+      });
+
+      const [de, ate, resultado, idFone, inspetor] = params;
+      if (de) rows = rows.filter((r) => String(r.data_inspecao || '').slice(0, 10) >= String(de));
+      if (ate) rows = rows.filter((r) => String(r.data_inspecao || '').slice(0, 10) <= String(ate));
+      if (resultado) rows = rows.filter((r) => String(r.resultado_final || '').toLowerCase().includes(String(resultado).toLowerCase()));
+      if (idFone) rows = rows.filter((r) => r.id_fone === Number(idFone));
+      if (inspetor) rows = rows.filter((r) => String(r.inspetor || '').toLowerCase().includes(String(inspetor).toLowerCase()));
+
+      return [[{ total: rows.length }], []];
+    }
+
+    // 40. Listar manutenções com JOIN + filtros (status, data, fone, técnico) + paginação
+    if (
+      cleanLower.includes('from manutencao m') &&
+      cleanLower.includes('join fone f') &&
+      (cleanLower.includes('limit') || cleanLower.includes('where'))
+    ) {
+      const dados = loadLocalData();
+      let rows = dados.manutencao.map((m) => {
+        const fone = dados.fone.find((f) => f.id_fone === m.id_fone) || {};
+        const solicitante = dados.funcionario.find((f) => f.id_funcionario === m.solicitado_por) || {};
+        const concluidor = dados.funcionario.find((f) => f.id_funcionario === m.concluido_por) || {};
+        return {
+          id_manutencao: m.id_manutencao,
+          id_fone: m.id_fone,
+          descricao_defeito: m.descricao_defeito || '',
+          acao_corretiva: m.acao_corretiva || null,
+          status: m.status || 'Pendente',
+          prioridade: m.prioridade || 'Media',
+          solicitado_por: m.solicitado_por || null,
+          solicitado_por_nome: solicitante.nome || '—',
+          concluido_por: m.concluido_por || null,
+          concluido_por_nome: concluidor.nome || '—',
+          data_entrada: m.data_entrada,
+          data_conclusao: m.data_conclusao,
+          modelo: fone.modelo || '—',
+          numero_serie: fone.numero_serie || '—'
+        };
+      });
+
+      // params: [de, ate, status, id_fone, id_tecnico, prioridade, limit, offset]
+      const [de, ate, status, idFone, idTecnico, prioridade, limit, offset] = params;
+
+      if (de) rows = rows.filter((r) => String(r.data_entrada || '').slice(0, 10) >= String(de));
+      if (ate) rows = rows.filter((r) => String(r.data_entrada || '').slice(0, 10) <= String(ate));
+      if (status) rows = rows.filter((r) => String(r.status || '').toLowerCase() === String(status).toLowerCase());
+      if (idFone) rows = rows.filter((r) => r.id_fone === Number(idFone));
+      if (idTecnico) rows = rows.filter((r) => r.concluido_por === Number(idTecnico) || r.solicitado_por === Number(idTecnico));
+      if (prioridade) rows = rows.filter((r) => String(r.prioridade || '').toLowerCase() === String(prioridade).toLowerCase());
+
+      rows.sort((a, b) => new Date(b.data_entrada || 0) - new Date(a.data_entrada || 0));
+
+      const total = rows.length;
+      const lim = limit ? Number(limit) : total;
+      const off = offset ? Number(offset) : 0;
+      const pagina = rows.slice(off, off + lim);
+      return [pagina, []];
+    }
+
+    // 41. Contar manutenções com filtros
+    if (
+      cleanLower.includes('select count(*) as total from manutencao m') &&
+      cleanLower.includes('join fone f')
+    ) {
+      const dados = loadLocalData();
+      let rows = dados.manutencao.map((m) => {
+        const fone = dados.fone.find((f) => f.id_fone === m.id_fone) || {};
+        return { ...m, modelo: fone.modelo || '—', numero_serie: fone.numero_serie || '—' };
+      });
+
+      const [de, ate, status, idFone, idTecnico, prioridade] = params;
+      if (de) rows = rows.filter((r) => String(r.data_entrada || '').slice(0, 10) >= String(de));
+      if (ate) rows = rows.filter((r) => String(r.data_entrada || '').slice(0, 10) <= String(ate));
+      if (status) rows = rows.filter((r) => String(r.status || '').toLowerCase() === String(status).toLowerCase());
+      if (idFone) rows = rows.filter((r) => r.id_fone === Number(idFone));
+      if (idTecnico) rows = rows.filter((r) => r.concluido_por === Number(idTecnico) || r.solicitado_por === Number(idTecnico));
+      if (prioridade) rows = rows.filter((r) => String(r.prioridade || '').toLowerCase() === String(prioridade).toLowerCase());
+
+      return [[{ total: rows.length }], []];
+    }
+
+    // 42. Estatísticas do dashboard (agregações em memória para provedor local)
+    if (cleanLower.includes('dashboard estatisticas') || cleanLower.includes('select dashboard')) {
+      const dados = loadLocalData();
+      const agora = new Date();
+      const trintaDiasAtras = new Date(agora);
+      trintaDiasAtras.setDate(agora.getDate() - 30);
+
+      // Inspeções por dia (últimos 30 dias)
+      const inspecoesPorDia = {};
+      for (let d = 0; d < 30; d++) {
+        const dia = new Date(agora);
+        dia.setDate(agora.getDate() - d);
+        const chave = dia.toISOString().slice(0, 10);
+        inspecoesPorDia[chave] = 0;
+      }
+      dados.inspecao.forEach((i) => {
+        const dia = String(i.data_inspecao || '').slice(0, 10);
+        if (inspecoesPorDia[dia] !== undefined) inspecoesPorDia[dia]++;
+      });
+      const serieInspecoes = Object.entries(inspecoesPorDia)
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([data, total]) => ({ data, total }));
+
+      // Distribuição de status dos fones
+      const distribuicaoStatus = {};
+      dados.fone.forEach((f) => {
+        const s = f.status || 'Aguardando inspeção';
+        distribuicaoStatus[s] = (distribuicaoStatus[s] || 0) + 1;
+      })
+
+      // Reprovações por modelo
+      const reprovacoesPorModelo = {};
+      dados.inspecao.forEach((i) => {
+        if (String(i.resultado_final || '').toLowerCase().includes('reprovado')) {
+          const fone = dados.fone.find((f) => f.id_fone === i.id_fone);
+          const modelo = fone ? fone.modelo : '—';
+          reprovacoesPorModelo[modelo] = (reprovacoesPorModelo[modelo] || 0) + 1;
+        }
+      });
+      const topModelosReprovados = Object.entries(reprovacoesPorModelo)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([modelo, total]) => ({ modelo, total }));
+
+      // Tipos de teste que mais falham
+      const testesFalhos = {};
+      dados.teste.forEach((t) => {
+        if (String(t.resultado || '').toLowerCase().includes('não passou') || String(t.resultado || '').toLowerCase().includes('reprovado')) {
+          testesFalhos[t.tipo_teste] = (testesFalhos[t.tipo_teste] || 0) + 1;
+        }
+      });
+      const tiposTesteFalhos = Object.entries(testesFalhos)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([tipo, total]) => ({ tipo, total }));
+
+      // Manutenções pendentes e concluídas
+      const manutencoesPendentes = dados.manutencao.filter((m) => m.status !== 'Concluido').length;
+      const manutencoesConcluidas = dados.manutencao.filter((m) => m.status === 'Concluido').length;
+
+      // MTTR médio (dias) das concluídas
+      const mttrDias = [];
+      dados.manutencao.forEach((m) => {
+        if (m.status === 'Concluido' && m.data_entrada && m.data_conclusao) {
+          const inicio = new Date(m.data_entrada);
+          const fim = new Date(m.data_conclusao);
+          const diffDias = (fim - inicio) / (1000 * 60 * 60 * 24);
+          mttrDias.push(diffDias);
+        }
+      });
+      const mttrMedio = mttrDias.length > 0
+        ? (mttrDias.reduce((a, b) => a + b, 0) / mttrDias.length).toFixed(1)
+        : 0;
+
+      // Taxa de retrabalho: % de fones com mais de uma inspeção
+      const inspecoesPorFone = {};
+      dados.inspecao.forEach((i) => {
+        inspecoesPorFone[i.id_fone] = (inspecoesPorFone[i.id_fone] || 0) + 1;
+      });
+      const fonesComRetrabalho = Object.values(inspecoesPorFone).filter((c) => c > 1).length;
+      const taxaRetrabalho = dados.fone.length > 0
+        ? ((fonesComRetrabalho / dados.fone.length) * 100).toFixed(1) + '%'
+        : '0%';
+
+      // Concluídas por técnico
+      const concluidoPorTecnico = {};
+      dados.manutencao.forEach((m) => {
+        if (m.status === 'Concluido' && m.concluido_por) {
+          const func = dados.funcionario.find((f) => f.id_funcionario === m.concluido_por);
+          const nome = func ? func.nome : 'Técnico #' + m.concluido_por;
+          concluidoPorTecnico[nome] = (concluidoPorTecnico[nome] || 0) + 1;
+        }
+      });
+      const concluidasPorTecnico = Object.entries(concluidoPorTecnico)
+        .sort((a, b) => b[1] - a[1])
+        .map(([nome, total]) => ({ nome, total }));
+
+      return [[{
+        serie_inspecoes: serieInspecoes,
+        distribuicao_status: distribuicaoStatus,
+        reprovacoes_por_modelo: topModelosReprovados,
+        tipos_teste_falhos: tiposTesteFalhos,
+        manutencoes_pendentes: manutencoesPendentes,
+        manutencoes_concluidas: manutencoesConcluidas,
+        mttr_medio_dias: mttrMedio,
+        taxa_retrabalho: taxaRetrabalho,
+        concluidas_por_tecnico: concluidasPorTecnico
+      }], []];
     }
 
     console.warn('Query SQL não mapeada no provedor local:', sql, params);
@@ -609,7 +895,27 @@ async function ensureSchema(clientOrPool) {
     await clientOrPool.query('ALTER TABLE fone ADD COLUMN IF NOT EXISTS lote VARCHAR(50) DEFAULT \'LT-2026-A\';');
     await clientOrPool.query('ALTER TABLE inspecao ADD COLUMN IF NOT EXISTS foto_url TEXT;');
     await clientOrPool.query('ALTER TABLE funcionario ADD COLUMN IF NOT EXISTS cargo VARCHAR(50) DEFAULT \'Inspetor\';');
-    
+
+    // ---- Expansão: ciclo de solicitação de manutenção ----
+    await clientOrPool.query('ALTER TABLE manutencao ADD COLUMN IF NOT EXISTS prioridade VARCHAR(20) DEFAULT \'Media\';');
+    await clientOrPool.query('ALTER TABLE manutencao ADD COLUMN IF NOT EXISTS solicitado_por INT;');
+    await clientOrPool.query('ALTER TABLE manutencao ADD COLUMN IF NOT EXISTS concluido_por INT;');
+
+    // Relaxa a antiga restrição de status (que não incluía 'Solicitada') e recria com o novo domínio
+    await clientOrPool.query('ALTER TABLE manutencao DROP CONSTRAINT IF EXISTS manutencao_status_check;');
+    await clientOrPool.query(`ALTER TABLE manutencao ADD CONSTRAINT manutencao_status_check
+      CHECK (status IN ('Pendente', 'Em Manutencao', 'Concluido', 'Solicitada'));`);
+
+    // ---- Expansão: histórico de usuários (soft delete) ----
+    await clientOrPool.query('ALTER TABLE funcionario ADD COLUMN IF NOT EXISTS ativo BOOLEAN DEFAULT TRUE;');
+    await clientOrPool.query('ALTER TABLE funcionario ADD COLUMN IF NOT EXISTS excluido_em TIMESTAMP;');
+
+    // ---- Índices para filtros por data/status (agregações e históricos) ----
+    await clientOrPool.query('CREATE INDEX IF NOT EXISTS idx_inspecao_data ON inspecao (data_inspecao);');
+    await clientOrPool.query('CREATE INDEX IF NOT EXISTS idx_inspecao_fone ON inspecao (id_fone);');
+    await clientOrPool.query('CREATE INDEX IF NOT EXISTS idx_manutencao_status ON manutencao (status);');
+    await clientOrPool.query('CREATE INDEX IF NOT EXISTS idx_manutencao_entrada ON manutencao (data_entrada);');
+
     // Seed fones se a tabela estiver vazia
     const countRes = await clientOrPool.query('SELECT COUNT(*) FROM fone;');
     const totalFones = parseInt(countRes.rows?.[0]?.count || countRes.rows?.[0]?.['count(*)'] || 0, 10);

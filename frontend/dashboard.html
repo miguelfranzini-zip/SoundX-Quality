@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — SoundX Quality</title>
+  <title>Dashboard Analítico — SoundX Quality</title>
   <link rel="icon" type="image/png" href="assets/logo/4.png">
   <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
@@ -12,6 +12,81 @@
   <link rel="stylesheet" href="css/layout.css?v=2">
   <link rel="stylesheet" href="css/components.css?v=3">
   <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+  <style>
+    .graficos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-5);
+    }
+    @media (max-width: 768px) {
+      .graficos-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .grafico-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(96, 33, 0, 0.08);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+    }
+    .grafico-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-3);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .grafico-card__header h3 {
+      font-size: 1rem;
+      margin: 0;
+      color: var(--marrom);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .grafico-card__canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 260px;
+    }
+    .listas-analiticas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-5);
+    }
+    .mini-lista {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .mini-lista-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      font-size: 0.88rem;
+    }
+    .mini-lista-item:last-child {
+      border-bottom: none;
+    }
+    .filtro-periodo-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: #FFFFFF;
+      border: 1px solid rgba(96, 33, 0, 0.08);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      flex-wrap: wrap;
+    }
+  </style>
 </head>
 <body>
   <div class="app-shell">
@@ -25,83 +100,205 @@
         <div class="content__inner">
           <div class="page-header">
             <div>
-              <h1>Dashboard de Qualidade</h1>
-              <p>Indicadores gerais do controle de qualidade.</p>
+              <h1>Dashboard Analítico de Qualidade</h1>
+              <p>Métricas operacionais em tempo real, telemetria fabril e indicadores de conformidade.</p>
             </div>
-            <button class="btn btn--secundario" id="btn-exportar-relatorio" title="Exportar indicadores para relatório">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              Exportar Indicadores
-            </button>
+            <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap;">
+              <div class="filtro-periodo-bar">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--marrom);">Período:</span>
+                <button class="btn btn--pequeno btn--primario" id="btn-periodo-30">Últimos 30 dias</button>
+                <button class="btn btn--pequeno btn--ghost" id="btn-periodo-7">7 dias</button>
+                <button class="btn btn--pequeno btn--ghost" id="btn-periodo-90">90 dias</button>
+              </div>
+
+              <button class="btn btn--secundario" id="btn-exportar-relatorio" title="Exportar indicadores para relatório CSV">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Exportar Dados
+              </button>
+            </div>
           </div>
 
+          <!-- Mensagem de boas-vindas / contexto de perfil -->
+          <div id="painel-contexto-perfil" class="card" style="margin-bottom: var(--space-4); background: linear-gradient(135deg, rgba(255, 152, 0, 0.08), rgba(255, 189, 43, 0.12)); border-left: 4px solid var(--laranja); padding: var(--space-3) var(--space-4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
+              <div>
+                <strong id="msg-saudacao" style="color: var(--marrom);">Olá!</strong>
+                <span id="msg-cargo-subtitulo" style="font-size: 0.9rem; color: var(--text-suave); margin-left: 6px;">Visualizando métricas corporativas.</span>
+              </div>
+              <div id="atalhos-rapidos-contexto" style="display: flex; gap: var(--space-2);"></div>
+            </div>
+          </div>
+
+          <!-- Grade Principal de KPIs -->
           <div class="kpi-grid" id="kpis"></div>
 
-          <div class="dashboard-grid-detalhes">
-            <!-- Painel de Conformidade e Distribuição -->
-            <div class="card" id="card-progresso">
-              <div class="card__title">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--laranja)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                <h2>
-                  Índice Geral de Conformidade
-                  <span class="tooltip-hint" data-tooltip="Percentual de aprovação direta de qualidade (First Pass Yield) calculado sobre todas as inspeções realizadas na linha fabril." title="Índice de aprovação da linha de produção." tabindex="0">!</span>
-                </h2>
-              </div>
-              <p class="muted">
-                Taxa calculada em tempo real sobre as inspeções executadas na linha de produção.
-              </p>
+          <!-- Barra de Progresso e Conformidade Geral -->
+          <div class="card" id="card-progresso" style="margin-top: var(--space-4);">
+            <div class="card__title">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--laranja)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <h2>
+                Índice Geral de Conformidade Direta (First Pass Yield)
+                <span class="tooltip-hint" data-tooltip="Percentual de aprovação direta da linha de montagem sem necessidade de reparo ou reteste." title="Taxa de aprovação primária." tabindex="0">!</span>
+              </h2>
+            </div>
+            <p class="muted">
+              Relação direta de conformidade entre produtos aprovados no primeiro teste e volume total inspecionado.
+            </p>
 
-              <div class="progresso-wrapper">
-                <div style="display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 6px;">
-                  <span>Taxa de Aprovação</span>
-                  <span id="taxa-texto" style="color: var(--marrom);">0%</span>
-                </div>
-                <div class="progresso-barra">
-                  <div class="progresso-valor" id="barra-progresso" style="width: 0%;"></div>
-                </div>
+            <div class="progresso-wrapper">
+              <div style="display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 6px;">
+                <span>Taxa de Aprovação</span>
+                <span id="taxa-texto" style="color: var(--marrom);">0%</span>
               </div>
-
-              <div style="margin-top: var(--space-5);">
-                <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; color: var(--marrom);">
-                  Proporção de Resultados
-                </div>
-                <div class="distribuicao-barra">
-                  <div class="distribuicao-barra__aprovados" id="barra-aprovados" style="width: 50%;"></div>
-                  <div class="distribuicao-barra__reprovados" id="barra-reprovados" style="width: 50%;"></div>
-                </div>
-                <div class="legendas-distribuicao">
-                  <div class="legenda-item">
-                    <span class="legenda-cor legenda-cor--verde"></span>
-                    <span>Aprovados: <strong id="lbl-aprovados">0</strong></span>
-                  </div>
-                  <div class="legenda-item">
-                    <span class="legenda-cor legenda-cor--vermelho"></span>
-                    <span>Reprovados: <strong id="lbl-reprovados">0</strong></span>
-                  </div>
-                </div>
+              <div class="progresso-barra">
+                <div class="progresso-valor" id="barra-progresso" style="width: 0%;"></div>
               </div>
             </div>
 
-            <!-- Painel de Ações Rápidas -->
-            <div class="card">
-              <div class="card__title">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--dourado)"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
-                <h2>Ações da Linha de Produção</h2>
+            <div style="margin-top: var(--space-4);">
+              <div class="distribuicao-barra">
+                <div class="distribuicao-barra__aprovados" id="barra-aprovados" style="width: 50%;"></div>
+                <div class="distribuicao-barra__reprovados" id="barra-reprovados" style="width: 50%;"></div>
               </div>
-              <p class="muted">
-                Acesse diretamente as rotinas principais de inspeção, reparo técnico e controle.
-              </p>
-
-              <div class="acoes-rapidas-grid" id="grid-acoes-rapidas"></div>
+              <div class="legendas-distribuicao">
+                <div class="legenda-item">
+                  <span class="legenda-cor legenda-cor--verde"></span>
+                  <span>Aprovados: <strong id="lbl-aprovados">0</strong></span>
+                </div>
+                <div class="legenda-item">
+                  <span class="legenda-cor legenda-cor--vermelho"></span>
+                  <span>Reprovados / Manutenção: <strong id="lbl-reprovados">0</strong></span>
+                </div>
+              </div>
             </div>
           </div>
+
+          <!-- 6 Gráficos Analíticos com Chart.js -->
+          <div class="graficos-grid">
+            <!-- 1. Linha: Inspeções ao longo do tempo -->
+            <div class="grafico-card">
+              <div class="grafico-card__header">
+                <h3>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--laranja);"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                  Volume de Inspeções Realizadas
+                </h3>
+                <span class="badge badge--neutro">Diário</span>
+              </div>
+              <div class="grafico-card__canvas-wrapper">
+                <canvas id="chart-inspecoes-tempo"></canvas>
+              </div>
+            </div>
+
+            <!-- 2. Rosca: Distribuição de Status do Estoque -->
+            <div class="grafico-card">
+              <div class="grafico-card__header">
+                <h3>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--dourado);"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                  Distribuição de Status dos Fones
+                </h3>
+                <span class="badge badge--neutro">Estoque</span>
+              </div>
+              <div class="grafico-card__canvas-wrapper">
+                <canvas id="chart-distribuicao-status"></canvas>
+              </div>
+            </div>
+
+            <!-- 3. Barra: Modelos mais Reprovados -->
+            <div class="grafico-card">
+              <div class="grafico-card__header">
+                <h3>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--erro);"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+                  Modelos com Maior Reprovação
+                </h3>
+                <span class="badge badge--perigo">Atenção</span>
+              </div>
+              <div class="grafico-card__canvas-wrapper">
+                <canvas id="chart-reprovacoes-modelo"></canvas>
+              </div>
+            </div>
+
+            <!-- 4. Rosca: Tipos de Teste que Mais Falham -->
+            <div class="grafico-card">
+              <div class="grafico-card__header">
+                <h3>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--laranja);"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  Gargalos por Tipo de Teste
+                </h3>
+                <span class="badge badge--alerta">Checklist</span>
+              </div>
+              <div class="grafico-card__canvas-wrapper">
+                <canvas id="chart-testes-falhos"></canvas>
+              </div>
+            </div>
+
+            <!-- 5. Barra/Rosca: Eficiência de Manutenção -->
+            <div class="grafico-card">
+              <div class="grafico-card__header">
+                <h3>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--sucesso);"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                  Bancada: Pendentes vs Concluídas
+                </h3>
+                <span class="badge badge--info">Reparos</span>
+              </div>
+              <div class="grafico-card__canvas-wrapper">
+                <canvas id="chart-manutencao-status"></canvas>
+              </div>
+            </div>
+
+            <!-- 6. Barra: Concluídas por Técnico -->
+            <div class="grafico-card">
+              <div class="grafico-card__header">
+                <h3>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--marrom);"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                  Produtividade por Técnico
+                </h3>
+                <span class="badge badge--sucesso">Equipe</span>
+              </div>
+              <div class="grafico-card__canvas-wrapper">
+                <canvas id="chart-concluidas-tecnico"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Listas Analíticas (Manutenções a Fazer e Concluídas Recentemente) -->
+          <div class="listas-analiticas-grid">
+            <!-- Lista 1: Manutenções a Fazer (Prioritárias) -->
+            <div class="card">
+              <div class="card__title">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--erro);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <h2>Manutenções a Fazer (Fila em Aberto)</h2>
+              </div>
+              <p class="muted">Ordens aguardando atendimento técnico na bancada de reparos.</p>
+              <ul class="mini-lista" id="lista-manutencoes-fazer">
+                <li class="mini-lista-item">Carregando fila...</li>
+              </ul>
+              <div style="margin-top: var(--space-3); text-align: right;">
+                <a href="manutencao.html" class="btn btn--pequeno btn--ghost">Ver fila completa →</a>
+              </div>
+            </div>
+
+            <!-- Lista 2: Concluídas Recentemente -->
+            <div class="card">
+              <div class="card__title">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--sucesso);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <h2>Reparos Concluídos Recentemente</h2>
+              </div>
+              <p class="muted">Fones liberados pela manutenção e prontos para reteste de qualidade.</p>
+              <ul class="mini-lista" id="lista-manutencoes-concluidas">
+                <li class="mini-lista-item">Carregando concluídas...</li>
+              </ul>
+              <div style="margin-top: var(--space-3); text-align: right;">
+                <a href="manutencao.html" class="btn btn--pequeno btn--ghost">Ver histórico de manutenções →</a>
+              </div>
+            </div>
+          </div>
+
         </div>
       </main>
     </div>
   </div>
 
   <div id="toast-container" class="toast-container"></div>
-
-  <!-- Configuração de ambiente (gerado no build do Netlify) -->
   <script src="js/env-config.js"></script>
   <script type="module" src="js/pages/dashboard.js"></script>
 </body>

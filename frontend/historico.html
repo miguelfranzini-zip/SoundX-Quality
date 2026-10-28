@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central de Históricos — SoundX Quality</title>
+  <link rel="icon" type="image/png" href="assets/logo/4.png">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=garet@400,600,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css?v=2">
+  <link rel="stylesheet" href="css/components.css?v=3">
+  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+  <style>
+    .filtro-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(96, 33, 0, 0.08);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+    .filtro-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-3);
+      align-items: flex-end;
+    }
+    .paginacao {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: var(--space-4);
+      padding: var(--space-3) 0;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+    .lotes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+    }
+    .lote-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(96, 33, 0, 0.08);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="app-main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <div class="content__inner">
+          <div class="page-header">
+            <div>
+              <h1>Central de Históricos e Auditoria</h1>
+              <p>Rastreabilidade completa de inspeções, ordens de manutenção e lotes industriais.</p>
+            </div>
+            <div style="display: flex; gap: var(--space-2);">
+              <button class="btn btn--secundario" id="btn-exportar-csv" title="Exportar dados filtrados para CSV">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Exportar CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Abas da Central -->
+          <div class="tabs" role="tablist">
+            <button class="tab tab--ativa" id="tab-inspecoes" data-aba="inspecoes" role="tab" aria-selected="true">
+              🔍 Histórico de Inspeções
+            </button>
+            <button class="tab" id="tab-manutencoes" data-aba="manutencoes" role="tab" aria-selected="false">
+              🛠️ Histórico de Manutenções
+            </button>
+            <button class="tab" id="tab-lotes" data-aba="lotes" role="tab" aria-selected="false">
+              📦 Rastreabilidade por Lote
+            </button>
+          </div>
+
+          <!-- Painel Filtros para Inspeções -->
+          <div class="filtro-card" id="painel-filtro-inspecoes">
+            <div class="filtro-grid">
+              <div class="form__grupo">
+                <label class="form__label" for="insp-filtro-de">De (Data inicial)</label>
+                <input type="date" class="form__controle" id="insp-filtro-de">
+              </div>
+              <div class="form__grupo">
+                <label class="form__label" for="insp-filtro-ate">Até (Data final)</label>
+                <input type="date" class="form__controle" id="insp-filtro-ate">
+              </div>
+              <div class="form__grupo">
+                <label class="form__label" for="insp-filtro-resultado">Parecer</label>
+                <select class="form__controle" id="insp-filtro-resultado">
+                  <option value="">Todos os pareceres</option>
+                  <option value="Aprovado">Aprovado</option>
+                  <option value="Reprovado">Reprovado</option>
+                </select>
+              </div>
+              <div class="form__grupo">
+                <label class="form__label" for="insp-filtro-texto">Fone / Inspetor</label>
+                <input type="text" class="form__controle" id="insp-filtro-texto" placeholder="Buscar por série, modelo...">
+              </div>
+              <div style="display: flex; gap: var(--space-2);">
+                <button class="btn btn--primario" id="btn-aplicar-filtro-insp" style="flex: 1;">Filtrar</button>
+                <button class="btn btn--ghost" id="btn-limpar-filtro-insp">Limpar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Painel Filtros para Manutenções -->
+          <div class="filtro-card hidden" id="painel-filtro-manutencoes">
+            <div class="filtro-grid">
+              <div class="form__grupo">
+                <label class="form__label" for="man-filtro-de">De (Data entrada)</label>
+                <input type="date" class="form__controle" id="man-filtro-de">
+              </div>
+              <div class="form__grupo">
+                <label class="form__label" for="man-filtro-ate">Até (Data entrada)</label>
+                <input type="date" class="form__controle" id="man-filtro-ate">
+              </div>
+              <div class="form__grupo">
+                <label class="form__label" for="man-filtro-status">Status</label>
+                <select class="form__controle" id="man-filtro-status">
+                  <option value="">Todos os status</option>
+                  <option value="Solicitada">Solicitada</option>
+                  <option value="Pendente">Pendente</option>
+                  <option value="Em Manutencao">Em Manutenção</option>
+                  <option value="Concluido">Concluído</option>
+                </select>
+              </div>
+              <div class="form__grupo">
+                <label class="form__label" for="man-filtro-prioridade">Prioridade</label>
+                <select class="form__controle" id="man-filtro-prioridade">
+                  <option value="">Todas</option>
+                  <option value="Critica">🔴 Crítica</option>
+                  <option value="Alta">🟠 Alta</option>
+                  <option value="Media">🟡 Média</option>
+                  <option value="Baixa">🟢 Baixa</option>
+                </select>
+              </div>
+              <div class="form__grupo">
+                <label class="form__label" for="man-filtro-texto">Série / Defeito</label>
+                <input type="text" class="form__controle" id="man-filtro-texto" placeholder="Buscar texto...">
+              </div>
+              <div style="display: flex; gap: var(--space-2);">
+                <button class="btn btn--primario" id="btn-aplicar-filtro-man" style="flex: 1;">Filtrar</button>
+                <button class="btn btn--ghost" id="btn-limpar-filtro-man">Limpar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabela Central -->
+          <div class="tabela-wrapper" id="container-tabela">
+            <table class="tabela">
+              <thead id="cabecalho-tabela"></thead>
+              <tbody id="corpo-tabela"></tbody>
+            </table>
+          </div>
+
+          <!-- Seção de Lotes (exibida apenas na aba de lotes) -->
+          <div class="hidden" id="container-lotes">
+            <div class="card" style="margin-bottom: var(--space-4);">
+              <div class="card__title">
+                <h2>Comparativo de Qualidade por Lote Fabril</h2>
+              </div>
+              <p class="muted">Desempenho comparativo de aprovação direta (FPY) entre remessas industriais.</p>
+              <div style="height: 250px; position: relative;">
+                <canvas id="chart-lotes-comparativo"></canvas>
+              </div>
+            </div>
+            <div class="lotes-grid" id="grade-cards-lote"></div>
+          </div>
+
+          <!-- Paginação -->
+          <div class="paginacao" id="barra-paginacao">
+            <div style="font-size: 0.88rem; color: var(--text-suave);" id="info-paginacao">
+              Carregando registros...
+            </div>
+            <div style="display: flex; gap: var(--space-2);">
+              <button class="btn btn--ghost btn--pequeno" id="btn-pag-anterior" disabled>← Anterior</button>
+              <span id="lbl-pagina-atual" style="display: flex; align-items: center; font-weight: 700; padding: 0 8px; font-size: 0.88rem;">1</span>
+              <button class="btn btn--ghost btn--pequeno" id="btn-pag-proxima">Próxima →</button>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="js/env-config.js"></script>
+  <script type="module" src="js/pages/historico.js"></script>
+</body>
+</html>

@@ -95,6 +95,10 @@ function renderizar(lista) {
       const linkTestes = `<button class="btn btn--ghost btn--pequeno" data-ver-testes="${inspecao.id_inspecao}">Testes</button>`;
 
       const linkFoto = linkFotoSeguro(inspecao.foto_url);
+      const isReprovado = String(inspecao.resultado_final || '').toLowerCase().includes('reprov');
+      const linkReparo = isReprovado && inspecao.id_fone
+        ? `<a class="btn btn--pequeno" style="background: rgba(255, 152, 0, 0.12); color: var(--marrom); border: 1px solid rgba(255, 152, 0, 0.35); text-decoration: none; display: inline-flex; align-items: center;" href="manutencao-solicitar.html?id_fone=${inspecao.id_fone}&defeito=${encodeURIComponent(inspecao.observacao || 'Reprovado na inspeção de qualidade')}" title="Abrir ordem de manutenção técnica">Reparo</a>`
+        : '';
 
       return `
       <tr>
@@ -113,6 +117,7 @@ function renderizar(lista) {
           <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
             ${linkFone}
             ${linkTestes}
+            ${linkReparo}
             ${podeEditar ? `
               <button
                 class="btn btn--secundario btn--pequeno"

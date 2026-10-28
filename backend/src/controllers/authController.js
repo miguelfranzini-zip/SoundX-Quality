@@ -14,6 +14,14 @@ exports.login = async (req, res) => {
 
     const funcionario = rows[0];
 
+    // Exclusão lógica: usuários excluídos não podem autenticar
+    const ativo = funcionario.ativo === undefined || funcionario.ativo === null
+      ? true
+      : Boolean(funcionario.ativo);
+    if (!ativo) {
+      return res.status(401).json({ mensagem: 'E-mail ou senha inválidos.' });
+    }
+
     // Suporta hash bcrypt com fallback para texto plano (dados de seed/legado)
     let senhaCorreta = false;
     if (funcionario.senha && (funcionario.senha.startsWith('$2a$') || funcionario.senha.startsWith('$2b$') || funcionario.senha.startsWith('$2y$'))) {

@@ -18,10 +18,16 @@ exports.changePassword = async (req, res) => {
   }
 
   try {
-    const [rows] = await db.query('SELECT senha FROM funcionario WHERE id_funcionario = ?', [userId]);
+    const [rows] = await db.query('SELECT senha, ativo FROM funcionario WHERE id_funcionario = ?', [userId]);
     const user = rows && rows[0];
 
     if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+
+    // Exclusão lógica: usuários excluídos não podem alterar a senha
+    const ativo = user.ativo === undefined || user.ativo === null ? true : Boolean(user.ativo);
+    if (!ativo) {
       return res.status(404).json({ message: 'Usuário não encontrado' });
     }
 

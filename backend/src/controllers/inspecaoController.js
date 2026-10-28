@@ -142,9 +142,188 @@ exports.obterDashboard = async (req, res) => {
   }
 };
 
-// 3. Listar todo o histórico de inspeções
+// 2b. Buscar estatísticas detalhadas e séries históricas para gráficos do dashboard
+exports.obterEstatisticasDashboard = async (req, res) => {
+  try {
+    const [statsRows] = await db.query("SELECT 'dashboard estatisticas' AS tipo");
+    if (statsRows && statsRows[0] && statsRows[0].serie_inspecoes) {
+      return res.json(statsRows[0]);
+    }
+
+    // Se estiver em PostgreSQL e não retornou o payload em lote:
+    const [inspecoes] = await db.query('SELECT data_inspecao, resultado_final, id_fone FROM inspecao ORDER BY data_inspecao ASC');
+    const [fones] = await db.query('SELECT id_fone, modelo, status FROM fone');
+    const [testes] = await db.query('SELECT tipo_teste, resultado FROM teste');
+    const [manutencoes] = await db.query('SELECT status, data_entrada, data_conclusao, concluido_por FROM manutencao');
+    const [funcionarios] = await db.query('SELECT id_funcionario, nome FROM funcionario');
+
+    const agora = new Date();
+    const inspecoesPorDia = {};
+    for (let d = 0; d < 30; d++) {
+      const dia = new Date(agora);
+      dia.setDate(agora.getDate() - d);
+      const chave = dia.toISOString().slice(0, 10);
+      inspecoesPorDia[chave] = 0;
+    }
+    (inspecoes || []).forEach((i) => {
+      const dia = String(i.data_inspecao || '').slice(0, 10);
+      if (inspecoesPorDia[dia] !== undefined) inspecoesPorDia[dia]++;
+    });
+    const serieInspecoes = Object.entries(inspecoesPorDia)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([data, total]) => ({ data, total }));
+
+    const distribuicaoStatus = {};
+    (fones || []).forEach((f) => {
+      const s = f.status || 'Aguardando inspeção';
+      distribuicaoStatus[s] = (distribuicaoStatus[s] || 0) + 1;
+    });
+
+    const reprovacoesPorModelo = {};
+    (inspecoes || []).forEach((i) => {
+      if (String(i.resultado_final || '').toLowerCase().includes('reprovado')) {
+        const fone = (fones || []).find((f) => f.id_fone === i.id_fone);
+        const modelo = fone ? fone.modelo : '—';
+        reprovacoesPorModelo[modelo] = (reprovacoesPorModelo[modelo] || 0) + 1;
+      }
+    });
+    const topModelosReprovados = Object.entries(reprovacoesPorModelo)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([modelo, total]) => ({ modelo, total }));
+
+    const testesFalhos = {};
+    (testes || []).forEach((t) => {
+      if (String(t.resultado || '').toLowerCase().includes('não passou') || String(t.resultado || '').toLowerCase().includes('reprovado')) {
+        testesFalhos[t.tipo_teste] = (testesFalhos[t.tipo_teste] || 0) + 1;
+      }
+    });
+    const tiposTesteFalhos = Object.entries(testesFalhos)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([tipo, total]) => ({ tipo, total }));
+
+    const manutencoesPendentes = (manutencoes || []).filter((m) => m.status !== 'Concluido').length;
+    const manutencoesConcluidas = (manutencoes || []).filter((m) => m.status === 'Concluido').length;
+
+    const mttrDias = [];
+    (manutencoes || []).forEach((m) => {
+      if (m.status === 'Concluido' && m.data_entrada && m.data_conclusao) {
+        const inicio = new Date(m.data_entrada);
+        const fim = new Date(m.data_conclusao);
+        const diffDias = (fim - inicio) / (1000 * 60 * 60 * 24);
+        mttrDias.push(diffDias);
+      }
+    });
+    const mttrMedio = mttrDias.length > 0
+      ? (mttrDias.reduce((a, b) => a + b, 0) / mttrDias.length).toFixed(1)
+      : 0;
+
+    const inspecoesPorFone = {};
+    (inspecoes || []).forEach((i) => {
+      inspecoesPorFone[i.id_fone] = (inspecoesPorFone[i.id_fone] || 0) + 1;
+    });
+    const fonesComRetrabalho = Object.values(inspecoesPorFone).filter((c) => c > 1).length;
+    const totalFonesCount = (fones || []).length;
+    const taxaRetrabalho = totalFonesCount > 0
+      ? ((fonesComRetrabalho / totalFonesCount) * 100).toFixed(1) + '%'
+      : '0%';
+
+    const concluidoPorTecnico = {};
+    (manutencoes || []).forEach((m) => {
+      if (m.status === 'Concluido' && m.concluido_por) {
+        const func = (funcionarios || []).find((f) => f.id_funcionario === m.concluido_por);
+        const nome = func ? func.nome : 'Técnico #' + m.concluido_por;
+        concluidoPorTecnico[nome] = (concluidoPorTecnico[nome] || 0) + 1;
+      }
+    });
+    const concluidasPorTecnico = Object.entries(concluidoPorTecnico)
+      .sort((a, b) => b[1] - a[1])
+      .map(([nome, total]) => ({ nome, total }));
+
+    res.json({
+      serie_inspecoes: serieInspecoes,
+      distribuicao_status: distribuicaoStatus,
+      reprovacoes_por_modelo: topModelosReprovados,
+      tipos_teste_falhos: tiposTesteFalhos,
+      manutencoes_pendentes: manutencoesPendentes,
+      manutencoes_concluidas: manutencoesConcluidas,
+      mttr_medio_dias: mttrMedio,
+      taxa_retrabalho: taxaRetrabalho,
+      concluidas_por_tecnico: concluidasPorTecnico
+    });
+  } catch (error) {
+    console.error('Erro ao gerar estatísticas detalhadas:', error);
+    res.status(500).json({ mensagem: 'Erro ao gerar estatísticas do dashboard.', detalhe: error.message });
+  }
+};
+
+// 3. Listar todo o histórico de inspeções (com filtros e paginação opcionais)
 exports.listarInspecoes = async (req, res) => {
   try {
+    const { de, ate, resultado, id_fone, inspetor, limite, pagina } = req.query;
+    const hasFilter = Boolean(de || ate || resultado || id_fone || inspetor || limite || pagina);
+
+    if (hasFilter) {
+      const lim = Math.max(1, parseInt(limite, 10) || 20);
+      const pag = Math.max(1, parseInt(pagina, 10) || 1);
+      const off = (pag - 1) * lim;
+
+      const countQuery = `
+        SELECT count(*) as total 
+        FROM inspecao i
+        LEFT JOIN fone f ON i.id_fone = f.id_fone
+        LEFT JOIN funcionario func ON i.id_funcionario = func.id_funcionario
+      `;
+      const [countResult] = await db.query(countQuery, [
+        de || null,
+        ate || null,
+        resultado || null,
+        id_fone ? Number(id_fone) : null,
+        inspetor || null
+      ]);
+      const total = Number(countResult[0]?.total || countResult[0]?.['count(*)'] || 0);
+
+      const queryPaginada = `
+        SELECT 
+          i.id_inspecao,
+          i.id_fone,
+          i.data_inspecao,
+          i.resultado_final,
+          i.observacao,
+          COALESCE(i.foto_url, '') AS foto_url,
+          f.modelo AS fone_modelo,
+          f.numero_serie AS fone_serie,
+          func.nome AS inspetor
+        FROM inspecao i
+        LEFT JOIN fone f ON i.id_fone = f.id_fone
+        LEFT JOIN funcionario func ON i.id_funcionario = func.id_funcionario
+        WHERE 1=1
+        LIMIT ? OFFSET ?
+      `;
+
+      const [rows] = await db.query(queryPaginada, [
+        de || null,
+        ate || null,
+        resultado || null,
+        id_fone ? Number(id_fone) : null,
+        inspetor || null,
+        lim,
+        off
+      ]);
+
+      if (limite || pagina) {
+        return res.json({
+          dados: rows || [],
+          total,
+          pagina: pag,
+          limite: lim,
+          total_paginas: Math.ceil(total / lim)
+        });
+      }
+      return res.json(rows || []);
+    }
+
     let rows;
     try {
       const query = `
