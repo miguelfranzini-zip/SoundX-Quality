@@ -59,22 +59,12 @@ async function carregarInspecoes() {
   if (de) params.append('de', de);
   if (ate) params.append('ate', ate);
   if (resultado) params.append('resultado', resultado);
-  if (texto) params.append('inspetor', texto);
+  if (texto) params.append('q', texto);
 
   try {
     const res = await api(`/inspecoes?${params.toString()}`);
     let lista = Array.isArray(res) ? res : (res.dados || []);
-    totalRegistros = Array.isArray(res) ? res.length : (res.total || lista.length);
-
-    // Filtro adicional local se houver busca textual por modelo ou fone
-    if (texto) {
-      const t = texto.toLowerCase();
-      lista = lista.filter((i) =>
-        String(i.fone_serie || '').toLowerCase().includes(t) ||
-        String(i.fone_modelo || '').toLowerCase().includes(t) ||
-        String(i.inspetor || '').toLowerCase().includes(t)
-      );
-    }
+    totalRegistros = Array.isArray(res) ? res.length : (res.total ?? lista.length);
 
     dadosCache = lista;
     renderizarInspecoes(lista);

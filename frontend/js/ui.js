@@ -52,9 +52,8 @@ export function initShell(tituloAtivo, usuario) {
 
   const itensVisiveis = MENU.filter((item) => {
     if (!item.cargos || item.cargos.length === 0) return true;
-    if (isAdminGerente(usuario.cargo)) return true;
     const cUser = normalizarCargo(usuario.cargo);
-    return item.cargos.map(normalizarCargo).some((c) => cUser === c || cUser.includes(c));
+    return item.cargos.map(normalizarCargo).includes(cUser);
   });
 
   const navHtml = itensVisiveis
@@ -279,9 +278,12 @@ function statusParaClasse(status) {
 /* ---------- Utilitários ---------- */
 
 export function escapeHtml(texto) {
-  const div = document.createElement('div');
-  div.textContent = texto == null ? '' : String(texto);
-  return div.innerHTML;
+  return String(texto ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
 
 export function obterQueryParam(nome) {

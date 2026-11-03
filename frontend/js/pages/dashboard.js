@@ -80,7 +80,7 @@ function desenharKpis(gerais, stats) {
     { classe: 'kpi--inspecoes', valor: String(gerais.total_inspecoes_realizadas ?? 0), rotulo: 'Inspeções Realizadas' },
     { classe: 'kpi--aprovados', valor: String(gerais.fones_aprovados ?? 0), rotulo: 'Fones Aprovados' },
     { classe: 'kpi--reprovados', valor: String(gerais.fones_reprovados ?? 0), rotulo: 'Fones Reprovados' },
-    { classe: 'kpi--taxa', valor: String(gerais.taxa_aprovacao ?? '0%'), rotulo: 'Taxa de Aprovação (FPY)' },
+    { classe: 'kpi--taxa', valor: String(gerais.fpy || gerais.taxa_aprovacao || '0%'), rotulo: 'Taxa de Aprovação (FPY)' },
     { classe: 'kpi--reprovados', valor: String(stats?.manutencoes_pendentes ?? 0), rotulo: 'Manutenções na Fila' },
     { classe: 'kpi--taxa', valor: `${stats?.mttr_medio_dias ?? 0} d`, rotulo: 'MTTR Médio (Reparo)' },
     { classe: 'kpi--inspecoes', valor: String(stats?.taxa_retrabalho ?? '0%'), rotulo: 'Taxa de Retrabalho' }
@@ -134,15 +134,11 @@ function desenharGraficos(stats) {
 
   // 1. Linha: Inspeções ao longo do tempo (diário)
   const serie = stats.serie_inspecoes || [];
-  const corteSerie = periodoSelecionado === 7 
-    ? serie.slice(-7) 
-    : (periodoSelecionado === 90 ? serie : serie.slice(-30));
-
-  const rotulosTempo = corteSerie.map((s) => {
+  const rotulosTempo = serie.map((s) => {
     const partes = String(s.data).split('-');
     return partes.length === 3 ? `${partes[2]}/${partes[1]}` : s.data;
   });
-  const valoresTempo = corteSerie.map((s) => s.total);
+  const valoresTempo = serie.map((s) => s.total);
 
   createChart('chart-inspecoes-tempo', 'line', {
     labels: rotulosTempo,
@@ -283,7 +279,7 @@ async function carregarDashboard() {
   try {
     const [gerais, stats, manutencoes] = await Promise.all([
       api('/inspecoes/dashboard'),
-      api('/inspecoes/dashboard/estatisticas'),
+      api(`/inspecoes/dashboard/estatisticas?dias=${periodoSelecionado}`),
       api('/manutencao')
     ]);
 
@@ -306,7 +302,7 @@ const btnP30 = document.getElementById('btn-periodo-30');
 const btnP7 = document.getElementById('btn-periodo-7');
 const btnP90 = document.getElementById('btn-periodo-90');
 
-function setPeriodo(dias, btnAtivo) {
+async function setPeriodo(dias, btnAtivo) {
   periodoSelecionado = dias;
   [btnP30, btnP7, btnP90].forEach((b) => {
     if (b) {
@@ -318,8 +314,14 @@ function setPeriodo(dias, btnAtivo) {
     btnAtivo.classList.remove('btn--ghost');
     btnAtivo.classList.add('btn--primario');
   }
-  if (dadosEstatisticas) {
+  try {
+    const stats = await api(`/inspecoes/dashboard/estatisticas?dias=${periodoSelecionado}`);
+    dadosEstatisticas = stats;
     desenharGraficos(dadosEstatisticas);
+  } catch (err) {
+    if (dadosEstatisticas) {
+      desenharGraficos(dadosEstatisticas);
+    }
   }
 }
 

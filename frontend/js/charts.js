@@ -1,10 +1,11 @@
 // =========================================================
-// SOUNDX QUALITY — Wrapper do Chart.js (vendido localmente)
+// SOUNDX QUALITY — Wrapper do Chart.js
 // Paleta oficial do Design System, tema consistente e
 // destruição segura de instâncias para evitar vazamentos.
 // =========================================================
 
-import Chart from '../assets/vendor/chart.umd.js';
+// Chart.js é carregado via script UMD (<script src="assets/vendor/chart.umd.js">)
+const Chart = (typeof window !== 'undefined' ? window.Chart : null) || (typeof globalThis !== 'undefined' ? globalThis.Chart : null);
 
 // Paleta SoundX (tokens de cores do Design System)
 export const PALETTE = {
@@ -37,31 +38,39 @@ function corSerie(idx) {
   return CORES_SERIE[idx % CORES_SERIE.length];
 }
 
-// Tema global aplicado a toda instancia de Chart
-Chart.defaults.color = PALETTE.texto;
-Chart.defaults.font.family = "'Muli', 'Segoe UI', sans-serif";
-Chart.defaults.font.size = 12;
-Chart.defaults.plugins.legend.position = 'bottom';
-Chart.defaults.plugins.legend.labels = {
-  color: PALETTE.textoSuave,
-  padding: 20,
-  boxWidth: 14
-};
-Chart.defaults.plugins.tooltip = {
-  backgroundColor: 'rgba(41, 14, 0, 0.85)',
-  titleColor: PALETTE.dourado,
-  bodyColor: '#FFFFFF',
-  borderColor: PALETTE.laranja,
-  borderWidth: 1,
-  cornerRadius: 6,
-  displayColors: false,
-  padding: 10
-};
+// Tema global aplicado a toda instancia de Chart se presente
+if (Chart && Chart.defaults) {
+  Chart.defaults.color = PALETTE.texto;
+  Chart.defaults.font.family = "'Muli', 'Segoe UI', sans-serif";
+  Chart.defaults.font.size = 12;
+  Chart.defaults.plugins.legend.position = 'bottom';
+  Chart.defaults.plugins.legend.labels = {
+    color: PALETTE.textoSuave,
+    padding: 20,
+    boxWidth: 14
+  };
+  Chart.defaults.plugins.tooltip = {
+    backgroundColor: 'rgba(41, 14, 0, 0.85)',
+    titleColor: PALETTE.dourado,
+    bodyColor: '#FFFFFF',
+    borderColor: PALETTE.laranja,
+    borderWidth: 1,
+    cornerRadius: 6,
+    displayColors: false,
+    padding: 10
+  };
+}
 
 // Instâncias criadas pelo wrapper (chave = id do canvas)
 const instances = new Map();
 
 export function createChart(canvasId, type, data, options = {}) {
+  const currentChart = (typeof window !== 'undefined' ? window.Chart : null) || Chart;
+  if (!currentChart) {
+    console.warn(`[charts.js] Chart.js não está carregado no navegador. Canvas '#${canvasId}' não pôde ser renderizado.`);
+    return null;
+  }
+
   // Destrói uma instância anterior no mesmo canvas, se existir
   const existing = instances.get(canvasId);
   if (existing) {
@@ -90,7 +99,7 @@ export function createChart(canvasId, type, data, options = {}) {
     return null;
   }
 
-  const chart = new Chart(canvas, cfg);
+  const chart = new currentChart(canvas, cfg);
   instances.set(canvasId, chart);
   return chart;
 }
@@ -156,3 +165,6 @@ export function formatarNumero(n) {
   if (n >= 1e3) return (n / 1e3).toFixed(1) + 'k';
   return n.toString();
 }
+
+export { Chart };
+export default Chart;

@@ -6,9 +6,10 @@ exports.login = async (req, res) => {
   const { email, senha } = req.body;
 
   try {
-    const [rows] = await db.query('SELECT * FROM funcionario WHERE email = ?', [email]);
+    const emailNorm = String(email || '').trim().toLowerCase();
+    const [rows] = await db.query('SELECT * FROM funcionario WHERE LOWER(TRIM(email)) = ?', [emailNorm]);
 
-    if (rows.length === 0) {
+    if (!rows || rows.length === 0) {
       return res.status(401).json({ mensagem: 'E-mail ou senha inválidos.' });
     }
 
@@ -24,7 +25,8 @@ exports.login = async (req, res) => {
 
     // Suporta hash bcrypt com fallback para texto plano (dados de seed/legado)
     let senhaCorreta = false;
-    if (funcionario.senha && (funcionario.senha.startsWith('$2a$') || funcionario.senha.startsWith('$2b$') || funcionario.senha.startsWith('$2y$'))) {
+    const isBcrypt = funcionario.senha && (funcionario.senha.startsWith('$2a$') || funcionario.senha.startsWith('$2b$') || funcionario.senha.startsWith('$2y$'));
+    if (isBcrypt) {
       senhaCorreta = bcrypt.compareSync(senha, funcionario.senha);
     } else {
       senhaCorreta = senha === funcionario.senha;
@@ -32,6 +34,16 @@ exports.login = async (req, res) => {
 
     if (!senhaCorreta) {
       return res.status(401).json({ mensagem: 'E-mail ou senha inválidos.' });
+    }
+
+    // Se a senha ainda estava em texto plano, migra de forma transparente para hash bcrypt
+    if (!isBcrypt) {
+      try {
+        const hash = bcrypt.hashSync(senha, 10);
+        await db.query('UPDATE funcionario SET senha = ? WHERE id_funcionario = ?', [hash, funcionario.id_funcionario]);
+      } catch (migErr) {
+        console.warn('Não foi possível migrar senha para bcrypt:', migErr.message);
+      }
     }
 
     const secret = process.env.JWT_SECRET;

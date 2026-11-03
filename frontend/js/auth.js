@@ -41,6 +41,10 @@ export function normalizarCargo(cargo) {
     .toLowerCase();
 }
 
+export function isAdmin(cargo) {
+  return normalizarCargo(cargo) === 'admin';
+}
+
 export function isAdminGerente(cargo) {
   const c = normalizarCargo(cargo);
   return c === 'admin' || c === 'gerente';
@@ -52,10 +56,10 @@ export function guardPagina(cargosPermitidos = null) {
     return null;
   }
   const usuario = getUsuario();
-  if (cargosPermitidos && !isAdminGerente(usuario.cargo)) {
-    const cUser = normalizarCargo(usuario.cargo);
+  if (cargosPermitidos) {
+    const cUser = normalizarCargo(usuario?.cargo);
     const permitidosNorm = cargosPermitidos.map(normalizarCargo);
-    const autorizado = permitidosNorm.some((p) => cUser === p || cUser.includes(p));
+    const autorizado = permitidosNorm.includes(cUser);
     if (!autorizado) {
       window.location.href = 'acesso-negado.html';
       return null;

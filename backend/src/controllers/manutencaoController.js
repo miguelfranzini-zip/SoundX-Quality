@@ -252,12 +252,34 @@ exports.excluirManutencao = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [existentes] = await db.query('SELECT id_manutencao FROM manutencao WHERE id_manutencao = ?', [id]);
+    const [existentes] = await db.query('SELECT id_manutencao, id_fone FROM manutencao WHERE id_manutencao = ?', [id]);
     if (!existentes || existentes.length === 0) {
       return res.status(404).json({ mensagem: 'Ordem de manutenção não encontrada.' });
     }
+    const idFone = existentes[0].id_fone;
 
     await db.query('DELETE FROM manutencao WHERE id_manutencao = ?', [id]);
+
+    // Reconcilia status do fone se não restarem outras manutenções abertas
+    if (idFone) {
+      const [abertas] = await db.query(
+        "SELECT id_manutencao FROM manutencao WHERE id_fone = ? AND status != 'Concluido'",
+        [idFone]
+      );
+      if (!abertas || abertas.length === 0) {
+        const [ultInspecao] = await db.query(
+          'SELECT resultado_final FROM inspecao WHERE id_fone = ? ORDER BY data_inspecao DESC, id_inspecao DESC LIMIT 1',
+          [idFone]
+        );
+        let novoStatus = 'Aguardando inspeção';
+        if (ultInspecao && ultInspecao.length > 0) {
+          const resUlt = String(ultInspecao[0].resultado_final || '').toLowerCase();
+          novoStatus = resUlt.includes('aprovado') ? 'Aprovado' : 'Reprovado / Manutenção';
+        }
+        await db.query('UPDATE fone SET status = ? WHERE id_fone = ?', [novoStatus, idFone]);
+      }
+    }
+
     res.json({ mensagem: 'Ordem de manutenção excluída com sucesso!' });
   } catch (error) {
     console.error('Erro ao excluir manutenção:', error);

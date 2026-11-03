@@ -93,9 +93,9 @@ const localProvider = {
         const rows = data.funcionario.filter(f => f.id_funcionario === id);
         return [rows, []];
       }
-      if (cleanLower.includes('where email = ?') || cleanLower.includes('where email = $1')) {
-        const email = params[0];
-        const rows = data.funcionario.filter(f => f.email === email);
+      if (cleanLower.includes('where') && cleanLower.includes('email')) {
+        const email = String(params[0] || '').toLowerCase().trim();
+        const rows = data.funcionario.filter(f => String(f.email || '').toLowerCase().trim() === email);
         return [rows, []];
       }
       if (cleanLower.includes('where cpf = ?') || cleanLower.includes('where cpf = $1')) {
@@ -169,6 +169,11 @@ const localProvider = {
       return [rows, []];
     }
 
+    // 5b. SELECT * FROM inspecao ORDER BY data_inspecao
+    if (cleanLower.startsWith('select') && cleanLower.includes('from inspecao') && cleanLower.includes('order by')) {
+      const rows = [...data.inspecao].sort((a, b) => new Date(a.data_inspecao || 0) - new Date(b.data_inspecao || 0));
+      return [rows, []];
+    }
     // 6. Histórico: testes de um fone
     if (cleanLower.includes('from teste t join inspecao i') && cleanLower.includes('where i.id_fone = ?')) {
       const id = Number(params[0]);
@@ -331,6 +336,18 @@ const localProvider = {
       return [rows, []];
     }
 
+    // 16b. UPDATE manutencao SET status = 'Em Manutencao' (assumir ordem)
+    if (cleanLower.includes("update manutencao set status = 'em manutencao'") || (cleanLower.startsWith('update manutencao set status') && cleanLower.includes('concluido_por = ?'))) {
+      const [concluido_por, id] = params;
+      const item = data.manutencao.find(m => m.id_manutencao === Number(id));
+      if (item) {
+        item.status = 'Em Manutencao';
+        item.concluido_por = Number(concluido_por);
+        saveLocalData(data);
+      }
+      return [{ affectedRows: item ? 1 : 0 }, []];
+    }
+
     // 17. UPDATE manutencao SET acao_corretiva = ? (com concluido_por)
     if (cleanLower.startsWith('update manutencao set acao_corretiva = ?') || cleanLower.startsWith('update manutencao set acao_corretiva = $1')) {
       const [acao_corretiva, status, data_conclusao, id, concluido_por] = params;
@@ -406,11 +423,16 @@ const localProvider = {
 
     // 23. UPDATE inspecao SET resultado_final = ?
     if (cleanLower.startsWith('update inspecao set resultado_final = ?') || cleanLower.startsWith('update inspecao set resultado_final = $1')) {
-      const [resultado_final, observacao, id] = params;
+      const [resultado_final, observacao, foto_url, id] = params.length >= 4 
+        ? [params[0], params[1], params[2], params[3]] 
+        : [params[0], params[1], null, params[2]];
       const inspecao = data.inspecao.find(i => i.id_inspecao === Number(id));
       if (inspecao) {
         inspecao.resultado_final = resultado_final;
         inspecao.observacao = observacao;
+        if (foto_url !== null && foto_url !== undefined) {
+          inspecao.foto_url = foto_url;
+        }
         saveLocalData(data);
       }
       return [{ affectedRows: inspecao ? 1 : 0 }, []];
@@ -892,6 +914,57 @@ let schemaEnsured = false;
 async function ensureSchema(clientOrPool) {
   if (schemaEnsured) return;
   try {
+    await clientOrPool.query(`
+      CREATE TABLE IF NOT EXISTS funcionario (
+        id_funcionario SERIAL PRIMARY KEY,
+        nome VARCHAR(100) NOT NULL,
+        cpf VARCHAR(14) UNIQUE,
+        cargo VARCHAR(50) DEFAULT 'Inspetor',
+        email VARCHAR(100) NOT NULL UNIQUE,
+        senha VARCHAR(255) NOT NULL,
+        ativo BOOLEAN DEFAULT TRUE,
+        excluido_em TIMESTAMP NULL
+      );
+      CREATE TABLE IF NOT EXISTS fone (
+        id_fone SERIAL PRIMARY KEY,
+        numero_serie VARCHAR(50) NOT NULL UNIQUE,
+        modelo VARCHAR(100) NOT NULL,
+        marca VARCHAR(100) DEFAULT 'SoundX',
+        tipo_conexao VARCHAR(50) DEFAULT 'Bluetooth',
+        lote VARCHAR(50) DEFAULT 'LT-2026-A',
+        data_fabricacao DATE DEFAULT CURRENT_DATE,
+        status VARCHAR(50) DEFAULT 'Aguardando inspeção'
+      );
+      CREATE TABLE IF NOT EXISTS inspecao (
+        id_inspecao SERIAL PRIMARY KEY,
+        id_fone INT NOT NULL,
+        id_funcionario INT,
+        data_inspecao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        resultado_final VARCHAR(50) NOT NULL,
+        observacao TEXT,
+        foto_url TEXT
+      );
+      CREATE TABLE IF NOT EXISTS teste (
+        id_teste SERIAL PRIMARY KEY,
+        id_inspecao INT NOT NULL,
+        tipo_teste VARCHAR(100) NOT NULL,
+        parametro_medido VARCHAR(100),
+        resultado VARCHAR(50) NOT NULL,
+        observacao TEXT
+      );
+      CREATE TABLE IF NOT EXISTS manutencao (
+        id_manutencao SERIAL PRIMARY KEY,
+        id_fone INT NOT NULL,
+        descricao_defeito TEXT NOT NULL,
+        acao_corretiva TEXT,
+        status VARCHAR(50) DEFAULT 'Pendente',
+        prioridade VARCHAR(20) DEFAULT 'Media',
+        solicitado_por INT,
+        concluido_por INT,
+        data_entrada TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        data_conclusao TIMESTAMP
+      );
+    `);
     await clientOrPool.query('ALTER TABLE fone ADD COLUMN IF NOT EXISTS lote VARCHAR(50) DEFAULT \'LT-2026-A\';');
     await clientOrPool.query('ALTER TABLE inspecao ADD COLUMN IF NOT EXISTS foto_url TEXT;');
     await clientOrPool.query('ALTER TABLE funcionario ADD COLUMN IF NOT EXISTS cargo VARCHAR(50) DEFAULT \'Inspetor\';');

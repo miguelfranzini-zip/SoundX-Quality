@@ -117,7 +117,7 @@ exports.obterDashboard = async (req, res) => {
     const [totalFones] = await db.query('SELECT COUNT(*) AS total FROM fone');
     const [totalInspecoes] = await db.query('SELECT COUNT(*) AS total FROM inspecao');
     const [fonesAprovados] = await db.query("SELECT COUNT(*) AS total FROM fone WHERE status = 'Aprovado'");
-    const [fonesReprovados] = await db.query("SELECT COUNT(*) AS total FROM fone WHERE status != 'Aprovado' AND status != 'Aguardando inspeção'");
+    const [fonesReprovados] = await db.query("SELECT COUNT(*) AS total FROM fone WHERE status LIKE 'Reprovado%'");
 
     const totalF = Number(totalFones[0]?.total || 0);
     const totalI = Number(totalInspecoes[0]?.total || 0);
@@ -126,15 +126,33 @@ exports.obterDashboard = async (req, res) => {
     const testados = aprovados + reprovados;
 
     const taxaAprovacao = testados > 0 
-      ? ((aprovados / testados) * 100).toFixed(2) + '%' 
+      ? ((aprovados / testados) * 100).toFixed(1) + '%' 
       : '0%';
+
+    // First Pass Yield (FPY) calculado na primeira inspeção de cada fone
+    let fpy = taxaAprovacao;
+    try {
+      const [todasInspecoes] = await db.query('SELECT id_fone, resultado_final, data_inspecao FROM inspecao ORDER BY data_inspecao ASC, id_inspecao ASC');
+      const primeiraInspecao = {};
+      (todasInspecoes || []).forEach((i) => {
+        if (i.id_fone && !primeiraInspecao[i.id_fone]) {
+          primeiraInspecao[i.id_fone] = i.resultado_final;
+        }
+      });
+      const resultadosPrimeira = Object.values(primeiraInspecao);
+      if (resultadosPrimeira.length > 0) {
+        const aprovadosPrimeira = resultadosPrimeira.filter(r => String(r || '').toLowerCase() === 'aprovado').length;
+        fpy = ((aprovadosPrimeira / resultadosPrimeira.length) * 100).toFixed(1) + '%';
+      }
+    } catch (e) {}
 
     res.json({
       total_fones_cadastrados: totalF,
       total_inspecoes_realizadas: totalI,
       fones_aprovados: aprovados,
       fones_reprovados: reprovados,
-      taxa_aprovacao: taxaAprovacao
+      taxa_aprovacao: taxaAprovacao,
+      fpy
     });
   } catch (error) {
     console.error(error);
@@ -145,9 +163,29 @@ exports.obterDashboard = async (req, res) => {
 // 2b. Buscar estatísticas detalhadas e séries históricas para gráficos do dashboard
 exports.obterEstatisticasDashboard = async (req, res) => {
   try {
+    const numDias = Math.min(365, Math.max(1, parseInt(req.query.dias, 10) || 30));
     const [statsRows] = await db.query("SELECT 'dashboard estatisticas' AS tipo");
     if (statsRows && statsRows[0] && statsRows[0].serie_inspecoes) {
-      return res.json(statsRows[0]);
+      const stats = { ...statsRows[0] };
+      if (numDias !== 30) {
+        const agora = new Date();
+        const inspecoesPorDia = {};
+        for (let d = 0; d < numDias; d++) {
+          const dia = new Date(agora);
+          dia.setDate(agora.getDate() - d);
+          const chave = dia.toISOString().slice(0, 10);
+          inspecoesPorDia[chave] = 0;
+        }
+        const [inspecoes] = await db.query('SELECT data_inspecao FROM inspecao');
+        (inspecoes || []).forEach((i) => {
+          const dia = String(i.data_inspecao || '').slice(0, 10);
+          if (inspecoesPorDia[dia] !== undefined) inspecoesPorDia[dia]++;
+        });
+        stats.serie_inspecoes = Object.entries(inspecoesPorDia)
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([data, total]) => ({ data, total }));
+      }
+      return res.json(stats);
     }
 
     // Se estiver em PostgreSQL e não retornou o payload em lote:
@@ -159,7 +197,7 @@ exports.obterEstatisticasDashboard = async (req, res) => {
 
     const agora = new Date();
     const inspecoesPorDia = {};
-    for (let d = 0; d < 30; d++) {
+    for (let d = 0; d < numDias; d++) {
       const dia = new Date(agora);
       dia.setDate(agora.getDate() - d);
       const chave = dia.toISOString().slice(0, 10);
@@ -261,27 +299,53 @@ exports.obterEstatisticasDashboard = async (req, res) => {
 // 3. Listar todo o histórico de inspeções (com filtros e paginação opcionais)
 exports.listarInspecoes = async (req, res) => {
   try {
-    const { de, ate, resultado, id_fone, inspetor, limite, pagina } = req.query;
-    const hasFilter = Boolean(de || ate || resultado || id_fone || inspetor || limite || pagina);
+    const { de, ate, resultado, id_fone, inspetor, q, limite, pagina } = req.query;
+    const hasFilter = Boolean(de || ate || resultado || id_fone || inspetor || q || limite || pagina);
 
     if (hasFilter) {
       const lim = Math.max(1, parseInt(limite, 10) || 20);
       const pag = Math.max(1, parseInt(pagina, 10) || 1);
       const off = (pag - 1) * lim;
 
+      const condicoes = ['1=1'];
+      const parametros = [];
+
+      if (de) {
+        condicoes.push('i.data_inspecao >= ?');
+        parametros.push(de);
+      }
+      if (ate) {
+        condicoes.push('i.data_inspecao <= ?');
+        parametros.push(ate.includes(':') ? ate : `${ate} 23:59:59`);
+      }
+      if (resultado) {
+        condicoes.push('i.resultado_final = ?');
+        parametros.push(resultado);
+      }
+      if (id_fone) {
+        condicoes.push('i.id_fone = ?');
+        parametros.push(Number(id_fone));
+      }
+      if (inspetor) {
+        condicoes.push('LOWER(func.nome) LIKE LOWER(?)');
+        parametros.push(`%${inspetor}%`);
+      }
+      if (q) {
+        condicoes.push('(LOWER(f.numero_serie) LIKE LOWER(?) OR LOWER(f.modelo) LIKE LOWER(?) OR LOWER(func.nome) LIKE LOWER(?) OR LOWER(i.observacao) LIKE LOWER(?))');
+        const termo = `%${q}%`;
+        parametros.push(termo, termo, termo, termo);
+      }
+
+      const whereClause = condicoes.join(' AND ');
+
       const countQuery = `
         SELECT count(*) as total 
         FROM inspecao i
         LEFT JOIN fone f ON i.id_fone = f.id_fone
         LEFT JOIN funcionario func ON i.id_funcionario = func.id_funcionario
+        WHERE ${whereClause}
       `;
-      const [countResult] = await db.query(countQuery, [
-        de || null,
-        ate || null,
-        resultado || null,
-        id_fone ? Number(id_fone) : null,
-        inspetor || null
-      ]);
+      const [countResult] = await db.query(countQuery, [...parametros]);
       const total = Number(countResult[0]?.total || countResult[0]?.['count(*)'] || 0);
 
       const queryPaginada = `
@@ -298,16 +362,13 @@ exports.listarInspecoes = async (req, res) => {
         FROM inspecao i
         LEFT JOIN fone f ON i.id_fone = f.id_fone
         LEFT JOIN funcionario func ON i.id_funcionario = func.id_funcionario
-        WHERE 1=1
+        WHERE ${whereClause}
+        ORDER BY i.data_inspecao DESC
         LIMIT ? OFFSET ?
       `;
 
       const [rows] = await db.query(queryPaginada, [
-        de || null,
-        ate || null,
-        resultado || null,
-        id_fone ? Number(id_fone) : null,
-        inspetor || null,
+        ...parametros,
         lim,
         off
       ]);
@@ -318,7 +379,7 @@ exports.listarInspecoes = async (req, res) => {
           total,
           pagina: pag,
           limite: lim,
-          total_paginas: Math.ceil(total / lim)
+          total_paginas: Math.ceil(total / lim) || 1
         });
       }
       return res.json(rows || []);

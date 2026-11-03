@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { guardPagina } from '../auth.js';
-import { initShell, toast } from '../ui.js?v=3';
+import { initShell, toast, escapeHtml } from '../ui.js?v=3';
 
 const usuario = guardPagina(['Admin', 'Gerente', 'Inspetor', 'Técnico']);
 if (usuario) {
@@ -60,8 +60,8 @@ async function carregarFones() {
       '<option value="">Selecione o fone...</option>',
       ...listaFones.map((f) => {
         const sel = String(f.id_fone) === String(fonePreId) ? 'selected' : '';
-        const lote = f.lote ? ` [${f.lote}]` : '';
-        return `<option value="${f.id_fone}" ${sel}>${f.numero_serie} — ${f.modelo}${lote} (${f.status})</option>`;
+        const lote = f.lote ? ` [${escapeHtml(f.lote)}]` : '';
+        return `<option value="${escapeHtml(f.id_fone)}" ${sel}>${escapeHtml(f.numero_serie)} — ${escapeHtml(f.modelo)}${lote} (${escapeHtml(f.status)})</option>`;
       })
     ].join('');
 

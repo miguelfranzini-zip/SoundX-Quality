@@ -160,6 +160,11 @@ app.post('/api/admin/reset-dados', authMiddleware, (req, res) => {
   }
 });
 
+// 404 JSON para rotas da API não encontradas
+app.use('/api', (req, res) => {
+  res.status(404).json({ mensagem: 'Rota da API não encontrada.' });
+});
+
 // Tratamento de erros padrão retornando JSON
 app.use((err, req, res, next) => {
   console.error('Erro na API:', err.message);
