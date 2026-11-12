@@ -99,39 +99,43 @@ exports.listarManutencoes = async (req, res) => {
     const pag = Math.max(1, parseInt(pagina, 10) || 1);
     const off = (pag - 1) * lim;
 
+    // Monta o WHERE dinamicamente para que filtros e parâmetros fiquem sincronizados
+    const filtros = [];
+    const parametros = [];
+    if (de) { filtros.push('DATE(m.data_entrada) >= ?'); parametros.push(de); }
+    if (ate) { filtros.push('DATE(m.data_entrada) <= ?'); parametros.push(ate); }
+    if (status) { filtros.push('m.status = ?'); parametros.push(status); }
+    if (id_fone) { filtros.push('m.id_fone = ?'); parametros.push(Number(id_fone)); }
+    if (id_tecnico) {
+      filtros.push('(m.concluido_por = ? OR m.solicitado_por = ?)');
+      parametros.push(Number(id_tecnico), Number(id_tecnico));
+    }
+    if (prioridade) { filtros.push('m.prioridade = ?'); parametros.push(prioridade); }
+
+    const whereClause = filtros.length ? `WHERE ${filtros.join(' AND ')}` : '';
+
     const countQuery = `
       SELECT count(*) as total 
       FROM manutencao m 
       JOIN fone f ON m.id_fone = f.id_fone
+      ${whereClause}
     `;
-    const [countRes] = await db.query(countQuery, [
-      de || null,
-      ate || null,
-      status || null,
-      id_fone ? Number(id_fone) : null,
-      id_tecnico ? Number(id_tecnico) : null,
-      prioridade || null
-    ]);
+    const [countRes] = await db.query(countQuery, parametros);
     const total = Number(countRes[0]?.total || countRes[0]?.['count(*)'] || 0);
 
     const query = `
       SELECT m.*, f.modelo, f.numero_serie
       FROM manutencao m
       JOIN fone f ON m.id_fone = f.id_fone
-      WHERE 1=1
+      ${whereClause}
       ORDER BY m.data_entrada DESC
       LIMIT ? OFFSET ?
     `;
 
     const [rows] = await db.query(query, [
-      de || null,
-      ate || null,
-      status || null,
-      id_fone ? Number(id_fone) : null,
-      id_tecnico ? Number(id_tecnico) : null,
-      prioridade || null,
-      lim,
-      off
+      ...parametros,
+      hasPagination ? lim : null,
+      hasPagination ? off : 0
     ]);
 
     if (hasPagination) {

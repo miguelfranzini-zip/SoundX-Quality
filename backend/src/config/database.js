@@ -325,8 +325,13 @@ const localProvider = {
       return [rows, []];
     }
 
-    // 16. Fila de manutenção com JOIN fone
-    if (cleanLower.includes('from manutencao m') && cleanLower.includes('join fone f')) {
+    // 16. Fila de manutenção com JOIN fone (somente a consulta específica da fila)
+    if (
+      cleanLower.includes('from manutencao m') &&
+      cleanLower.includes('join fone f') &&
+      cleanLower.includes("where m.status != 'concluido'") &&
+      !cleanLower.includes('limit')
+    ) {
       const rows = data.manutencao
         .filter(m => m.status !== 'Concluido')
         .map(m => {
@@ -746,8 +751,17 @@ const localProvider = {
         };
       });
 
-      // params: [de, ate, status, id_fone, id_tecnico, prioridade, limit, offset]
-      const [de, ate, status, idFone, idTecnico, prioridade, limit, offset] = params;
+      // params dinâmicos: [filtros..., limit, offset]
+      const offset = params.length >= 2 ? Number(params[params.length - 1]) : 0;
+      const limit = params.length >= 2 ? Number(params[params.length - 2]) : null;
+      const filtrosParams = params.slice(0, Math.max(0, params.length - 2));
+      let fi = 0;
+      const de = cleanLower.includes('date(m.data_entrada) >=') ? filtrosParams[fi++] : null;
+      const ate = cleanLower.includes('date(m.data_entrada) <=') ? filtrosParams[fi++] : null;
+      const status = cleanLower.includes('m.status = ?') ? filtrosParams[fi++] : null;
+      const idFone = cleanLower.includes('m.id_fone = ?') ? filtrosParams[fi++] : null;
+      const idTecnico = cleanLower.includes('m.concluido_por = ?') ? filtrosParams[fi++] : null;
+      const prioridade = cleanLower.includes('m.prioridade = ?') ? filtrosParams[fi++] : null;
 
       if (de) rows = rows.filter((r) => String(r.data_entrada || '').slice(0, 10) >= String(de));
       if (ate) rows = rows.filter((r) => String(r.data_entrada || '').slice(0, 10) <= String(ate));
@@ -776,7 +790,14 @@ const localProvider = {
         return { ...m, modelo: fone.modelo || '—', numero_serie: fone.numero_serie || '—' };
       });
 
-      const [de, ate, status, idFone, idTecnico, prioridade] = params;
+      // params dinâmicos: [filtros...]
+      let ci = 0;
+      const de = cleanLower.includes('date(m.data_entrada) >=') ? params[ci++] : null;
+      const ate = cleanLower.includes('date(m.data_entrada) <=') ? params[ci++] : null;
+      const status = cleanLower.includes('m.status = ?') ? params[ci++] : null;
+      const idFone = cleanLower.includes('m.id_fone = ?') ? params[ci++] : null;
+      const idTecnico = cleanLower.includes('m.concluido_por = ?') ? params[ci++] : null;
+      const prioridade = cleanLower.includes('m.prioridade = ?') ? params[ci++] : null;
       if (de) rows = rows.filter((r) => String(r.data_entrada || '').slice(0, 10) >= String(de));
       if (ate) rows = rows.filter((r) => String(r.data_entrada || '').slice(0, 10) <= String(ate));
       if (status) rows = rows.filter((r) => String(r.status || '').toLowerCase() === String(status).toLowerCase());
