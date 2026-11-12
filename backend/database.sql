@@ -7,7 +7,7 @@
 CREATE TABLE IF NOT EXISTS funcionario (
     id_funcionario SERIAL PRIMARY KEY,
     nome           VARCHAR(100) NOT NULL,
-    cpf            VARCHAR(14)  UNIQUE,
+    cpf            VARCHAR(11)  UNIQUE,
     cargo          VARCHAR(50)  DEFAULT 'Inspetor',
     email          VARCHAR(100) NOT NULL UNIQUE,
     senha          VARCHAR(255) NOT NULL,
@@ -86,9 +86,9 @@ CREATE INDEX IF NOT EXISTS idx_funcionario_ativo ON funcionario (ativo);
 -- Funcionários com senhas hash ou texto compatíveis com o ambiente
 INSERT INTO funcionario (nome, cpf, cargo, email, senha, ativo)
 VALUES
-    ('Lucas Silva',   '123.456.789-00', 'Inspetor', 'lucas@email.com',       '1234', TRUE),
-    ('Marcos Santos', '234.567.890-11', 'Técnico',  'tecnico@soundx.com',    '1234', TRUE),
-    ('Carlos Souza',  '345.678.901-22', 'Admin',    'admin@soundx.com',      '1234', TRUE)
+    ('Lucas Silva',   '12345678900', 'Inspetor', 'lucas@email.com',       '1234', TRUE),
+    ('Marcos Santos', '23456789011', 'Técnico',  'tecnico@soundx.com',    '1234', TRUE),
+    ('Carlos Souza',  '34567890122', 'Admin',    'admin@soundx.com',      '1234', TRUE)
 ON CONFLICT (email) DO UPDATE SET nome = EXCLUDED.nome, cargo = EXCLUDED.cargo, ativo = TRUE;
 
 -- Fones de demonstração fabril

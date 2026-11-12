@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { guardPagina, isAdminGerente } from '../auth.js';
-import { initShell, badgeStatus, formatarData, escapeHtml, toast, confirmarAcao } from '../ui.js?v=3';
+import { initShell, badgeStatus, formatarData, escapeHtml, toast, confirmarAcao } from '../ui.js?v=4';
 
 const usuario = guardPagina(['Admin', 'Gerente', 'Técnico', 'Inspetor']);
 if (usuario) {
@@ -45,15 +45,15 @@ function esconderAlerta() {
 function badgePrioridade(p) {
   const norm = String(p || 'Media').toLowerCase();
   if (norm.includes('crit')) {
-    return '<span class="badge badge--perigo" title="Prioridade Crítica">🔴 Crítica</span>';
+    return '<span class="badge badge--perigo" title="Prioridade Crítica"><span class="badge__dot"></span>Crítica</span>';
   }
   if (norm.includes('alt')) {
-    return '<span class="badge badge--alerta" title="Prioridade Alta">🟠 Alta</span>';
+    return '<span class="badge badge--alerta" title="Prioridade Alta"><span class="badge__dot"></span>Alta</span>';
   }
   if (norm.includes('baix')) {
-    return '<span class="badge badge--sucesso" title="Prioridade Baixa">🟢 Baixa</span>';
+    return '<span class="badge badge--sucesso" title="Prioridade Baixa"><span class="badge__dot"></span>Baixa</span>';
   }
-  return '<span class="badge badge--neutro" title="Prioridade Média">🟡 Média</span>';
+  return '<span class="badge badge--neutro" title="Prioridade Média"><span class="badge__dot"></span>Média</span>';
 }
 
 function abrirModal(m) {
@@ -169,7 +169,7 @@ function renderizar() {
             </div>
             ${m.acao_corretiva ? `
               <div style="font-size: 0.78rem; color: var(--sucesso); margin-top: 4px; font-style: italic;">
-                ↳ Reparo: ${escapeHtml(m.acao_corretiva)}
+                Reparo: ${escapeHtml(m.acao_corretiva)}
               </div>
             ` : ''}
           </td>

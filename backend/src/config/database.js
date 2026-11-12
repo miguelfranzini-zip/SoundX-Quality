@@ -29,9 +29,9 @@ if (process.env.VERCEL) {
 function getInitialData() {
   return {
     funcionario: [
-      { id_funcionario: 1, nome: 'Lucas Silva',   cpf: '123.456.789-00', cargo: 'Inspetor', email: 'lucas@email.com',    senha: '1234', ativo: true },
-      { id_funcionario: 2, nome: 'Marcos Santos', cpf: '234.567.890-11', cargo: 'Técnico',  email: 'tecnico@soundx.com', senha: '1234', ativo: true },
-      { id_funcionario: 3, nome: 'Carlos Souza',  cpf: '345.678.901-22', cargo: 'Admin',    email: 'admin@soundx.com',   senha: '1234', ativo: true }
+      { id_funcionario: 1, nome: 'Lucas Silva',   cpf: '12345678900', cargo: 'Inspetor', email: 'lucas@email.com',    senha: '1234', ativo: true },
+      { id_funcionario: 2, nome: 'Marcos Santos', cpf: '23456789011', cargo: 'Técnico',  email: 'tecnico@soundx.com', senha: '1234', ativo: true },
+      { id_funcionario: 3, nome: 'Carlos Souza',  cpf: '34567890122', cargo: 'Admin',    email: 'admin@soundx.com',   senha: '1234', ativo: true }
     ],
     fone: [
       { id_fone: 1, numero_serie: 'FN001',       modelo: 'SoundX Pro',        marca: 'SoundX', tipo_conexao: 'Bluetooth', lote: 'LT-2026-A', data_fabricacao: '2026-08-20', status: 'Reprovado / Manutenção' },
@@ -156,8 +156,9 @@ const localProvider = {
       return [rows, []];
     }
 
-    // 5. Histórico: inspeções de um fone (com ou sem alias i)
-    if (cleanLower.includes('from inspecao') && (cleanLower.includes('where id_fone = ?') || cleanLower.includes('where id_fone = $1') || cleanLower.includes('where i.id_fone = ?') || cleanLower.includes('where i.id_fone = $1'))) {
+    // 5. Histórico: inspeções de um fone (com ou sem alias i) — ignora consultas com JOIN,
+    // que são tratadas pelos padrões 38/39 para incluir modelo, série e inspetor.
+    if (!cleanLower.includes('join') && cleanLower.includes('from inspecao') && (cleanLower.includes('where id_fone = ?') || cleanLower.includes('where id_fone = $1') || cleanLower.includes('where i.id_fone = ?') || cleanLower.includes('where i.id_fone = $1'))) {
       const id = Number(params[0]);
       const rows = data.inspecao
         .filter(i => i.id_fone === id)
@@ -169,8 +170,8 @@ const localProvider = {
       return [rows, []];
     }
 
-    // 5b. SELECT * FROM inspecao ORDER BY data_inspecao
-    if (cleanLower.startsWith('select') && cleanLower.includes('from inspecao') && cleanLower.includes('order by')) {
+    // 5b. SELECT * FROM inspecao ORDER BY data_inspecao (sem JOIN — o JOIN cai no padrão 38)
+    if (cleanLower.startsWith('select') && !cleanLower.includes('join') && cleanLower.includes('from inspecao') && cleanLower.includes('order by')) {
       const rows = [...data.inspecao].sort((a, b) => new Date(a.data_inspecao || 0) - new Date(b.data_inspecao || 0));
       return [rows, []];
     }
@@ -646,7 +647,7 @@ const localProvider = {
       cleanLower.includes('from inspecao i') &&
       cleanLower.includes('left join fone f') &&
       cleanLower.includes('left join funcionario func') &&
-      (cleanLower.includes('limit') || cleanLower.includes('where'))
+      (cleanLower.includes('limit') || cleanLower.includes('where') || cleanLower.includes('order by'))
     ) {
       const dados = loadLocalData();
       let rows = dados.inspecao.map((i) => {
@@ -720,7 +721,7 @@ const localProvider = {
     if (
       cleanLower.includes('from manutencao m') &&
       cleanLower.includes('join fone f') &&
-      (cleanLower.includes('limit') || cleanLower.includes('where'))
+      (cleanLower.includes('limit') || cleanLower.includes('where') || cleanLower.includes('order by'))
     ) {
       const dados = loadLocalData();
       let rows = dados.manutencao.map((m) => {
@@ -918,7 +919,7 @@ async function ensureSchema(clientOrPool) {
       CREATE TABLE IF NOT EXISTS funcionario (
         id_funcionario SERIAL PRIMARY KEY,
         nome VARCHAR(100) NOT NULL,
-        cpf VARCHAR(14) UNIQUE,
+        cpf VARCHAR(11) UNIQUE,
         cargo VARCHAR(50) DEFAULT 'Inspetor',
         email VARCHAR(100) NOT NULL UNIQUE,
         senha VARCHAR(255) NOT NULL,
@@ -982,6 +983,9 @@ async function ensureSchema(clientOrPool) {
     // ---- Expansão: histórico de usuários (soft delete) ----
     await clientOrPool.query('ALTER TABLE funcionario ADD COLUMN IF NOT EXISTS ativo BOOLEAN DEFAULT TRUE;');
     await clientOrPool.query('ALTER TABLE funcionario ADD COLUMN IF NOT EXISTS excluido_em TIMESTAMP;');
+
+    // Normaliza CPFs antigos removendo pontos e traços (mantém apenas números)
+    await clientOrPool.query("UPDATE funcionario SET cpf = REGEXP_REPLACE(cpf, '\\D', '', 'g') WHERE cpf IS NOT NULL AND cpf ~ '\\D';");
 
     // ---- Índices para filtros por data/status (agregações e históricos) ----
     await clientOrPool.query('CREATE INDEX IF NOT EXISTS idx_inspecao_data ON inspecao (data_inspecao);');

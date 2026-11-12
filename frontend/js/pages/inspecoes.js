@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { guardPagina, isAdminGerente } from '../auth.js';
-import { initShell, badgeStatus, formatarData, escapeHtml, toast, confirmarAcao } from '../ui.js?v=3';
+import { initShell, badgeStatus, formatarData, escapeHtml, toast, confirmarAcao, ICONES_ACAO } from '../ui.js?v=4';
 
 const usuario = guardPagina(['Admin', 'Gerente', 'Inspetor']);
 if (usuario) {
@@ -35,7 +35,7 @@ function linkFotoSeguro(url) {
   if (!url || typeof url !== 'string') return '';
   const u = url.trim();
   if (!u.startsWith('http://') && !u.startsWith('https://')) return '';
-  return `<div style="margin-top: 4px;"><a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer" class="badge badge--info" title="Visualizar evidência fotográfica">📸 Ver Foto</a></div>`;
+  return `<div style="margin-top: 4px;"><a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer" class="badge badge--info" title="Visualizar evidência fotográfica">${ICONES_ACAO.foto} Ver Foto</a></div>`;
 }
 
 const btnExportarInspecoes = document.getElementById('btn-exportar-inspecoes');
@@ -90,14 +90,14 @@ function renderizar(lista) {
   corpoTabela.innerHTML = lista
     .map((inspecao) => {
       const linkFone = inspecao.id_fone
-        ? `<button class="btn btn--ghost btn--pequeno" data-ver-historico="${inspecao.id_fone}">Histórico</button>`
+        ? `<button class="btn btn--ghost btn--icone" data-ver-historico="${inspecao.id_fone}" title="Ver histórico do fone" aria-label="Ver histórico do fone">${ICONES_ACAO.historico}</button>`
         : '';
-      const linkTestes = `<button class="btn btn--ghost btn--pequeno" data-ver-testes="${inspecao.id_inspecao}">Testes</button>`;
+      const linkTestes = `<button class="btn btn--ghost btn--icone" data-ver-testes="${inspecao.id_inspecao}" title="Ver testes da inspeção" aria-label="Ver testes da inspeção">${ICONES_ACAO.testes}</button>`;
 
       const linkFoto = linkFotoSeguro(inspecao.foto_url);
       const isReprovado = String(inspecao.resultado_final || '').toLowerCase().includes('reprov');
       const linkReparo = isReprovado && inspecao.id_fone
-        ? `<a class="btn btn--pequeno" style="background: rgba(255, 152, 0, 0.12); color: var(--marrom); border: 1px solid rgba(255, 152, 0, 0.35); text-decoration: none; display: inline-flex; align-items: center;" href="manutencao-solicitar.html?id_fone=${inspecao.id_fone}&defeito=${encodeURIComponent(inspecao.observacao || 'Reprovado na inspeção de qualidade')}" title="Abrir ordem de manutenção técnica">Reparo</a>`
+        ? `<a class="btn btn--reparo btn--icone" href="manutencao-solicitar.html?id_fone=${inspecao.id_fone}&defeito=${encodeURIComponent(inspecao.observacao || 'Reprovado na inspeção de qualidade')}" title="Abrir ordem de manutenção técnica" aria-label="Abrir ordem de manutenção técnica">${ICONES_ACAO.reparo}</a>`
         : '';
 
       return `
@@ -114,23 +114,25 @@ function renderizar(lista) {
           ${linkFoto}
         </td>
         <td>
-          <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+          <div class="acoes-tabela">
             ${linkFone}
             ${linkTestes}
             ${linkReparo}
             ${podeEditar ? `
               <button
-                class="btn btn--secundario btn--pequeno"
+                class="btn btn--secundario btn--icone"
                 data-editar-inspecao="${inspecao.id_inspecao}"
                 title="Editar inspeção"
-              >Editar</button>
+                aria-label="Editar inspeção"
+              >${ICONES_ACAO.editar}</button>
             ` : ''}
             ${podeExcluir ? `
               <button
-                class="btn btn--danger btn--pequeno"
+                class="btn btn--danger btn--icone"
                 data-excluir-inspecao="${inspecao.id_inspecao}"
                 title="Excluir inspeção"
-              >Excluir</button>
+                aria-label="Excluir inspeção"
+              >${ICONES_ACAO.excluir}</button>
             ` : ''}
           </div>
         </td>

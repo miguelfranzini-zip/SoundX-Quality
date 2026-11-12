@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css?v=3">
-  <link rel="stylesheet" href="css/components.css?v=3">
+  <link rel="stylesheet" href="css/components.css?v=4">
   <link rel="stylesheet" href="css/docs.css?v=3">
 </head>
 <body class="docs-body">
@@ -1365,7 +1365,7 @@ http://localhost:3001</code></pre>
                         <tbody>
                           <tr><td><code>id_funcionario</code></td><td>SERIAL</td><td>PK</td><td>Gerado pelo banco; vira <span class="docs-inline">req.usuarioId</span> no JWT.</td></tr>
                           <tr><td><code>nome</code></td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Exibido no shell e no histórico.</td></tr>
-                          <tr><td><code>cpf</code></td><td>VARCHAR(14)</td><td>UNIQUE, nullable</td><td>Opcional no cadastro; sem validação de dígitos.</td></tr>
+                          <tr><td><code>cpf</code></td><td>VARCHAR(11)</td><td>UNIQUE, nullable</td><td>Opcional no cadastro; armazenado somente com números.</td></tr>
                           <tr><td><code>cargo</code></td><td>VARCHAR(50)</td><td>DEFAULT 'Inspetor'</td><td>Texto livre; o backend valida apenas na criação de usuário.</td></tr>
                           <tr><td><code>email</code></td><td>VARCHAR(100)</td><td>NOT NULL, UNIQUE</td><td>Identificador do login.</td></tr>
                           <tr><td><code>senha</code></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Aceita hash bcrypt ou texto plano legado.</td></tr>
@@ -1569,9 +1569,9 @@ http://localhost:3001</code></pre>
                   <div class="docs-code__bar"><span class="docs-code__file">backend/database.sql · seeds</span><button class="docs-copy" type="button" data-copy="code-db-seed">Copiar</button></div>
                   <pre><code id="code-db-seed">INSERT INTO funcionario (nome, cpf, cargo, email, senha)
 VALUES
-  ('Lucas Silva',   '123.456.789-00', 'Inspetor', 'lucas@email.com',    '1234'),
-  ('Marcos Santos', '234.567.890-11', 'Técnico',  'tecnico@soundx.com', '1234'),
-  ('Carlos Souza',  '345.678.901-22', 'Admin',    'admin@soundx.com',   '1234')
+  ('Lucas Silva',   '12345678900', 'Inspetor', 'lucas@email.com',    '1234'),
+  ('Marcos Santos', '23456789011', 'Técnico',  'tecnico@soundx.com', '1234'),
+  ('Carlos Souza',  '34567890122', 'Admin',    'admin@soundx.com',   '1234')
 ON CONFLICT (email) DO UPDATE
   SET nome = EXCLUDED.nome, cargo = EXCLUDED.cargo;
 
@@ -1776,7 +1776,7 @@ async function pgQuery(sql, params = []) {
     {
       "id_funcionario": 1,
       "nome": "Lucas Silva",
-      "cpf": "123.456.789-00",
+      "cpf": "12345678900",
       "cargo": "Inspetor",
       "email": "lucas@email.com",
       "senha": "1234"

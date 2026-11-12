@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { toast, initShell, emptyState, escapeHtml, confirmarAcao } from '../ui.js?v=3';
+import { toast, initShell, emptyState, escapeHtml, confirmarAcao } from '../ui.js?v=4';
 import { guardPagina } from '../auth.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -15,6 +15,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnVoltar = document.getElementById('btn-voltar');
   const tabelaWrapper = document.getElementById('tabela-usuarios-wrapper');
   const tabsContainer = document.getElementById('tabs-usuarios');
+  const campoCpf = document.getElementById('cpf');
+
+  // CPF é armazenado e exibido apenas com números (sem pontos ou traços)
+  campoCpf?.addEventListener('input', () => {
+    const somenteNumeros = campoCpf.value.replace(/\D/g, '').slice(0, 11);
+    if (campoCpf.value !== somenteNumeros) campoCpf.value = somenteNumeros;
+  });
 
   let abaAtiva = 'ativos';
 
@@ -75,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </td>
             <td>${escapeHtml(u.email)}</td>
             <td>${escapeHtml(u.cargo)}</td>
-            <td style="color:var(--text-secundario)">${escapeHtml(u.cpf || '—')}</td>
+            <td style="color:var(--text-secundario)">${escapeHtml(String(u.cpf || '').replace(/\D/g, '') || '—')}</td>
             <td>${excluido ? dataBR(u.excluido_em) : '—'}</td>
             <td style="text-align: right;">${colunaAcoes}</td>
           </tr>
@@ -175,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const email = document.getElementById('email').value.trim();
     const senha = document.getElementById('senha').value;
     const cargo = document.getElementById('cargo').value;
-    const cpf = document.getElementById('cpf').value.trim();
+    const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
 
     if (senha.length < 6) {
       alertaForm.textContent = 'A senha deve ter no mínimo 6 caracteres.';

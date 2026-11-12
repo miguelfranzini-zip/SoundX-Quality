@@ -76,6 +76,33 @@
 .btn--bloco { width: 100%; }
 .btn--pequeno { padding: 0.4rem 0.85rem; font-size: 0.85rem; }
 
+/* Botões compactos de ação em tabelas */
+.btn--icone {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  flex: 0 0 34px;
+  border-radius: var(--radius-sm);
+}
+.btn--icone svg { width: 16px; height: 16px; }
+.btn--reparo {
+  background: rgba(255, 152, 0, 0.12);
+  color: var(--marrom);
+  border-color: rgba(255, 152, 0, 0.35);
+}
+.btn--reparo:hover {
+  background: rgba(255, 152, 0, 0.2);
+  border-color: var(--laranja);
+}
+
+/* Agrupador de ações para manter os botões alinhados na mesma linha */
+.acoes-tabela {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
 /* ---------- Cards ---------- */
 .card {
   background: var(--card-bg);
@@ -271,6 +298,7 @@
   display: inline-block;
   flex-shrink: 0;
 }
+.badge svg { width: 13px; height: 13px; flex-shrink: 0; }
 
 .badge--sucesso {
   background: var(--sucesso-bg);
@@ -311,6 +339,36 @@
 .badge--info .badge__dot {
   background: var(--marrom);
   box-shadow: 0 0 0 2px rgba(96, 33, 0, 0.15);
+}
+
+.badge--perigo {
+  background: rgba(198, 40, 40, 0.1);
+  color: var(--erro);
+  border: 1px solid rgba(198, 40, 40, 0.28);
+}
+.badge--perigo .badge__dot {
+  background: var(--erro);
+  box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.22);
+}
+
+.badge--alerta {
+  background: #fff3df;
+  color: #a85600;
+  border: 1px solid #ffca7b;
+}
+.badge--alerta .badge__dot {
+  background: var(--laranja);
+  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.22);
+}
+
+.badge--neutro {
+  background: #fff9e3;
+  color: #8a6500;
+  border: 1px solid #ffe08a;
+}
+.badge--neutro .badge__dot {
+  background: var(--dourado);
+  box-shadow: 0 0 0 2px rgba(255, 189, 43, 0.25);
 }
 
 /* ---------- Formulários ---------- */
@@ -713,6 +771,9 @@ textarea.form__controle { min-height: 96px; resize: vertical; }
   flex-wrap: wrap;
 }
 .tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: 0.65rem 1.25rem;
   background: none;
   border: none;
@@ -725,6 +786,7 @@ textarea.form__controle { min-height: 96px; resize: vertical; }
   transition: all var(--transition-fast);
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
+.tab > svg { width: 16px; height: 16px; flex-shrink: 0; }
 .tab:hover {
   color: var(--marrom);
   background: rgba(255, 189, 43, 0.08);
@@ -982,8 +1044,12 @@ textarea.form__controle { min-height: 96px; resize: vertical; }
 /* ---------- Busca ---------- */
 .busca {
   position: relative;
+  flex: 1 1 320px;
+  min-width: 300px;
+  max-width: 420px;
 }
 .busca input {
+  width: 100%;
   padding-left: 2.5rem;
 }
 .busca::before {
@@ -1037,6 +1103,7 @@ textarea.form__controle { min-height: 96px; resize: vertical; }
   .login__lado-visual { display: none; }
   .login__logo-mobile { display: block; width: 100px; margin-bottom: var(--space-4); }
   .page-header { flex-direction: column; align-items: stretch; }
+  .page-header .toolbar .busca { flex: 1 1 100%; min-width: 0; max-width: none; }
   .toast-container { left: var(--space-4); right: var(--space-4); }
   .toast { width: 100%; max-width: none; }
 }

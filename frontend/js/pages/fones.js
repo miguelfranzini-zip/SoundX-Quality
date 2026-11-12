@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { guardPagina, isAdminGerente } from '../auth.js';
-import { initShell, badgeStatus, formatarDataCurta, escapeHtml, toast, confirmarAcao } from '../ui.js?v=3';
+import { initShell, badgeStatus, formatarDataCurta, escapeHtml, toast, confirmarAcao, ICONES_ACAO } from '../ui.js?v=4';
 
 const usuario = guardPagina(['Admin', 'Gerente', 'Inspetor']);
 if (usuario) {
@@ -51,35 +51,38 @@ function renderizar(lista) {
         <td>${badgeStatus(fone.status)}</td>
         <td>${formatarDataCurta(fone.data_fabricacao)}</td>
         <td>
-          <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+          <div class="acoes-tabela">
             <button
-              class="btn btn--ghost btn--pequeno"
+              class="btn btn--ghost btn--icone"
               data-ver-historico="${fone.id_fone}"
               title="Ver histórico do fone"
-            >Histórico</button>
+              aria-label="Ver histórico do fone"
+            >${ICONES_ACAO.historico}</button>
 
             <a
-              class="btn btn--pequeno"
-              style="background: rgba(255, 152, 0, 0.12); color: var(--marrom); border: 1px solid rgba(255, 152, 0, 0.35); text-decoration: none; display: inline-flex; align-items: center;"
+              class="btn btn--reparo btn--icone"
               href="manutencao-solicitar.html?id_fone=${fone.id_fone}"
               title="Solicitar manutenção técnica para este fone"
-            >Reparo</a>
+              aria-label="Solicitar manutenção técnica para este fone"
+            >${ICONES_ACAO.reparo}</a>
 
             ${podeEditar ? `
               <button
-                class="btn btn--secundario btn--pequeno"
+                class="btn btn--secundario btn--icone"
                 data-editar-fone="${fone.id_fone}"
                 title="Editar dados do fone"
-              >Editar</button>
+                aria-label="Editar dados do fone"
+              >${ICONES_ACAO.editar}</button>
             ` : ''}
 
             ${podeExcluir ? `
               <button
-                class="btn btn--danger btn--pequeno"
+                class="btn btn--danger btn--icone"
                 data-excluir-fone="${fone.id_fone}"
                 data-serie="${escapeHtml(fone.numero_serie || '')}"
                 title="Excluir fone do sistema"
-              >Excluir</button>
+                aria-label="Excluir fone do sistema"
+              >${ICONES_ACAO.excluir}</button>
             ` : ''}
           </div>
         </td>

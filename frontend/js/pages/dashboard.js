@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { guardPagina, isAdminGerente } from '../auth.js';
-import { initShell, showSkeleton, toast, formatarData, escapeHtml } from '../ui.js?v=3';
+import { initShell, showSkeleton, toast, formatarData, escapeHtml } from '../ui.js?v=4';
 import { createChart, linha, barra, rosca, PALETTE } from '../charts.js';
 
 const usuario = guardPagina(['Admin', 'Gerente', 'Inspetor', 'Técnico']);
@@ -19,10 +19,10 @@ let periodoSelecionado = 30;
 
 function badgePrioridade(p) {
   const norm = String(p || 'Media').toLowerCase();
-  if (norm.includes('crit')) return '<span class="badge badge--perigo" style="font-size:0.75rem;">🔴 Crítica</span>';
-  if (norm.includes('alt')) return '<span class="badge badge--alerta" style="font-size:0.75rem;">🟠 Alta</span>';
-  if (norm.includes('baix')) return '<span class="badge badge--sucesso" style="font-size:0.75rem;">🟢 Baixa</span>';
-  return '<span class="badge badge--neutro" style="font-size:0.75rem;">🟡 Média</span>';
+  if (norm.includes('crit')) return '<span class="badge badge--perigo" style="font-size:0.75rem;"><span class="badge__dot"></span>Crítica</span>';
+  if (norm.includes('alt')) return '<span class="badge badge--alerta" style="font-size:0.75rem;"><span class="badge__dot"></span>Alta</span>';
+  if (norm.includes('baix')) return '<span class="badge badge--sucesso" style="font-size:0.75rem;"><span class="badge__dot"></span>Baixa</span>';
+  return '<span class="badge badge--neutro" style="font-size:0.75rem;"><span class="badge__dot"></span>Média</span>';
 }
 
 function diasEmEspera(dataEntrada) {

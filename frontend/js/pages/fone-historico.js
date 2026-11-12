@@ -9,7 +9,8 @@ import {
   emptyState,
   showSkeleton,
   toast,
-} from '../ui.js';
+  ICONES_ACAO,
+} from '../ui.js?v=4';
 
 const usuario = guardPagina(['Admin', 'Gerente', 'Inspetor', 'Técnico']);
 if (usuario) {
@@ -91,8 +92,8 @@ function renderizarInspecoes(lista) {
             </div>
             ${inspecao.foto_url ? `
               <div style="margin-top: 6px;">
-                <a href="${escapeHtml(inspecao.foto_url)}" target="_blank" rel="noopener noreferrer" class="btn btn--pequeno btn--ghost" style="padding: 2px 8px; font-size: 0.78rem;">
-                  📷 Ver Evidência Fotográfica
+                <a href="${escapeHtml(inspecao.foto_url)}" target="_blank" rel="noopener noreferrer" class="btn btn--pequeno btn--ghost" style="padding: 2px 8px; font-size: 0.78rem; gap: 5px;">
+                  ${ICONES_ACAO.foto} Ver Evidência Fotográfica
                 </a>
               </div>
             ` : ''}

@@ -8,9 +8,6 @@ node_modules/
 # Arquivos de banco de dados local (fallback)
 local_data.json
 
-# Arquivos de configuração do banco
-backend/database.sql
-
 # Arquivos de testes (se houver arquivos de log ou dump)
 *.log
 *.backup

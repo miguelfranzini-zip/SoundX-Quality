@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import { guardPagina } from '../auth.js';
-import { initShell, badgeStatus, formatarData, escapeHtml, toast } from '../ui.js?v=3';
+import { initShell, badgeStatus, formatarData, escapeHtml, toast, ICONES_ACAO } from '../ui.js?v=4';
 import { createChart, barra, PALETTE } from '../charts.js';
 
 const usuario = guardPagina(['Admin', 'Gerente']);
@@ -31,17 +31,17 @@ let dadosCache = [];
 
 function badgePrioridade(p) {
   const norm = String(p || 'Media').toLowerCase();
-  if (norm.includes('crit')) return '<span class="badge badge--perigo" style="font-size:0.75rem;">🔴 Crítica</span>';
-  if (norm.includes('alt')) return '<span class="badge badge--alerta" style="font-size:0.75rem;">🟠 Alta</span>';
-  if (norm.includes('baix')) return '<span class="badge badge--sucesso" style="font-size:0.75rem;">🟢 Baixa</span>';
-  return '<span class="badge badge--neutro" style="font-size:0.75rem;">🟡 Média</span>';
+  if (norm.includes('crit')) return '<span class="badge badge--perigo" style="font-size:0.75rem;"><span class="badge__dot"></span>Crítica</span>';
+  if (norm.includes('alt')) return '<span class="badge badge--alerta" style="font-size:0.75rem;"><span class="badge__dot"></span>Alta</span>';
+  if (norm.includes('baix')) return '<span class="badge badge--sucesso" style="font-size:0.75rem;"><span class="badge__dot"></span>Baixa</span>';
+  return '<span class="badge badge--neutro" style="font-size:0.75rem;"><span class="badge__dot"></span>Média</span>';
 }
 
 function linkFotoSeguro(url) {
   if (!url) return '';
   const u = String(url).trim();
   if (u.startsWith('http://') || u.startsWith('https://')) {
-    return `<a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer" class="btn btn--pequeno btn--ghost" style="padding: 2px 6px; font-size: 0.75rem; margin-top: 3px;" title="Ver evidência fotográfica">📷 Foto</a>`;
+    return `<a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer" class="btn btn--pequeno btn--ghost" style="padding: 2px 6px; font-size: 0.75rem; margin-top: 3px; gap: 4px;" title="Ver evidência fotográfica">${ICONES_ACAO.foto} Foto</a>`;
   }
   return '';
 }
@@ -278,9 +278,9 @@ async function carregarLotes() {
             <div class="distribuicao-barra__reprovados" style="width: ${100 - taxa}%;"></div>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
-            <span>🟢 Aprovados: <strong>${l.aprovados}</strong></span>
-            <span>🔴 Falhas: <strong>${l.reprovados}</strong></span>
-            <span>🟡 Fila: <strong>${l.aguardando}</strong></span>
+            <span style="display:inline-flex;align-items:center;gap:5px;"><span class="badge__dot" style="background:var(--sucesso);"></span>Aprovados: <strong>${l.aprovados}</strong></span>
+            <span style="display:inline-flex;align-items:center;gap:5px;"><span class="badge__dot" style="background:var(--erro);"></span>Falhas: <strong>${l.reprovados}</strong></span>
+            <span style="display:inline-flex;align-items:center;gap:5px;"><span class="badge__dot" style="background:var(--dourado);"></span>Fila: <strong>${l.aguardando}</strong></span>
           </div>
         </div>
       `;

@@ -4,6 +4,8 @@ const db = require('../config/database');
 // Criar novo funcionário/usuário (apenas Admin)
 exports.createUser = async (req, res) => {
   const { nome, email, senha, cargo, cpf } = req.body;
+  // CPF é persistido apenas com números (sem pontos ou traços)
+  const cpfNumeros = cpf ? String(cpf).replace(/\D/g, '') : '';
 
   if (!nome || !email || !senha || !cargo) {
     return res.status(400).json({ mensagem: 'Nome, e-mail, senha e cargo são obrigatórios.' });
@@ -26,8 +28,8 @@ exports.createUser = async (req, res) => {
     }
 
     // Verifica CPF duplicado (se fornecido)
-    if (cpf) {
-      const [cpfExistente] = await db.query('SELECT id_funcionario FROM funcionario WHERE cpf = ?', [cpf]);
+    if (cpfNumeros) {
+      const [cpfExistente] = await db.query('SELECT id_funcionario FROM funcionario WHERE cpf = ?', [cpfNumeros]);
       if (cpfExistente && cpfExistente.length > 0) {
         return res.status(409).json({ mensagem: 'Já existe um usuário cadastrado com este CPF.' });
       }
@@ -39,7 +41,7 @@ exports.createUser = async (req, res) => {
     // Insere novo funcionário (sempre ativo)
     const [resultado] = await db.query(
       'INSERT INTO funcionario (nome, cpf, cargo, email, senha) VALUES (?, ?, ?, ?, ?) RETURNING id_funcionario',
-      [nome.trim(), cpf || null, cargo, email.trim().toLowerCase(), senhaHash]
+      [nome.trim(), cpfNumeros || null, cargo, email.trim().toLowerCase(), senhaHash]
     );
 
     res.status(201).json({

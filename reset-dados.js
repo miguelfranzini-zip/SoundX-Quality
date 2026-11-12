@@ -12,9 +12,9 @@ console.log('📀 Resetando banco de dados local...\n');
 try {
   const dadosIniciais = {
     funcionario: [
-      { id_funcionario: 1, nome: 'Lucas Silva',   cpf: '123.456.789-00', cargo: 'Inspetor', email: 'lucas@email.com',    senha: '1234' },
-      { id_funcionario: 2, nome: 'Marcos Santos', cpf: '234.567.890-11', cargo: 'Técnico',  email: 'tecnico@soundx.com', senha: '1234' },
-      { id_funcionario: 3, nome: 'Carlos Souza',  cpf: '345.678.901-22', cargo: 'Admin',    email: 'admin@soundx.com',   senha: '1234' }
+      { id_funcionario: 1, nome: 'Lucas Silva',   cpf: '12345678900', cargo: 'Inspetor', email: 'lucas@email.com',    senha: '1234' },
+      { id_funcionario: 2, nome: 'Marcos Santos', cpf: '23456789011', cargo: 'Técnico',  email: 'tecnico@soundx.com', senha: '1234' },
+      { id_funcionario: 3, nome: 'Carlos Souza',  cpf: '34567890122', cargo: 'Admin',    email: 'admin@soundx.com',   senha: '1234' }
     ],
     fone: [],
     inspecao: [],
