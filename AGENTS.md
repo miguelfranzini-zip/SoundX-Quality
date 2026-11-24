@@ -10,9 +10,10 @@
 
 - Diretório: `C:\Users\Aluno\Downloads\SoundX-Quality-main`
 - Remoto: `https://github.com/miguelfranzini-zip/SoundX-Quality` — branch `main`
-- HEAD local = `16b4653` = `origin/main` (projeto já idêntico ao GitHub)
+- HEAD local = `6775773` = `origin/main` (sincronizado em 24/11/2026)
 - `core.autocrlf=true` (arquivos CRLF do Windows não aparecem como modificados)
-- Push **ainda não autenticado**: não há credencial GitHub no Windows Credential Manager
+- Push autenticado via Git Credential Manager
+- `antigravity` adotou este protocolo e removeu o `.agents-sync.json` em 24/11
 
 ---
 
@@ -73,14 +74,23 @@ Remove-Item -Recurse -Force .agents/locks/backend
 | `frontend-ui` | `frontend/*.html`, `frontend/css/**`, `frontend/assets/**` |
 | `docs` | `README.md`, `*.md`, `frontend/documentacao.html`, `frontend/manual.html` |
 | `infra` | `netlify.toml`, `vercel.json`, `package.json`, `.gitignore`, `backend/package.json`, `backend/vercel.json` |
+| `scripts` | `reset-dados.js`, `test-backend.js` |
 
-`infra` e `docs` são **compartilhadas**: lock obrigatório, uma por vez.
+`docs` e `infra` são **compartilhadas**: lock obrigatório, uma por vez.
 
 ---
 
 ## 4. Branches e merge
 
-- Cada agente trabalha em `agent/<agente>/<tema>` — nunca em `main`.
+Regra objetiva, sem interpretação:
+
+| Situação | Onde commitar |
+|----------|---------------|
+| Tarefa de **1 commit**, dentro da sua área, já testada | direto em `main`, após `git fetch origin && git rebase origin/main` |
+| Tarefa com **2+ commits**, ou que toque área compartilhada (`docs`/`infra`) | branch `agent/<agente>/<tema>` obrigatória |
+
+`git pull --rebase origin main && git push origin main` **não** substitui branch quando a tarefa tem vários commits — só vale para o caso de 1 commit acima.
+
 - Antes de abrir PR/merge: `git fetch origin && git rebase origin/main` (rebase só na **sua** branch).
 - Merge em `main`: **um por vez**, fast-forward, com a árvore limpa.
 
@@ -98,9 +108,11 @@ git push -u origin HEAD
 
 | Agente | Área principal | Observação |
 |--------|----------------|------------|
-| `opencode` | `backend` + `infra` | APIs, controllers, rotas, deploy |
-| `antigravity` | `frontend-js` + `frontend-ui` | páginas, estilos, componentes |
-| ambos | `docs` | sempre com lock |
+| `opencode` | `backend` + `infra` + `scripts` | APIs, controllers, rotas, deploy, scripts de teste |
+| `antigravity` | `frontend-js` + `frontend-ui` + `docs` | páginas, estilos, componentes, documentação |
+
+`docs` tem dono (`antigravity`), que já produz a documentação do projeto. `opencode` pode editar `docs` apenas com lock e registro no state.
+`infra` é de `opencode`, mas é a área mais sensível: qualquer alteração exige lock e `git diff` revisado antes do commit.
 
 > Ajustável: se precisar mudar, edite esta tabela com lock em `infra` e avise no seu state.
 
@@ -115,6 +127,9 @@ git push -u origin HEAD
 | Arquivos por commit | ≤ 10 | commits pequenos, revisáveis |
 | Assunto do commit | ≤ 72 caracteres | corpo só se necessário |
 | Saída de terminal | filtrar | `Select-Object -First 30`, `git diff --stat` em vez de `git diff` completo |
+| Comandos de inspeção | agrupar | `git status; git log --oneline -3; git diff --stat` numa só chamada |
+| Git em segundo plano | evitar | processo longo segura `.git/index.lock` e trava o outro agente |
+| Rate limit / cota | 1 suíte longa por vez | enquanto um roda testes, o outro faz análise estática |
 | Estado entre sessões | ≤ 40 linhas | `.agents/state/<agente>.md` |
 | Escopo | 1 tarefa por vez | sem refatoração fora do escopo, sem abstração nova não pedida |
 | Sincronização | `git diff --stat` + `git log --oneline -5` | não reler o repositório inteiro para saber o que mudou |
@@ -172,12 +187,12 @@ Se os dois tentarem a mesma área, **quem criar o lock primeiro ganha**; o outro
 
 ---
 
-## 10. Arquivo legado `.agents-sync.json`
+## 10. Histórico: `.agents-sync.json` (removido)
 
-O `antigravity` iniciou um `.agents-sync.json` (adicionado ao `.gitignore` em 24/11 08:16).
-**Está descontinuado:** o mecanismo oficial de lock é `.agents/locks/<area>/` (seção 3).
+Em 24/11/2026 o `antigravity` criou um `.agents-sync.json` como trava de arquivos e depois **removeu**, adotando os locks atômicos da seção 3.
 
-Motivo: `.agents-sync.json` está no `.gitignore`, então não sincroniza pelo GitHub, e um JSON não tem escrita atômica — dois agentes podem gravá-lo ao mesmo tempo e um sobrescreve o outro. O diretório de lock resolve isso por criação atômica.
-
-Se você já tiver criado `.agents-sync.json`, pode apagá-lo. Nada no projeto depende dele.
+**Não recrie esse arquivo.** Motivos, para não se repetir o erro:
+- estava no `.gitignore` → não sincronizava pelo GitHub;
+- JSON não tem escrita atômica: dois agentes leem `idle`, os dois gravam `busy`, o último sobrescreve e **ambos editam o mesmo arquivo** (TOCTOU);
+- o lock por diretório falha na criação, então a exclusão mútua é garantida pelo sistema de arquivos.
 
