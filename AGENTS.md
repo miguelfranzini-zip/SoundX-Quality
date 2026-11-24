@@ -185,6 +185,20 @@ Se os dois tentarem a mesma área, **quem criar o lock primeiro ganha**; o outro
 - Arquivo que você editou mudou sozinho (`git status`) → o outro agente está nele. Saia da área, avise no state.
 - Conflito de merge → resolva **só** nos arquivos da sua área; se envolver área alheia, reverta seu commit e reabra a tarefa.
 
+### O índice do Git é compartilhado
+
+Os dois agentes usam o **mesmo** `.git/index` (mesmo diretório, mesmo `.git`). Isso cria um risco que nenhuma branch resolve:
+
+> Se você roda `git add` e demora para commitar, o `git commit` do outro agente pode **levar seus arquivos junto** — e o commit dele passa a conter mudanças da sua área.
+
+Regra: encadeie sempre na **mesma chamada**, sem pausa entre elas:
+
+```powershell
+git add <arquivos-explicitos>; git commit -m "tipo(escopo): resumo"
+```
+
+Se o `commit` falhar por `.git/index.lock`, **não** apague o lock: aguarde o outro agente terminar e repita o par `add; commit`.
+
 ---
 
 ## 10. Histórico: `.agents-sync.json` (removido)
