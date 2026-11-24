@@ -924,13 +924,79 @@ const localProvider = {
 };
 
 // ============================================================
-// Pool PostgreSQL (Supabase)
+// Pool PostgreSQL (Supabase) com Resiliência para Cold Start
 // ============================================================
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }  // necessário para Supabase
+  ssl: { rejectUnauthorized: false },  // necessário para Supabase
+  connectionTimeoutMillis: 10000,      // 10s de timeout de conexão para absorver cold start
+  idleTimeoutMillis: 30000,            // fecha conexões ociosas após 30s
+  max: 10,                             // limite equilibrado para ambientes serverless
+  allowExitOnIdle: true
 });
+
+// Detecção avançada de erros de inicialização / cold start do Supabase
+function isColdStartError(error) {
+  if (!error) return false;
+  const msg = String(error.message || '').toLowerCase();
+  const code = String(error.code || '');
+  return (
+    code === 'ECONNREFUSED' ||
+    code === 'ENOTFOUND' ||
+    code === '57P01' || // admin_shutdown
+    code === '57P02' || // crash_shutdown
+    code === '57P03' || // cannot_connect_now (database starting up)
+    code === 'ETIMEDOUT' ||
+    code === 'PROTOCOL_CONNECTION_LOST' ||
+    msg.includes('etimedout') ||
+    msg.includes('timeout') ||
+    msg.includes('connection terminated') ||
+    msg.includes('connection refused') ||
+    msg.includes('the database system is starting up') ||
+    msg.includes('recovery in progress')
+  );
+}
+
+// Execução com retry exponencial para absorver os 15-45s de boot do Supabase
+async function executeWithRetry(operation, maxRetries = 3, baseDelayMs = 1500) {
+  let attempt = 0;
+  while (attempt < maxRetries) {
+    try {
+      return await operation();
+    } catch (err) {
+      attempt++;
+      if (isColdStartError(err) && attempt < maxRetries) {
+        const delay = baseDelayMs * Math.pow(2, attempt - 1);
+        console.warn(`⏳ [Supabase Cold Start] Tentativa ${attempt} falhou (${err.message}). Aguardando ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
+let connectionState = {
+  isChecking: false,
+  lastCheck: 0,
+  isOnline: false
+};
+
+async function pingDatabase() {
+  if (!process.env.DATABASE_URL) {
+    return { ok: false, reason: 'DATABASE_URL_NOT_CONFIGURED' };
+  }
+  try {
+    const res = await pool.query('SELECT 1 as ping;');
+    connectionState.isOnline = true;
+    useLocalFallback = false;
+    return { ok: true, provedor: 'postgresql_supabase', ping: res.rows?.[0]?.ping === 1 };
+  } catch (err) {
+    connectionState.isOnline = false;
+    return { ok: false, reason: err.message, cold_start: isColdStartError(err) };
+  }
+}
 
 let schemaEnsured = false;
 async function ensureSchema(clientOrPool) {
@@ -1146,25 +1212,39 @@ async function withTransaction(callback) {
 
 module.exports = {
   async query(sql, params) {
-    if (useLocalFallback || !process.env.DATABASE_URL) {
+    if (!process.env.DATABASE_URL) {
       return localProvider.query(sql, params);
     }
+
+    // Auto-Recovery: se entrou em fallback, tenta reconectar periodicamente a cada 30 segundos
+    if (useLocalFallback) {
+      const now = Date.now();
+      if (!connectionState.isChecking && (now - connectionState.lastCheck > 30000)) {
+        connectionState.isChecking = true;
+        connectionState.lastCheck = now;
+        pingDatabase().then(status => {
+          connectionState.isChecking = false;
+          if (status.ok) {
+            console.log('🔄 [Supabase Recovery] Supabase reativado com sucesso! Restaurando conexão.');
+            useLocalFallback = false;
+          }
+        }).catch(() => { connectionState.isChecking = false; });
+      }
+      return localProvider.query(sql, params);
+    }
+
     try {
-      return await pgQuery(sql, params);
+      return await executeWithRetry(() => pgQuery(sql, params));
     } catch (error) {
-      if (
-        error.code === 'ECONNREFUSED' ||
-        error.code === 'ENOTFOUND' ||
-        error.code === 'PROTOCOL_CONNECTION_LOST' ||
-        error.message?.includes('connect ETIMEDOUT')
-      ) {
+      if (isColdStartError(error)) {
         if (process.env.NODE_ENV !== 'production') {
           useLocalFallback = true;
-          console.log('⚡ Alternando para o provedor de dados local devido a erro de conexão Supabase.');
+          console.log('⚡ Alternando temporariamente para o provedor local devido a cold start do Supabase.');
           return localProvider.query(sql, params);
         } else {
-          const falha = new Error('Banco de dados indisponível.');
+          const falha = new Error('O banco de dados seguro está em inicialização após período de inatividade. Por favor, aguarde alguns instantes e tente novamente.');
           falha.status = 503;
+          falha.code = 'DATABASE_WARMING_UP';
           throw falha;
         }
       }
@@ -1172,10 +1252,14 @@ module.exports = {
     }
   },
   withTransaction,
-  getProviderStatus() {
+  async getProviderStatus() {
+    const ping = await pingDatabase();
     return {
-      provedor: (useLocalFallback || !process.env.DATABASE_URL) ? 'local_json' : 'postgresql_supabase',
-      database_url_configurada: Boolean(process.env.DATABASE_URL)
+      provedor: ping.ok ? 'postgresql_supabase' : (useLocalFallback ? 'local_json' : 'supabase_warming_up'),
+      database_url_configurada: Boolean(process.env.DATABASE_URL),
+      supabase_conectado: ping.ok,
+      status_conexao: ping.ok ? 'pronto' : (ping.cold_start ? 'inicializando_cold_start' : 'falha'),
+      mensagem: ping.ok ? 'Operação normal' : (ping.cold_start ? 'Supabase reativando após inatividade' : (ping.reason || 'Conectando'))
     };
   }
 };

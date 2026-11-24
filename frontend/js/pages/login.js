@@ -60,7 +60,12 @@ form.addEventListener('submit', async (e) => {
       window.location.href = paginaInicialPorCargo(dados.usuario?.cargo);
     }, 800);
   } catch (erro) {
-    exibirAlerta(erro.message || 'Não foi possível conectar ao servidor.');
+    const msg = erro.message || '';
+    if (msg.includes('inicializando') || msg.includes('inatividade') || msg.includes('acordando')) {
+      exibirAlerta('O banco de dados está acordando da inatividade. Aguarde alguns segundos e tente entrar novamente.');
+    } else {
+      exibirAlerta(msg || 'Não foi possível conectar ao servidor.');
+    }
   } finally {
     btnEntrar.disabled = false;
     btnEntrar.textContent = 'Entrar';

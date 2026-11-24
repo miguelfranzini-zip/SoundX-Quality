@@ -104,16 +104,25 @@ app.use('/api/manutencao', manutencaoRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/user-auth', userAuthRoutes);
 
-// Health check & Diagnóstico do Provedor
+// Health check & Diagnóstico do Provedor (com verificação ativa de cold start)
 const db = require('./config/database');
-app.get('/api/status', (req, res) => {
-  const providerInfo = db.getProviderStatus ? db.getProviderStatus() : {};
-  res.json({
-    status: 'online',
-    versao: '1.0.0',
-    ...providerInfo,
-    timestamp: new Date()
-  });
+app.get('/api/status', async (req, res) => {
+  try {
+    const providerInfo = db.getProviderStatus ? await db.getProviderStatus() : {};
+    res.json({
+      status: 'online',
+      versao: '1.0.0',
+      ...providerInfo,
+      timestamp: new Date()
+    });
+  } catch (err) {
+    res.status(503).json({
+      status: 'inicializando',
+      versao: '1.0.0',
+      erro: err.message,
+      timestamp: new Date()
+    });
+  }
 });
 
 // Reset administrativo do banco de dados local (mantém apenas os usuários seed)
