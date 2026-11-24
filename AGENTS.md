@@ -169,3 +169,15 @@ Se os dois tentarem a mesma área, **quem criar o lock primeiro ganha**; o outro
 - `.git/index.lock` existente → outro agente está commitando. Aguarde 30s, não apague o arquivo à força.
 - Arquivo que você editou mudou sozinho (`git status`) → o outro agente está nele. Saia da área, avise no state.
 - Conflito de merge → resolva **só** nos arquivos da sua área; se envolver área alheia, reverta seu commit e reabra a tarefa.
+
+---
+
+## 10. Arquivo legado `.agents-sync.json`
+
+O `antigravity` iniciou um `.agents-sync.json` (adicionado ao `.gitignore` em 24/11 08:16).
+**Está descontinuado:** o mecanismo oficial de lock é `.agents/locks/<area>/` (seção 3).
+
+Motivo: `.agents-sync.json` está no `.gitignore`, então não sincroniza pelo GitHub, e um JSON não tem escrita atômica — dois agentes podem gravá-lo ao mesmo tempo e um sobrescreve o outro. O diretório de lock resolve isso por criação atômica.
+
+Se você já tiver criado `.agents-sync.json`, pode apagá-lo. Nada no projeto depende dele.
+
