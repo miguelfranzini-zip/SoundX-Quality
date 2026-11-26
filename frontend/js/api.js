@@ -11,7 +11,7 @@ function getToken() {
 
 export function logoutRedireciona() {
   localStorage.removeItem(SESSION_KEY);
-  window.location.href = 'index.html';
+  window.location.replace('index.html');
 }
 
 export async function testarStatusApi(urlAlvo) {

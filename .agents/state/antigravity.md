@@ -1,23 +1,22 @@
 # antigravity — estado da sessão
 
 ## Agora
-tarefa: sistema de acessibilidade e suporte (FAB, painéis, tour e alto contraste) concluído
-branch: main
+tarefa: auditoria Lighthouse e proteção de abas sem login concluídas
+branch: agent/antigravity/acessibilidade-suporte
 lock: nenhum
-arquivos: frontend/css/accessibility.css, frontend/js/accessibility.js, frontend/css/tokens.css, frontend/css/base.css, frontend/js/ui.js, frontend/*.html
+arquivos: AVALIACAO-LIGHTHOUSE.md, frontend/robots.txt, frontend/manifest.json, frontend/index.html, frontend/js/auth.js, frontend/js/api.js, frontend/*.html
 
 ## Feito nesta sessão
-- Planejamento aprovado pelo usuário (plano-acessibilidade-suporte.md)
-- Adicionados tokens de escala e modos de acessibilidade (tokens.css e base.css)
-- Criado frontend/css/accessibility.css com Alto Contraste (WCAG AAA), estilo do FAB stack, painéis modal, switches, acordeão de FAQ e tour spotlight
-- Criado frontend/js/accessibility.js com gerenciador SoundXAccessibility, persistência em localStorage, atalhos de teclado (Alt+1~5, Alt+A, Alt+S, Esc), tour guiado interativo e formulário de suporte
-- Integrado hook de inicialização global em ui.js e prevenções de FOUC em todos os 16 arquivos HTML
-- Adicionada Seção 5 no Manual do Usuário (manual.html) documentando o sistema de acessibilidade
-- Sintaxe JS validada (21 arquivos, 0 erros) e build.mjs executado com sucesso
-- Locks frontend-js e frontend-ui liberados
+- Criado AVALIACAO-LIGHTHOUSE.md detalhando o diagnóstico dos 104 erros no robots.txt e plano completo dos 5 pilares do Lighthouse
+- Criado frontend/robots.txt e frontend/manifest.json
+- Inseridas meta tags de SEO, theme-color, preconnect, Open Graph, JSON-LD e dimensões de imagens (CLS 0) no index.html
+- Implementada proteção síncrona contra acesso não autenticado no <head> de todas as 13 páginas protegidas
+- Implementada sincronização reativa entre abas via eventos storage e visibilitychange no auth.js
+- Atualizado manual.html com guardPagina
+- Locks liberados
 
 ## Próximo
-- Aguardar novas solicitações do usuário ou testes do time
+- Apresentar o documento AVALIACAO-LIGHTHOUSE.md e as correções ao usuário
 
 ## Bloqueios
 - nenhum

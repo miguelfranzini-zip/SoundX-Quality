@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/layout.css?v=2">
   <link rel="stylesheet" href="css/components.css?v=4">
     <link rel="stylesheet" href="css/accessibility.css">
-  <script>(function(){try{if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');if(localStorage.getItem('sxq_a11y_contrast')==='alto')document.documentElement.classList.add('sxq-hc');var fs=localStorage.getItem('sxq_a11y_font_size');if(fs)document.documentElement.style.setProperty('--sxq-font-size',fs);if(localStorage.getItem('sxq_a11y_reduced_motion')==='true')document.documentElement.classList.add('sxq-no-motion');if(localStorage.getItem('sxq_a11y_focus_visible')==='true')document.documentElement.classList.add('sxq-focus-visible');}catch(e){}})();</script>
+  <script>(function(){try{var s=localStorage.getItem('sxq_session');var sess=s?JSON.parse(s):null;if(!sess||!sess.token){window.location.replace('index.html');return;}if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');if(localStorage.getItem('sxq_a11y_contrast')==='alto')document.documentElement.classList.add('sxq-hc');var fs=localStorage.getItem('sxq_a11y_font_size');if(fs)document.documentElement.style.setProperty('--sxq-font-size',fs);if(localStorage.getItem('sxq_a11y_reduced_motion')==='true')document.documentElement.classList.add('sxq-no-motion');if(localStorage.getItem('sxq_a11y_focus_visible')==='true')document.documentElement.classList.add('sxq-focus-visible');}catch(e){window.location.replace('index.html');}})();</script>
   <style>
     .manual-container {
       max-width: 960px;
@@ -393,10 +393,10 @@
   <div id="toast-container" class="toast-container"></div>
   <script src="js/env-config.js"></script>
   <script type="module">
-    import { getUsuario } from './js/auth.js';
+    import { guardPagina } from './js/auth.js';
     import { initShell } from './js/ui.js?v=4';
 
-    const usuario = getUsuario();
+    const usuario = guardPagina();
     if (usuario) {
       initShell('manual', usuario);
     }

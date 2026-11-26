@@ -50,11 +50,30 @@ export function isAdminGerente(cargo) {
   return c === 'admin' || c === 'gerente';
 }
 
+export function configurarProtecaoAbas() {
+  if (typeof window === 'undefined') return;
+
+  // Escuta logout ou remoção da sessão feita em outra aba
+  window.addEventListener('storage', (event) => {
+    if (event.key === SESSION_KEY && !event.newValue) {
+      window.location.replace('index.html');
+    }
+  });
+
+  // Ao focar ou alternar de volta para a aba, se não estiver logado, redireciona
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && !estaAutenticado()) {
+      window.location.replace('index.html');
+    }
+  });
+}
+
 export function guardPagina(cargosPermitidos = null) {
   if (!estaAutenticado()) {
     logoutRedireciona();
     return null;
   }
+  configurarProtecaoAbas();
   const usuario = getUsuario();
   if (cargosPermitidos) {
     const cUser = normalizarCargo(usuario?.cargo);

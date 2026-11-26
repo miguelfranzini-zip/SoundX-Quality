@@ -1,0 +1,12 @@
+# robots.txt para SoundX Quality
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /documentacao.html
+Allow: /manual.html
+
+# Bloqueia rotas de API e dados internos
+Disallow: /api/
+Disallow: /backend/
+
+Sitemap: https://soundx-quality.netlify.app/sitemap.xml
