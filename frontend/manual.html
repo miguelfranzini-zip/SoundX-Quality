@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -11,7 +11,8 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css?v=2">
   <link rel="stylesheet" href="css/components.css?v=4">
-  <script>if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');</script>
+    <link rel="stylesheet" href="css/accessibility.css">
+  <script>(function(){try{if(localStorage.getItem('sxq_sidebar_collapsed')==='true')document.documentElement.classList.add('sxq-collapsed');if(localStorage.getItem('sxq_a11y_contrast')==='alto')document.documentElement.classList.add('sxq-hc');var fs=localStorage.getItem('sxq_a11y_font_size');if(fs)document.documentElement.style.setProperty('--sxq-font-size',fs);if(localStorage.getItem('sxq_a11y_reduced_motion')==='true')document.documentElement.classList.add('sxq-no-motion');if(localStorage.getItem('sxq_a11y_focus_visible')==='true')document.documentElement.classList.add('sxq-focus-visible');}catch(e){}})();</script>
   <style>
     .manual-container {
       max-width: 960px;
@@ -143,6 +144,7 @@
               <a href="#persona-tecnico" class="btn btn--ghost btn--pequeno">2. Guia do Técnico</a>
               <a href="#persona-gerente" class="btn btn--ghost btn--pequeno">3. Guia do Gerente & Admin</a>
               <a href="#secao-glossario" class="btn btn--ghost btn--pequeno">4. Glossário de Indicadores</a>
+              <a href="#secao-acessibilidade" class="btn btn--ghost btn--pequeno">5. Acessibilidade & Suporte</a>
             </div>
           </div>
 
@@ -333,6 +335,53 @@
                 <strong>Lote de Produção</strong>
                 <span>Identificador da remessa de fabricação (ex: <code>LT-2026-A</code>) que permite auditoria de componentes e isolamento de falhas em série.</span>
               </div>
+            </div>
+          </section>
+
+          <!-- 5. SISTEMA DE ACESSIBILIDADE & SUPORTE -->
+          <section class="manual-secao" id="secao-acessibilidade">
+            <h2>
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--laranja);"><circle cx="12" cy="4" r="2"></circle><path d="M4 8h16"></path><path d="M12 8v8"></path><path d="M8 20l4-4 4 4"></path></svg>
+              5. Recursos de Acessibilidade & Suporte Integrado
+            </h2>
+            <p class="muted">
+              Ferramentas de inclusão, conformidade WCAG 2.1 AA e assistência rápida disponíveis em todas as telas.
+            </p>
+
+            <div class="manual-passo">
+              <div class="passo-numero">1</div>
+              <div class="passo-conteudo">
+                <h4>Botões Flutuantes (FAB Stack)</h4>
+                <p>No canto inferior direito de qualquer tela, estão disponíveis dois botões de acesso rápido: <strong>Acessibilidade (♿)</strong> e <strong>Suporte & Ajuda (❓)</strong>. Você também pode acioná-los pelos atalhos <code>Alt + A</code> e <code>Alt + S</code>.</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">2</div>
+              <div class="passo-conteudo">
+                <h4>Alto Contraste & Escala Tipográfica</h4>
+                <p>O modo <em>Alto Contraste</em> atende aos critérios WCAG AAA para uso em ambientes industriais com alta ou baixa luminosidade. É possível escolher entre 4 tamanhos de fonte (90%, 100%, 115% e 130%) com persistência automática no seu navegador.</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">3</div>
+              <div class="passo-conteudo">
+                <h4>Navegação 100% por Teclado</h4>
+                <p>Operadores que utilizam terminais de chão de fábrica sem mouse podem navegar por atalhos: <code>Alt + 1</code> (Dashboard), <code>Alt + 2</code> (Fones), <code>Alt + 3</code> (Inspeções), <code>Alt + 4</code> (Testes), <code>Alt + 5</code> (Manutenção) e <code>Esc</code> para fechar janelas.</p>
+              </div>
+            </div>
+
+            <div class="manual-passo">
+              <div class="passo-numero">4</div>
+              <div class="passo-conteudo">
+                <h4>Tour Interativo & FAQ Operacional</h4>
+                <p>Ao abrir o menu de suporte, selecione a aba <em>Tour da Tela</em> para iniciar uma visita guiada destacando os principais controles da página atual, ou consulte a aba <em>Dúvidas (FAQ)</em> para respostas imediatas.</p>
+              </div>
+            </div>
+
+            <div class="destaque-box">
+              ♿ <strong>Inclusão Industrial:</strong> Ativação de <em>Reduzir Animações</em> e <em>Foco Visível Reforçado</em> garantem ergonomia visual e segurança operacional para todos os operadores.
             </div>
           </section>
 

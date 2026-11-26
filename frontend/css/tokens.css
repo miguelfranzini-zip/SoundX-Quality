@@ -85,4 +85,7 @@
   /* Breakpoints */
   --bp-desktop: 1024px;
   --bp-tablet: 768px;
+
+  /* Acessibilidade & Escala */
+  --sxq-font-size: 100%;
 }

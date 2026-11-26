@@ -1,0 +1,802 @@
+/* =========================================================
+   SOUNDX QUALITY — ACESSIBILIDADE & SUPORTE
+   ========================================================= */
+
+/* ---------- TEMA ALTO CONTRASTE (WCAG AAA) ---------- */
+html.sxq-hc {
+  --bg-base:           #000000;
+  --bg-alternativo:    #121212;
+  --bg-dark:           #000000;
+  --card-bg:           #141414;
+  --text-primario:     #FFFFFF;
+  --text-secundario:   #FFFF00;
+  --text-suave:        #EAEAEA;
+  --border:            #FFFF00;
+  
+  --laranja:           #FFD700;
+  --dourado:           #FFE066;
+  --marrom:            #FFFF00;
+  --marrom-profundo:   #FFFFFF;
+  --terracota:         #FFA500;
+  --marrom-quente:     #FFD700;
+
+  --sucesso:           #00FF66;
+  --sucesso-bg:        #003311;
+  --atencao:           #FFFF00;
+  --atencao-bg:        #333300;
+  --erro:              #FF4444;
+  --erro-bg:           #440000;
+  --info:              #00E5FF;
+  --info-bg:           #002B36;
+
+  --grad-base:         linear-gradient(135deg, #000000 0%, #1e1e1e 100%);
+  --grad-energia:      linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  --grad-suave:        linear-gradient(135deg, #1e1e1e 0%, #111111 100%);
+  --grad-dark:         linear-gradient(135deg, #000000 0%, #222222 100%);
+  --grad-forte:        linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+
+  color-scheme: dark;
+}
+
+html.sxq-hc body {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+html.sxq-hc .card,
+html.sxq-hc .topbar,
+html.sxq-hc .sidebar,
+html.sxq-hc .grafico-card,
+html.sxq-hc .tabela-container,
+html.sxq-hc .modal__conteudo,
+html.sxq-hc .inspecao-card,
+html.sxq-hc .fone-card,
+html.sxq-hc .kpi-card,
+html.sxq-hc .banner-cold-start,
+html.sxq-hc .login__lado-formulario {
+  background: #121212 !important;
+  border: 2px solid #FFFF00 !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+
+html.sxq-hc .sidebar__brand,
+html.sxq-hc .sidebar__footer,
+html.sxq-hc .topbar__dropdown,
+html.sxq-hc .filtro-periodo-bar {
+  border-color: #FFFF00 !important;
+}
+
+html.sxq-hc input,
+html.sxq-hc select,
+html.sxq-hc textarea {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #FFFF00 !important;
+}
+
+html.sxq-hc input:focus,
+html.sxq-hc select:focus,
+html.sxq-hc textarea:focus {
+  outline: 3px solid #FFFF00 !important;
+  background: #111111 !important;
+}
+
+html.sxq-hc .btn--primario,
+html.sxq-hc .btn--dourado {
+  background: #FFD700 !important;
+  color: #000000 !important;
+  border: 2px solid #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+html.sxq-hc .btn--secundario,
+html.sxq-hc .btn--ghost {
+  background: #000000 !important;
+  border: 2px solid #FFFF00 !important;
+  color: #FFFF00 !important;
+}
+
+html.sxq-hc .badge {
+  border: 1px solid currentColor !important;
+  font-weight: 800 !important;
+}
+
+html.sxq-hc a {
+  color: #FFFF00 !important;
+  text-decoration: underline !important;
+}
+
+/* ---------- FAB GROUP (BOTÕES FLUTUANTES) ---------- */
+.sxq-fab-group {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 12px;
+  z-index: 9998;
+  pointer-events: none;
+}
+
+.sxq-fab-btn {
+  pointer-events: auto;
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  background: var(--grad-energia);
+  color: var(--marrom-profundo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(96, 33, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+  outline: none;
+}
+
+.sxq-fab-btn:hover {
+  transform: translateY(-3px) scale(1.06);
+  box-shadow: 0 8px 24px rgba(255, 152, 0, 0.48);
+}
+
+.sxq-fab-btn:active {
+  transform: translateY(0) scale(0.96);
+}
+
+.sxq-fab-btn svg {
+  width: 25px;
+  height: 25px;
+  stroke-width: 2.2;
+  transition: transform var(--transition);
+}
+
+.sxq-fab-btn--suporte {
+  background: linear-gradient(135deg, #FFBD2B 0%, #FF9800 100%);
+}
+
+.sxq-fab-btn--acessibilidade {
+  background: linear-gradient(135deg, #FC9C2E 0%, #8D4622 100%);
+  color: #FFFFFF;
+}
+
+.sxq-fab-btn.sxq-active {
+  background: var(--marrom-profundo);
+  color: #FFF;
+  border-color: var(--dourado);
+  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.6);
+}
+
+.sxq-fab-btn .sxq-fab-tooltip {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--marrom-profundo);
+  color: #FFFFFF;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.sxq-fab-btn:hover .sxq-fab-tooltip,
+.sxq-fab-btn:focus-visible .sxq-fab-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+/* ---------- OVERLAY ESCURO ---------- */
+.sxq-a11y-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(41, 14, 0, 0.48);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s var(--ease-spring), visibility 0.25s;
+}
+
+.sxq-a11y-overlay.sxq-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ---------- PAINEL FLUTUANTE (DRAWER/MODAL) ---------- */
+.sxq-panel {
+  position: fixed;
+  bottom: 86px;
+  right: 24px;
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 110px);
+  background: #FFFFFF;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(96, 33, 0, 0.12);
+  box-shadow: 0 20px 48px -8px rgba(41, 14, 0, 0.35), 0 8px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 10001;
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.28s var(--ease-spring), transform 0.28s var(--ease-spring), visibility 0.28s;
+  overflow: hidden;
+}
+
+.sxq-panel.sxq-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* Header do Painel */
+.sxq-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-alternativo);
+  border-bottom: 1px solid var(--border);
+  gap: var(--space-3);
+}
+
+.sxq-panel__title-box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sxq-panel__icon {
+  width: 24px;
+  height: 24px;
+  color: var(--laranja);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sxq-panel__title {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--marrom);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sxq-panel__badge {
+  font-size: 0.68rem;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  background: var(--laranja);
+  color: #FFF;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.sxq-panel__btn-close {
+  background: transparent;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secundario);
+  transition: all var(--transition);
+  cursor: pointer;
+}
+
+.sxq-panel__btn-close:hover {
+  background: rgba(96, 33, 0, 0.08);
+  color: var(--erro);
+  transform: scale(1.1);
+}
+
+.sxq-panel__btn-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Corpo do Painel */
+.sxq-panel__body {
+  padding: var(--space-5);
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Seções de Opções */
+.sxq-section-title {
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 700;
+  color: var(--text-suave);
+  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Grade de Botões de Opção */
+.sxq-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.sxq-opt-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  background: var(--off-white);
+  color: var(--text-primario);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  gap: var(--space-1);
+}
+
+.sxq-opt-btn:hover {
+  border-color: var(--laranja);
+  background: #FFF;
+  transform: translateY(-2px);
+}
+
+.sxq-opt-btn.sxq-active {
+  border-color: var(--laranja);
+  background: rgba(255, 152, 0, 0.12);
+  color: var(--marrom-profundo);
+  box-shadow: 0 0 0 1px var(--laranja);
+}
+
+.sxq-opt-btn svg {
+  width: 22px;
+  height: 22px;
+  color: var(--laranja);
+}
+
+/* Botões de Tamanho de Fonte (A- / P / A+ / A++) */
+.sxq-font-sizes {
+  display: flex;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.sxq-font-btn {
+  flex: 1;
+  padding: var(--space-2) var(--space-1);
+  text-align: center;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--off-white);
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--marrom);
+  transition: all var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.sxq-font-btn:hover {
+  border-color: var(--laranja);
+  background: #FFF;
+}
+
+.sxq-font-btn.sxq-active {
+  background: var(--laranja);
+  color: #FFF;
+  border-color: var(--laranja);
+}
+
+.sxq-font-btn span.label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* Switches / Toggles */
+.sxq-switch-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  background: var(--off-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  gap: var(--space-3);
+}
+
+.sxq-switch-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sxq-switch-label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primario);
+}
+
+.sxq-switch-desc {
+  font-size: 0.78rem;
+  color: var(--text-suave);
+  line-height: 1.3;
+}
+
+/* Toggle Switch Visual */
+.sxq-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.sxq-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.sxq-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #D1C5B4;
+  border-radius: 34px;
+  transition: .3s var(--ease-spring);
+}
+
+.sxq-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .3s var(--ease-spring);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.sxq-toggle input:checked + .sxq-toggle-slider {
+  background-color: var(--laranja);
+}
+
+.sxq-toggle input:checked + .sxq-toggle-slider:before {
+  transform: translateX(20px);
+}
+
+/* Tabela de Atalhos */
+.sxq-shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sxq-shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  background: var(--off-white);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.sxq-shortcut-item kbd {
+  background: var(--marrom-profundo);
+  color: #FFF;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  font-family: monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Footer do Painel */
+.sxq-panel__footer {
+  padding: var(--space-3) var(--space-5);
+  background: var(--bg-alternativo);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ---------- PAINEL DE SUPORTE: ABAS ---------- */
+.sxq-tabs-nav {
+  display: flex;
+  background: var(--off-white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 var(--space-4);
+  gap: var(--space-2);
+  overflow-x: auto;
+}
+
+.sxq-tab-btn {
+  padding: var(--space-3) var(--space-2);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secundario);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.sxq-tab-btn:hover {
+  color: var(--laranja);
+}
+
+.sxq-tab-btn.sxq-active {
+  color: var(--laranja);
+  border-bottom-color: var(--laranja);
+}
+
+.sxq-tab-content {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sxq-tab-content.sxq-active {
+  display: flex;
+}
+
+/* Acordeão de FAQ */
+.sxq-faq-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--off-white);
+  overflow: hidden;
+  transition: all var(--transition);
+}
+
+.sxq-faq-header {
+  padding: var(--space-3) var(--space-4);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--marrom);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  background: transparent;
+  width: 100%;
+  border: none;
+  text-align: left;
+}
+
+.sxq-faq-header:hover {
+  background: rgba(96, 33, 0, 0.04);
+}
+
+.sxq-faq-header svg {
+  width: 18px;
+  height: 18px;
+  color: var(--laranja);
+  transition: transform var(--transition);
+}
+
+.sxq-faq-item.sxq-expanded .sxq-faq-header svg {
+  transform: rotate(180deg);
+}
+
+.sxq-faq-body {
+  padding: 0 var(--space-4) var(--space-3) var(--space-4);
+  font-size: 0.85rem;
+  color: var(--text-primario);
+  line-height: 1.5;
+  display: none;
+}
+
+.sxq-faq-item.sxq-expanded .sxq-faq-body {
+  display: block;
+}
+
+/* CTA Tour Guiado */
+.sxq-tour-cta-card {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--grad-energia);
+  color: var(--marrom-profundo);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(255, 152, 0, 0.25);
+}
+
+.sxq-tour-cta-card h4 {
+  color: var(--marrom-profundo);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.sxq-tour-cta-card p {
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Card do Cargo */
+.sxq-role-card {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--off-white);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sxq-role-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sxq-role-card__title {
+  font-weight: 700;
+  color: var(--marrom);
+  font-size: 0.95rem;
+}
+
+.sxq-role-list {
+  padding-left: var(--space-4);
+  list-style-type: disc;
+  font-size: 0.85rem;
+  color: var(--text-primario);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Formulário de Contato */
+.sxq-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sxq-contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sxq-contact-field label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secundario);
+}
+
+.sxq-contact-field input,
+.sxq-contact-field select,
+.sxq-contact-field textarea {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-size: 0.88rem;
+}
+
+/* ---------- TOUR GUIADO (ELEMENTOS INTERATIVOS) ---------- */
+.sxq-tour-spotlight {
+  position: relative !important;
+  z-index: 10005 !important;
+  outline: 4px solid var(--laranja) !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65) !important;
+  border-radius: var(--radius-md);
+  transition: outline 0.25s, box-shadow 0.25s;
+}
+
+.sxq-tour-card {
+  position: fixed;
+  z-index: 10010;
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--laranja);
+  width: 330px;
+  max-width: calc(100vw - 32px);
+  animation: pageEnter 0.25s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sxq-tour-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sxq-tour-card__step {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--laranja);
+  background: rgba(255, 152, 0, 0.12);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.sxq-tour-card__title {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--marrom-profundo);
+}
+
+.sxq-tour-card__desc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-primario);
+  line-height: 1.45;
+}
+
+.sxq-tour-card__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-2);
+}
+
+/* ---------- RESPONSIVIDADE ---------- */
+@media (max-width: 600px) {
+  .sxq-panel {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+  .sxq-fab-group {
+    bottom: 16px;
+    right: 16px;
+  }
+}

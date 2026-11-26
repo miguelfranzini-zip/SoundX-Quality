@@ -1,4 +1,5 @@
 import { getUsuario, logoutRedireciona, cargoLabel, isAdminGerente, normalizarCargo } from './auth.js';
+import { initAccessibility } from './accessibility.js';
 
 // Previne flash/animação indevida ao alternar entre abas
 if (typeof localStorage !== 'undefined' && localStorage.getItem('sxq_sidebar_collapsed') === 'true') {
@@ -214,6 +215,9 @@ export function initShell(tituloAtivo, usuario) {
 
   // Inicializa tooltips flutuantes globais
   initTooltips();
+
+  // Inicializa sistema de acessibilidade e suporte
+  initAccessibility(usuario, tituloAtivo);
 }
 
 function tituloAtivoHumanizado(id) {
